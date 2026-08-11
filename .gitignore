@@ -1,2 +1,6 @@
 # Graphify (local knowledge graph — do not commit)
 graphify-out/
+
+# macOS
+.DS_Store
+
