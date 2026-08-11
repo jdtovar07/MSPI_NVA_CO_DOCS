@@ -9,6 +9,7 @@
 | Programa académico | Ingeniería de Sistemas |
 | Dirigido a | Profesor/asesor de trabajo de grado |
 | Fecha de elaboración | 2026-08-27 |
+| Última revisión cruzada con código | 2026-10-07 (`08-Referencia-API.md` alineada a controladores reales) |
 | Fuentes primarias | `Documentacion-investigacion/Documento-Investigacion.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; los 6 `03-Diseno.md` de `Documentacion-Frontend/`; [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI); `Documentacion-General/MER-MSPI.sql`; `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` y `DBvsExcel.md`; `docker-compose.apps.yml` / `docker-compose.front.yml` / `docker-compose.yml` (postgres, keycloak) |
 
 > **Nota de trazabilidad.** Cada afirmación técnica de este documento cita, entre paréntesis, el archivo del repositorio en el que se verificó. Cuando un dato no pudo confirmarse en ningún documento fuente, se declara explícitamente como no verificado en lugar de asumirse.
