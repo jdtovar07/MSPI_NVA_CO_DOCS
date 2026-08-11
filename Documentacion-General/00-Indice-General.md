@@ -32,9 +32,14 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) | Arquitectura completa del sistema: diagrama C4 de contenedores, tabla de los 8 microservicios y 6 microfrontends, diagrama de despliegue Docker, arquitectura de seguridad (Keycloak/JWT/RBAC/2FA/auditoría), capas hexagonales, decisiones arquitectónicas y deuda técnica conocida. |
 | [`02-Modelo-de-Dominio.md`](02-Modelo-de-Dominio.md) | Los 7 dominios (bounded contexts) del sistema + 2 placeholders, entidades principales con atributos reales, diagrama entidad-relación consolidado, patrón catálogo-vs-ejecución, mapa de módulos funcionales → microservicios y glosario de dominio (SGSI, PHVA, Anexo A, NIST CSF, etc.). |
 | [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) | Objetivo general y objetivos específicos en formato de referencia rápida, con trazabilidad a los módulos que los implementan y su estado real (implementado / con limitaciones / no implementado). |
-| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación interactivo de PostgreSQL (esquemas `iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`). Fuente local: [`MER-MSPI.sql`](MER-MSPI.sql) y [`MER-MSPI.pdf`](MER-MSPI.pdf). |
+| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación interactivo de PostgreSQL (esquemas `iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`). Fuente local: [`MER-MSPI.sql`](MER-MSPI.sql), [`MER-MSPI.dbml`](MER-MSPI.dbml) (DBML actualizado 1:1 con el DDL real ejecutado) y [`MER-MSPI.pdf`](MER-MSPI.pdf). |
+| [`04-Decisiones-Tecnicas-Complementarias.md`](04-Decisiones-Tecnicas-Complementarias.md) | Decisiones técnicas puntuales tomadas en la implementación de RBAC fino, catálogo (escalas/bancos de preguntas) y funcionalidades administrativas de `ms_iam` |
+| [`05-Manual-Despliegue.md`](05-Manual-Despliegue.md) | Cómo levantar el stack completo en Docker paso a paso |
+| [`06-Guia-Pruebas-Funcionales.md`](06-Guia-Pruebas-Funcionales.md) | Secuencia de flujos funcionales end-to-end para demostrar el sistema |
+| [`07-Manual-Usuario.md`](07-Manual-Usuario.md) | Qué puede hacer cada rol, en lenguaje de usuario final |
+| [`08-Referencia-API.md`](08-Referencia-API.md) | Índice consolidado de la API de los 6 microservicios |
 
-Estos tres documentos son el **punto de entrada recomendado para el profesor**: en menos de 30 minutos de lectura dan una visión completa de qué se construyó, cómo está arquitecturado y qué dominios de negocio cubre, sin tener que leer los 99 documentos técnicos detallados por componente.
+Estos documentos son el **punto de entrada recomendado para el profesor**: en menos de 30 minutos de lectura dan una visión completa de qué se construyó, cómo está arquitecturado y qué dominios de negocio cubre, sin tener que leer los 99 documentos técnicos detallados por componente.
 
 ## 4. Documentación técnica detallada por componente (ciclo de vida completo)
 

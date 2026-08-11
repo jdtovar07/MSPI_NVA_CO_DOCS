@@ -129,7 +129,12 @@ Punto de entrada recomendado para el asesor. En menos de 30 minutos da una visi�
 | [`01-Arquitectura-General-del-Sistema.md`](Documentacion-General/01-Arquitectura-General-del-Sistema.md) | C4, despliegue, seguridad, decisiones y deuda técnica |
 | [`02-Modelo-de-Dominio.md`](Documentacion-General/02-Modelo-de-Dominio.md) | Bounded contexts, entidades, ER y glosario |
 | [`03-Objetivos-del-Proyecto.md`](Documentacion-General/03-Objetivos-del-Proyecto.md) | Objetivo general y específicos, con trazabilidad a módulos |
-| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | MER interactivo; fuente SQL: [`MER-MSPI.sql`](Documentacion-General/MER-MSPI.sql) · PDF: [`MER-MSPI.pdf`](Documentacion-General/MER-MSPI.pdf) |
+| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | MER interactivo; fuente SQL: [`MER-MSPI.sql`](Documentacion-General/MER-MSPI.sql) · DBML: [`MER-MSPI.dbml`](Documentacion-General/MER-MSPI.dbml) · PDF: [`MER-MSPI.pdf`](Documentacion-General/MER-MSPI.pdf) |
+| [`04-Decisiones-Tecnicas-Complementarias.md`](Documentacion-General/04-Decisiones-Tecnicas-Complementarias.md) | Decisiones técnicas de RBAC fino, catálogo y funcionalidades administrativas |
+| [`05-Manual-Despliegue.md`](Documentacion-General/05-Manual-Despliegue.md) | Cómo levantar el stack completo en Docker |
+| [`06-Guia-Pruebas-Funcionales.md`](Documentacion-General/06-Guia-Pruebas-Funcionales.md) | Flujos funcionales end-to-end para demostración |
+| [`07-Manual-Usuario.md`](Documentacion-General/07-Manual-Usuario.md) | Manual de usuario final por rol |
+| [`08-Referencia-API.md`](Documentacion-General/08-Referencia-API.md) | Referencia consolidada de la API |
 
 ### Backend
 
