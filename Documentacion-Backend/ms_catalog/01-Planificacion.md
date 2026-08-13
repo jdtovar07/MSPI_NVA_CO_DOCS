@@ -26,9 +26,9 @@ MSPI es un sistema de gestión de seguridad de la información construido como u
 - **Catálogo de controles ISO 27001 Anexo A**: 14 dominios ISO (`iso-domains`), árbol jerárquico completo (`control-catalog-tree`), controles hoja calificables filtrables por rama `ADMIN`/`TECH` (`control-catalog-leaves`), y reglas de validación por control hoja (`control-rules`: evidencia/brecha/recomendación obligatorias).
 - **Escala de evaluación publicada** (`scales/published`): niveles 0–100 y bandas de semáforo.
 - **Mapeo de controles a NIST CSF** (`nist-mappings`).
-- **Ciclo PHVA**: catálogo de ~17 requisitos (`phva-items`) y configuración de pesos/topes por componente Plan/Do/Check/Act (`phva-config`).
+- **Ciclo PHVA**: catálogo versionado (`phva-items`) y pesos/topes Plan/Do/Check/Act (`phva-config`). **template_version v2**: 7 cláusulas ISO `C.4`–`C.10` (MANUAL) con pesos/caps **56/16/14/14**; v1 conserva ~17 ítems `P.1`…`M.2` con 40/20/20/20.
 - **Requisitos de madurez**: ~50 ítems Rn (`maturity-requirements`) con umbrales por nivel 1–5, y configuración de umbrales críticos (`maturity-config`).
-- **Hoja Ciber (NIST CSF)**: ~188 filas (`nist-ciber-items`) y metas por función NIST ID/PR/DE/RS/RC (`nist-config`).
+- **Hoja Ciber (NIST CSF)**: filas `nist-ciber-items` y metas (`nist-config`). **v2 = CSF 2.0**: 6 funciones (**GV/Gobernar**, ID, PR, DE, RS, RC) y 22 categorías MANUAL; v1 = enfoque CSF 1.1 (5 funciones + filas heredadas).
 
 Todo el catálogo es **inmutable en tiempo de ejecución** desde la perspectiva del microservicio: `ms_catalog` no expone ningún endpoint de escritura (no hay `POST`/`PUT`/`PATCH`/`DELETE` en `CatalogApi`); la administración del contenido del instrumento se realiza fuera de este microservicio (scripts SQL versionados, `schema.sql` + `data.sql`/`nist_ciber_data.sql`/`maturity_data.sql`).
 

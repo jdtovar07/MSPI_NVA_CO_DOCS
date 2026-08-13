@@ -37,12 +37,12 @@ Derivados uno a uno de los 17 métodos de `CatalogApi` y sus casos de uso corres
 | RF-09 | Listar reglas de validación por control hoja (evidencia/brecha/recomendación obligatorias, tipo y umbral de recomendación) | `GetControlRulesUseCase` | `GET /catalog/control-rules` |
 | RF-10 | Obtener niveles y bandas de la escala de evaluación publicada, por `scaleVersionId` o por defecto la de la plantilla activa | `GetScalePublishedUseCase` | `GET /catalog/scales/published` |
 | RF-11 | Listar mapeos control ISO ↔ subcategoría NIST CSF, opcionalmente filtrados por `controlNodeId` | `GetNistMappingsUseCase` | `GET /catalog/nist-mappings` |
-| RF-12 | Listar ~17 requisitos del ciclo PHVA (Plan/Do/Check/Act) activos | `GetPhvaItemCatalogUseCase` | `GET /catalog/phva-items` |
+| RF-12 | Listar requisitos del ciclo PHVA (Plan/Do/Check/Act) activos de la plantilla (v1 ≈17 ítems `P.*`/`I.*`/`E.*`/`M.*`; v2 = 7 cláusulas `C.4`–`C.10`) | `GetPhvaItemCatalogUseCase` | `GET /catalog/phva-items` |
 | RF-13 | Obtener pesos y topes configurados por componente PHVA (JSON en `template_version`, con *fallback* 40/20/20/20) | `GetPhvaTemplateConfigUseCase` | `GET /catalog/phva-config` |
 | RF-14 | Listar ~50 requisitos de madurez (Rn) activos, con sus umbrales por nivel 1–5 | `GetMaturityRequirementCatalogUseCase` | `GET /catalog/maturity-requirements` |
 | RF-15 | Obtener umbrales SUFICIENTE/INTERMEDIO/CRÍTICO por nivel de madurez (JSON en `template_version`, con *fallback* embebido en código) | `GetMaturityTemplateConfigUseCase` | `GET /catalog/maturity-config` |
 | RF-16 | Listar ~188 filas de la hoja Ciber (ítems NIST CSF por función/subcategoría) activas | `GetNistCiberItemCatalogUseCase` | `GET /catalog/nist-ciber-items` |
-| RF-17 | Obtener metas por función NIST (ID/PR/DE/RS/RC) y valor ideal (JSON en `template_version`, con *fallback* 60% por función / 100 ideal) | `GetNistTemplateConfigUseCase` | `GET /catalog/nist-config` |
+| RF-17 | Obtener metas por función NIST CSF 2.0 (GV/ID/PR/DE/RS/RC) y valor ideal (JSON en `template_version`, con *fallback* 60% por función / 100 ideal; v2 incluye GV) | `GetNistTemplateConfigUseCase` | `GET /catalog/nist-config` |
 
 Todos los requerimientos son de **consulta (lectura)**; no existe ningún requerimiento funcional de creación, actualización o eliminación implementado como endpoint HTTP en este microservicio.
 
