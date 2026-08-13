@@ -138,20 +138,20 @@ flowchart LR
 | Grupo | Entidad | Atributos clave reales |
 |---|---|---|
 | Plantilla | `catalog.template` | `id`, `name (UK)` |
-| Plantilla | `catalog.template_version` | `id`, `template_id (FK)`, `scale_version_id (FK)`, `version`, `status (DRAFT\|PUBLISHED)`, `phva_weights (jsonb)`, `phva_caps (jsonb)`, `maturity_crit_thresholds (jsonb)`, `nist_function_targets (jsonb)` |
+| Plantilla | `catalog.template_version` | `id`, `template_id (FK)`, `scale_version_id (FK)`, `version`, `status (DRAFT\|PUBLISHED)`, `phva_weights (jsonb)`, `phva_caps (jsonb)`, `maturity_crit_thresholds (jsonb)`, `nist_function_targets (jsonb)`. **v1** (id `d000…001`): PHVA 40/20/20/20 y NIST CSF 1.1 (5 funciones). **v2** (id `d000…002`, `PUBLISHED`, activa por `published_at` más reciente): PHVA 56/16/14/14, 7 cláusulas ISO `C.4`–`C.10`, NIST CSF 2.0 (6 funciones incl. GV) |
 | Escala | `catalog.scale`, `catalog.scale_version`, `catalog.scale_level`, `catalog.scale_band` | Escala 0/20/40/60/80/100 + N/A; bandas de etiqueta (INEXISTENTE…OPTIMIZADO) |
 | Controles Anexo A | `catalog.iso_domain` | `code (PK)` — 14 dominios A.5..A.18, `control_type (ADMIN\|TECH)`, `display_position` |
-| Controles Anexo A | `catalog.control_catalog_node` | `id`, `template_version_id (FK)`, `parent_id (FK, árbol)`, `node_type (DOMAIN\|OBJECTIVE\|SUB_OBJECTIVE\|CONTROL)`, `control_type`, `code (AD.x / T.x)`, `iso_code (A.x.y.z)`, `is_scored (bool)`, `default_steward_role_code (ref.)` |
+| Controles Anexo A | `catalog.control_catalog_node` | `id`, `template_version_id (FK)`, `parent_id (FK, árbol)`, `node_type (DOMAIN\|OBJECTIVE\|SUB_OBJECTIVE\|CONTROL)`, `control_type`, `code (AD.x / T.x)`, `iso_code` (v1: estilo 2013 `A.x.y.z`; v2: numeración tipo ISO 27001:2022 sin prefijo `A.`, p. ej. `5.1`), `is_scored (bool)`, `default_steward_role_code (ref.)` |
 | Controles Anexo A | `catalog.control_rule` | `control_node_id (FK, UK)`, `requires_evidence`, `requires_gap`, `requires_recommendation`, `recommendation_rule_type` |
 | Responsables | `catalog.steward_role` | `code (PK)`, `label`, `sort_order` — cargos responsables del instrumento |
 | Responsables | `catalog.assessment_area_preset` | `code (PK)` — 8 áreas fijas de la hoja "Áreas involucradas" |
-| PHVA | `catalog.phva_item_catalog` | `id`, `template_version_id (FK)`, `code (P.1, I.2…)`, `component (PLAN\|DO\|CHECK\|ACT)`, `scoring_mode (MANUAL\|INHERITED)`, `inherit_rule`, `source_control_node_id (FK)` |
+| PHVA | `catalog.phva_item_catalog` | `id`, `template_version_id (FK)`, `code` (v1: `P.1`…`M.2`; v2: 7 cláusulas `C.4`…`C.10` MANUAL), `component (PLAN\|DO\|CHECK\|ACT)`, `scoring_mode (MANUAL\|INHERITED)`, `inherit_rule`, `source_control_node_id (FK)` |
 | Madurez | `catalog.maturity_requirement_catalog` | `id`, `code (R1..R55)`, `source_type (ADMIN\|TECH\|PHVA\|MATURITY)`, `scoring_mode`, `inherit_rule`, `composite_phva_codes (jsonb)` |
 | Madurez | `catalog.maturity_threshold` | `id`, `requirement_id (FK)`, `level (1..5)`, `is_na (bool)`, `expected_value` |
-| NIST CSF | `catalog.nist_function` | `id`, `code (UK: ID\|PR\|DE\|RS\|RC)`, `name`, `position` |
-| NIST CSF | `catalog.nist_subcategory` | `id`, `function_id (FK)`, `code (UK, ej. ID.AM-1)` |
-| NIST CSF | `catalog.nist_mapping` | `id`, `subcategory_id (FK)`, `control_node_id (FK)`, `iso_control_code` — trazabilidad inversa control→subcategoría |
-| NIST CSF | `catalog.nist_ciber_item_catalog` | `id`, `function_id (FK)`, `subcategory_id (FK)`, `source_control_node_id (FK)`, `scoring_mode` — ~188 filas por plantilla |
+| NIST CSF | `catalog.nist_function` | `id`, `code (UK: GV\|ID\|PR\|DE\|RS\|RC)`, `name` (p. ej. Gobernar), `position` 1..6 |
+| NIST CSF | `catalog.nist_subcategory` | `id`, `function_id (FK)`, `code (UK)` — CSF 1.1 (`ID.AM-1…`) coexisten con CSF 2.0 (22 categorías: `GV.OC`, `ID.AM`, `PR.AA`, …) |
+| NIST CSF | `catalog.nist_mapping` | `id`, `subcategory_id (FK)`, `control_node_id (FK)`, `iso_control_code` — trazabilidad inversa control→subcategoría (sobre todo v1) |
+| NIST CSF | `catalog.nist_ciber_item_catalog` | `id`, `function_id (FK)`, `subcategory_id (FK)`, `source_control_node_id (FK)`, `scoring_mode` — v1: filas heredadas + MANUAL; v2: 22 ítems MANUAL CSF 2.0 (uno por categoría) |
 | Levantamiento | `catalog.lifting_question_catalog` | `id`, `code`, `section`, `field_type` — complementario |
 | Levantamiento | `catalog.lifting_document_item_catalog` | `id`, `item_number (1..43)`, `block (BASICA\|IMPLEMENTACION\|EVALUACION\|MEJORA_CONTINUA)`, `is_process_metric` — 43 ítems documentales fijos |
 | Orden territorial | `catalog.entity_order_type` | `code (PK: NACIONAL\|TERRITORIAL_A\|TERRITORIAL_B\|TERRITORIAL_C)`, `phva_expected_advance (numeric)` |
@@ -387,9 +387,9 @@ Dirigido a un lector académico que puede no conocer en profundidad el dominio d
 | **Control técnico** | Control del Anexo A de naturaleza tecnológica (control de acceso, criptografía, seguridad de operaciones, etc.), calificado en el Módulo 4 |
 | **Dominio** | Agrupación de controles del Anexo A (ej. A.5 "Políticas de seguridad"); hay 14 en total. En BD: `catalog.iso_domain` |
 | **Objetivo de control / subdominio** | Subdivisión dentro de un dominio (ej. A.9.1 "Requisitos de negocio para control de acceso") |
-| **PHVA** | Planificar–Hacer–Verificar–Actuar (ciclo de mejora continua, equivalente al PDCA de Deming), adoptado por ISO/IEC 27001 para operar el SGSI; en este proyecto se evalúa con 4 componentes ponderados (Planificación 40%, Implementación 20%, Evaluación de Desempeño 20%, Mejora Continua 20%) |
+| **PHVA** | Planificar–Hacer–Verificar–Actuar (ciclo de mejora continua, equivalente al PDCA de Deming), adoptado por ISO/IEC 27001 para operar el SGSI; en la plantilla activa **v2** se evalúa con 4 componentes ponderados (Planificación **56%**, Implementación **16%**, Evaluación de Desempeño **14%**, Mejora Continua **14%**) y 7 ítems = cláusulas ISO 27001:2022 (`C.4`–`C.10`). La v1 conserva 40/20/20/20 y códigos `P.1`…`M.2` |
 | **Nivel de madurez** | Resultado global calculado del SGSI de la entidad, en 5 niveles acumulativos (Inicial, Gestionado, Definido, Gestionado Cuantitativamente, Optimizado), determinado por una matriz de ~50 requisitos (`Rn`) contra 5 umbrales cada uno |
-| **NIST CSF** | Marco de Ciberseguridad del NIST (National Institute of Standards and Technology, EE. UU.), usado en este proyecto como segunda lente de evaluación sobre los mismos controles ya calificados, con 5 funciones: Identificar, Proteger, Detectar, Responder, Recuperar |
+| **NIST CSF** | Marco de Ciberseguridad del NIST (National Institute of Standards and Technology, EE. UU.); la plantilla **v2** usa **CSF 2.0** con **6 funciones** (Gobernar, Identificar, Proteger, Detectar, Responder, Recuperar) y 22 categorías. La v1 permanece en el enfoque CSF 1.1 de 5 funciones |
 | **Ítem de evidencia / evidencia documental** | Cualquiera de los 43 documentos que el instrumento exige levantar de la entidad (agrupados en bloques Básica, Implementación, Evaluación, Mejora Continua), rastreados en `evidence.lifting_document_delivery` |
 | **Snapshot** | Copia congelada de una parte del catálogo (controles, ítems PHVA, requisitos de madurez, ítems NIST) hecha al crear una evaluación, para que cambios futuros en el catálogo no alteren evaluaciones ya existentes |
 | **rowVersion / version** | Contador entero que se incrementa en cada modificación de un registro; usado para implementar bloqueo optimista: si dos usuarios intentan modificar el mismo registro con versiones distintas, el segundo `PATCH` recibe `HTTP 409 Conflict` |

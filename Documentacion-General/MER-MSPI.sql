@@ -687,7 +687,7 @@ COMMENT ON COLUMN "catalog"."template_version"."maturity_global_rule" IS 'MIN|AV
 
 COMMENT ON COLUMN "catalog"."template_version"."maturity_crit_thresholds" IS 'thresholds for SUFICIENTE/INTERMEDIO/CRITICO, per Excel';
 
-COMMENT ON COLUMN "catalog"."template_version"."phva_weights" IS 'optional: {PLAN:0.25,DO:0.25,CHECK:0.25,ACT:0.25}';
+COMMENT ON COLUMN "catalog"."template_version"."phva_weights" IS 'v2: {PLAN:56,DO:16,CHECK:14,ACT:14}; v1: {PLAN:40,DO:20,CHECK:20,ACT:20}';
 
 COMMENT ON COLUMN "catalog"."template_version"."phva_caps" IS 'optional: caps/topes like Excel if any';
 
@@ -717,7 +717,7 @@ COMMENT ON COLUMN "catalog"."maturity_threshold"."level" IS '1..5';
 
 COMMENT ON COLUMN "catalog"."maturity_threshold"."expected_value" IS 'e.g. 40/60/80/100';
 
-COMMENT ON COLUMN "catalog"."nist_function"."code" IS 'ID|PR|DE|RS|RC';
+COMMENT ON COLUMN "catalog"."nist_function"."code" IS 'GV|ID|PR|DE|RS|RC (CSF 2.0; v1 omitía GV)';
 
 COMMENT ON COLUMN "catalog"."nist_subcategory"."code" IS 'DE.AE-1, RC.IM-1, ...';
 

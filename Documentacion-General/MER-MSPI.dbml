@@ -248,7 +248,7 @@ Table catalog.template_version {
   maturity_crit_thresholds jsonb [note: "umbrales SUFICIENTE/INTERMEDIO/CRITICO"]
   phva_weights jsonb [note: "peso por componente PLAN/DO/CHECK/ACT"]
   phva_caps jsonb
-  nist_function_targets jsonb [note: "meta por función NIST (ID|PR|DE|RS|RC)"]
+  nist_function_targets jsonb [note: "meta por función NIST CSF 2.0 (GV|ID|PR|DE|RS|RC); v1 omitía GV"]
 }
 
 Table catalog.iso_domain {
@@ -357,7 +357,7 @@ Table catalog.maturity_threshold {
 
 Table catalog.nist_function {
   id uuid [pk]
-  code varchar(20) [unique, not null, note: "ID|PR|DE|RS|RC"]
+  code varchar(20) [unique, not null, note: "GV|ID|PR|DE|RS|RC (CSF 2.0)"]
   name varchar(120) [not null]
   position int [not null, default: 0]
 }
