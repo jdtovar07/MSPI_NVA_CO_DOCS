@@ -40,7 +40,7 @@
 | RF-15 | Calcular el resumen de madurez: matriz de cumplimiento por nivel (1–5), nivel alcanzado, categoría por nivel (SUFICIENTE/INTERMEDIO/CRÍTICO) y bloqueos al siguiente nivel | `ComputeMaturitySummaryUseCase` |
 | RF-16 | Listar ítems NIST Ciber (filtrables por `functionCode`, `sourceType`) y calificarlos | `ListNistCiberItemsUseCase`, `PatchNistCiberItemScoreUseCase` |
 | RF-17 | Calcular el resumen NIST por función (promedio, estado ALCANZA/NO ALCANZA, brecha respecto al objetivo) | `ComputeNistSummaryUseCase` |
-| RF-18 | Calcular la efectividad por dominio ISO (14 dominios de portada + promedio global) | `ComputeDomainEffectivenessUseCase` |
+| RF-18 | Calcular la efectividad por dominio ISO (N dominios del snapshot de la evaluación + promedio global; v2 típicamente A.5–A.8) | `ComputeDomainEffectivenessUseCase` |
 | RF-19 | Calcular el tablero diagnóstico agregando efectividad por dominio, avance PHVA, resumen de madurez, resumen NIST y comparación de auto-percepción (`ms_evidence`) | `ComputeDiagnosticDashboardUseCase` |
 | RF-20 | Listar brechas priorizadas (score por debajo de un umbral, por defecto 60), con filtros por dominio ISO y rol de responsable, ordenadas por dominio y score ascendente | `ListGapsUseCase` |
 | RF-21 | Construir el bundle de exportación agregado (evaluación + diagnóstico + brechas + controles + PHVA + madurez + NIST + áreas) para `ms_reporting` | `BuildReportExportBundleUseCase` |
@@ -96,19 +96,22 @@ Algoritmo documentado en el propio código (`ComputeAssessmentRollupUseCase`), d
 
 ### 4.4 Ítems PHVA (HU-PHVA-01..04)
 
-`PhvaScoreResolver` resuelve el "valor efectivo" (F_n) de cada ítem PHVA según su `scoringMode`:
+`PhvaScoreResolver` resuelve el "valor efectivo" (F_n) de cada ítem PHVA. Soporta el modelo **plano (v1)** y la jerarquía **CLAUSE → ITEM (v2)**:
 
 - `MANUAL` → toma directamente la respuesta capturada (`NA` → null; `SCORED` → `scoreValue`).
 - `INHERITED` → según `inheritRule`:
   - `CONTROL_SCORE` → hereda el `scoreValue` del control asociado (nulo si ese control está `NA`).
   - `CONTROL_ROLLUP` → hereda el promedio calculado del rollup para el nodo de control asociado.
   - `ANEXO_A_OVERALL` → hereda el promedio global (`overallAverage`) del rollup completo.
+- `ROLLUP` / `node_type=CLAUSE` → la cláusula **no** se califica directo; su score es el promedio *half-up* de los sub-numerales hijos (`parent_code` = código de la cláusula; N/A no cuenta).
+
+`ComputePhvaAdvanceUseCase`: en **v2**, el promedio de cada fase (PLAN/DO/CHECK/ACT) es el promedio equiponderado de las **cláusulas** de esa fase (cada una ya rollupeada); pesos/caps típicos **56/16/14/14**. En **v1**, promedio plano de todos los ítems de la fase (40/20/20/20).
 
 ### 4.5 Requisitos de madurez (HU-MAD-01..05)
 
 `MaturityScoreResolver` extiende la misma lógica de herencia de PHVA añadiendo dos reglas adicionales de composición:
 
-- `INHERIT_PHVA_ITEM_SCORE` → hereda el valor efectivo de un ítem PHVA específico (resuelto recursivamente con `PhvaScoreResolver`).
+- `INHERIT_PHVA_ITEM_SCORE` (`PHVA_ITEM_SCORE`) → hereda el valor efectivo de un código PHVA (ítem o **cláusula**); si apunta a `C.5`/`C.6` u otra cláusula, `PhvaScoreResolver.resolveByCode` aplica el rollup de sub-numerales.
 - `INHERIT_PHVA_COMPOSITE_AVG` → promedia los valores efectivos de una lista de códigos PHVA (`compositePhvaCodes`).
 - **Matriz de cumplimiento**: para cada requisito y cada nivel (1–5) se compara el valor efectivo (`F_n`) contra el umbral esperado (`MaturityThresholdSnapshot.expectedValue`) de ese nivel: `CUMPLE` (igual), `MENOR` (por debajo), `MAYOR` (por encima), o `N/A` si el umbral está marcado `is_na` o no hay valor calculable.
 - **Nivel alcanzado**: se evalúa secuencialmente de nivel 1 a 5; el primer nivel donde exista al menos un requisito en estado `MENOR` determina el techo alcanzado (etiquetas: "NO ALCANZA NIVEL INICIAL", "INICIAL", "GESTIONADO", "DEFINIDO", "GESTIONADO CUANTITATIVAMENTE", "OPTIMIZADO") — modelo inspirado en CMMI de 5 niveles.
@@ -132,7 +135,7 @@ Algoritmo documentado en el propio código (`ComputeAssessmentRollupUseCase`), d
 
 ### 4.8 Efectividad por dominio (HU-DIAG-01)
 
-`ComputeDomainEffectivenessUseCase` reutiliza el rollup general, localizando los nodos de tipo `DOMAIN` en el árbol (14 dominios "de portada" ISO 27001) e indexándolos por código ISO. El objetivo fijo es **100** para todos los dominios; se marca `calculable=false` cuando no hay score (dominio sin controles calificados).
+`ComputeDomainEffectivenessUseCase` reutiliza el rollup general y construye filas **solo** con los nodos `DOMAIN` presentes en el snapshot/rollup de la evaluación (p. ej. v2 → A.5–A.8; v1 puede llegar a 14), enriquecidos con metadatos de `catalog.iso_domain`. El objetivo fijo es **100**; se marca `calculable=false` cuando no hay score (dominio sin controles calificados).
 
 ### 4.9 Tablero diagnóstico (HU-DIAG-02..04)
 
