@@ -198,6 +198,8 @@ CREATE TABLE "catalog"."phva_item_catalog" (
   "id" uuid PRIMARY KEY,
   "template_version_id" uuid NOT NULL,
   "code" varchar(40) NOT NULL,
+  "parent_code" varchar(40),
+  "node_type" varchar(12) NOT NULL DEFAULT 'ITEM',
   "component" varchar(10) NOT NULL,
   "title" varchar(280) NOT NULL,
   "description" text,
@@ -710,6 +712,10 @@ COMMENT ON COLUMN "catalog"."control_rule"."max_files" IS 'override global confi
 COMMENT ON COLUMN "catalog"."control_rule"."max_text_len" IS 'optional per field: {evidence:5000,gap:3000,recommendation:3000}';
 
 COMMENT ON COLUMN "catalog"."phva_item_catalog"."component" IS 'PLAN|DO|CHECK|ACT';
+
+COMMENT ON COLUMN "catalog"."phva_item_catalog"."node_type" IS 'CLAUSE|ITEM — v2 hierarchy: clause score = avg of child items; v1 rows are ITEM';
+
+COMMENT ON COLUMN "catalog"."phva_item_catalog"."parent_code" IS 'For ITEM rows in v2: code of parent CLAUSE (e.g. C.5). NULL for CLAUSE / flat v1 items';
 
 COMMENT ON COLUMN "catalog"."phva_item_catalog"."source_control_code" IS 'for 1:1 derivation like Excel (VLOOKUP/cell refs)';
 
