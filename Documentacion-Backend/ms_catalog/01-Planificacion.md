@@ -23,10 +23,10 @@ MSPI es un sistema de gestión de seguridad de la información construido como u
 - **Versión de plantilla activa** (`template-versions/active`): resuelve la versión del instrumento en estado `PUBLISHED` vigente, base para el resto de consultas cuando no se especifica `templateVersionId`.
 - **Inventario documental de levantamiento** (`lifting-document-items`): 43 ítems por bloques temáticos.
 - **Cargos responsables** (`steward-roles`) y **áreas predefinidas** (`assessment-area-presets`) del instrumento (Módulo 2 / HU-AR-01).
-- **Catálogo de controles ISO 27001 Anexo A**: 14 dominios ISO (`iso-domains`), árbol jerárquico completo (`control-catalog-tree`), controles hoja calificables filtrables por rama `ADMIN`/`TECH` (`control-catalog-leaves`), y reglas de validación por control hoja (`control-rules`: evidencia/brecha/recomendación obligatorias).
+- **Catálogo de controles ISO 27001 Anexo A**: dominios ISO de referencia (`iso-domains`), árbol jerárquico completo (`control-catalog-tree`), controles hoja calificables filtrables por rama `ADMIN`/`TECH` (`control-catalog-leaves`), y reglas de validación por control hoja (`control-rules`: evidencia/brecha/recomendación obligatorias). **v2**: ~93 controles Anexo A 2022 (temas A.5–A.8); **v1**: estructura 2013 (hasta 14 dominios).
 - **Escala de evaluación publicada** (`scales/published`): niveles 0–100 y bandas de semáforo.
 - **Mapeo de controles a NIST CSF** (`nist-mappings`).
-- **Ciclo PHVA**: catálogo versionado (`phva-items`) y pesos/topes Plan/Do/Check/Act (`phva-config`). **template_version v2**: 7 cláusulas ISO `C.4`–`C.10` (MANUAL) con pesos/caps **56/16/14/14**; v1 conserva ~17 ítems `P.1`…`M.2` con 40/20/20/20.
+- **Ciclo PHVA**: catálogo versionado (`phva-items`) con `parent_code`/`node_type` (CLAUSE\|ITEM) y pesos/topes Plan/Do/Check/Act (`phva-config`). **template_version v2**: 7 cláusulas `C.4`–`C.10` + 23 sub-numerales, pesos/caps **56/16/14/14**; v1 conserva ~17 ítems planos `P.1`…`M.2` con 40/20/20/20.
 - **Requisitos de madurez**: ~50 ítems Rn (`maturity-requirements`) con umbrales por nivel 1–5, y configuración de umbrales críticos (`maturity-config`).
 - **Hoja Ciber (NIST CSF)**: filas `nist-ciber-items` y metas (`nist-config`). **v2 = CSF 2.0**: 6 funciones (**GV/Gobernar**, ID, PR, DE, RS, RC) y 22 categorías MANUAL; v1 = enfoque CSF 1.1 (5 funciones + filas heredadas).
 
