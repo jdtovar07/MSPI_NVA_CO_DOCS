@@ -1,0 +1,94 @@
+dominio_2022,id_item,control_iso_2022,nombre,rol_responsable,control_type,tipo_control
+A.5,AD.1.1,A.5.1,Políticas de seguridad de la información,Responsable de seguridad de la Información,ADMIN,Preventivo
+A.5,AD.1.2,A.5.2,Roles y responsabilidades de seguridad de la información,Responsable de seguridad de la Información,ADMIN,Preventivo
+A.5,AD.1.3,A.5.3,Segregación de funciones,Responsable de seguridad de la Información,ADMIN,Preventivo
+A.5,AD.1.4,A.5.4,Responsabilidades de la dirección,Responsable de seguridad de la Información,ADMIN,Preventivo
+A.5,AD.1.5,A.5.5,Contacto con las autoridades,Responsable de seguridad de la Información,ADMIN,Preventivo - Correctivo
+A.5,AD.1.6,A.5.6,Contacto con grupos de interés especial,Responsable de seguridad de la Información,ADMIN,Preventivo - Correctivo
+A.5,AD.1.7,A.5.7,Inteligencia de amenazas,Responsable de seguridad de la Información,ADMIN,Preventivo Detectivo y correctivo
+A.5,AD.1.8,A.5.8,Seguridad de la información en la gestión de proyectos,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.9,A.5.9,Inventario de información y otros activos asociados,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.10,A.5.10,Uso aceptable de la información y otros activos asociados,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.11,A.5.11,Devolución de Activos,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.12,A.5.12,Clasificación de la información,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.13,A.5.13,Etiquetado de la información,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.14,A.5.14,Transferencia de información,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.15,A.5.15,Control de acceso,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.16,A.5.16,Gestión de la identidad,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.17,A.5.17,Información de autenticación,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.18,A.5.18,Derechos de acceso,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.19,A.5.19,Seguridad de la información en las relaciones con proveedores,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.20,A.5.20,Abordar la seguridad de la información en los acuerdos con proveedores,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.21,A.5.21,Gestión de la seguridad de la información en la cadena de suministro de las TIC,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.22,A.5.22,"Seguimiento, Revisión y Gestión de Cambios de Servicios de Proveedores",Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.23,A.5.23,Seguridad de la información para el uso de servicios en la nube,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.24,A.5.24,Planificación y preparación de la gestión de incidentes de seguridad de la información,Responsable de seguridad de la Información,ADMIN,correctivo
+A.5,AD.1.25,A.5.25,Evaluación y Decisión sobre Eventos de Seguridad de la Información,Responsable de seguridad de la Información,ADMIN,Detectivo
+A.5,AD.1.26,A.5.26,Respuesta a los Incidentes de Seguridad de la Información,Responsable de seguridad de la Información,ADMIN,correctivo
+A.5,AD.1.27,A.5.27,Aprendizaje sobre los incidentes de seguridad de la información,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.28,A.5.28,Recopilación de pruebas,Responsable de seguridad de la Información,ADMIN,correctivo
+A.5,AD.1.29,A.5.29,Seguridad de la información durante la interrupción,Responsable de seguridad de la Información,ADMIN,correctivo-preventivo
+A.5,AD.1.30,A.5.30,Preparación de las TIC para la continuidad del negocio,Responsable de seguridad de la Información,ADMIN,correctivo
+A.5,AD.1.31,A.5.31,"Requisitos legales, estatutarios, reglamentarios y contractuales",Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.32,A.5.32,Derechos de propiedad intelectual,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.33,A.5.33,Protección de registros,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.34,A.5.34,Privacidad y protección de la PII,Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.35,A.5.35,Revisión independiente de la seguridad de la información,Responsable de seguridad de la Información,ADMIN,preventivo-correctivo
+A.5,AD.1.36,A.5.36,"Cumplimiento de políticas, normas y estándares de seguridad de la información",Responsable de seguridad de la Información,ADMIN,preventivo
+A.5,AD.1.37,A.5.37,Procedimientos operativos documentados,Responsable de seguridad de la Información,ADMIN,preventivo - correctivo
+A.6,P.1.1,A.6.1,Revisión de antecedentes,Gestión Humana,ADMIN,Preventivo
+A.6,P.1.2,A.6.2,Términos y condiciones de empleo,Gestión Humana,ADMIN,Preventivo
+A.6,P.1.3,A.6.3,"Concientización, educación y entrenamiento en seguridad de la información",Gestión Humana,ADMIN,Preventivo
+A.6,P.1.4,A.6.4,Proceso disciplinario,Gestión Humana,ADMIN,Preventivo
+A.6,P.1.5,A.6.5,Responsabilidades después de la finalización o cambio de empleo,Gestión Humana,ADMIN,Preventivo
+A.6,P.1.6,A.6.6,Acuerdos de confidencialidad o no divulgación,Gestión Humana,ADMIN,Preventivo
+A.6,P.1.7,A.6.7,Trabajo remoto,Gestión Humana,ADMIN,Preventivo
+A.6,P.1.8,A.6.8,Reporte de eventos de seguridad de la información,Gestión Humana,ADMIN,Correctivo
+A.7,F.1.1,A.7.1,Perímetros de seguridad física,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.2,A.7.2,Entrada física,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.3,A.7.3,"Aseguramiento de oficinas, salas e instalaciones",Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.4,A.7.4,Supervisión de la seguridad física,Responsable recursos fisicos,ADMIN,Preventivo
+A.7,F.1.5,A.7.5,Protección contra amenazas físicas y ambientales,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.6,A.7.6,Trabajar en áreas seguras,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.7,A.7.7,Escritorio despejado y pantalla despejada,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.8,A.7.8,Ubicación y Protección del equipo,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.9,A.7.9,Seguridad de los activos fuera de las instalaciones,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.10,A.7.10,Medios de almacenamiento,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.11,A.7.11,Servicios de apoyo,Responsable recursos fisicos,ADMIN,Preventivo
+A.7,F.1.12,A.7.12,Seguridad del cableado,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.13,A.7.13,Mantenimiento de equipos,Responsable recursos físicos,ADMIN,Preventivo
+A.7,F.1.14,A.7.14,Eliminación segura o reutilización  de equipos,Responsable recursos físicos,ADMIN,Preventivo
+A.8,T.1.1,A.8.1,Dispositivos de punto final de usuario,Responsable TI,TECH,Preventivo
+A.8,T.1.2,A.8.2,Derechos de acceso privilegiado,Responsable TI,TECH,Preventivo
+A.8,T.1.3,A.8.3,Restricción de acceso a la información,Responsable TI,TECH,Preventivo
+A.8,T.1.4,A.8.4,Acceso al código fuente,Responsable TI,TECH,Preventivo
+A.8,T.1.5,A.8.5,Autenticación segura,Responsable TI,TECH,Preventivo
+A.8,T.1.6,A.8.6,Gestión de la capacidad,Responsable TI,TECH,Preventivo
+A.8,T.1.7,A.8.7,Protección contra malware,Responsable TI,TECH,Preventivo Dectivo y correctivo
+A.8,T.1.8,"A.8,8",Gestión de vulnerabilidades técnicas,Responsable TI,TECH,Preventivo
+A.8,T.1.9,A.8.9,Gestión de la configuración,Responsable TI,TECH,Preventivo
+A.8,T.1.10,A.8.10,Eliminación de información,Responsable TI,TECH,Preventivo
+A.8,T.1.11,A.8.11,Enmascaramiento de datos,Responsable TI,TECH,Preventivo
+A.8,T.1.12,A.8.12,Prevención de fuga de datos,Responsable TI,TECH,Preventivo
+A.8,T.1.13,A.8.13,Copia de seguridad de la información,Responsable TI,TECH,corectivo
+A.8,T.1.14,A.8.14,Redundancia de las instalaciones de procesamiento de información,Responsable TI,TECH,Preventivo
+A.8,T.1.15,A.8.15,Registro,Responsable TI,TECH,Detectivo
+A.8,T.1.16,A.8.16,Actividades de seguimiento,Responsable TI,TECH,correctivo
+A.8,T.1.17,A.8.17,Sincronización del reloj (clock),Responsable TI,TECH,Detectivo
+A.8,T.1.18,A.8.18,Uso de programas de utilidad privilegiados,Responsable TI,TECH,preventivo
+A.8,T.1.19,A.8.19,Instalación de software en sistemas operativos,Responsable TI,TECH,preventivo
+A.8,T.1.20,A.8.20,Seguridad en redes,Responsable TI,TECH,preventivo
+A.8,T.1.21,A.8.21,Seguridad de los servicios de red,Responsable TI,TECH,preventivo
+A.8,T.1.22,A.8.22,Segregación de redes,Responsable TI,TECH,preventivo
+A.8,T.1.23,A.8.23,Filtrado web,Responsable TI,TECH,preventivo
+A.8,T.1.24,A.8.24,Uso de criptografía,Responsable TI,TECH,preventivo
+A.8,T.1.25,A.8.25,Ciclo de vida de desarrollo seguro,Responsable TI,TECH,preventivo
+A.8,T.1.26,A.8.26,Requisitos de seguridad de la aplicación,Responsable TI,TECH,preventivo
+A.8,T.1.27,A.8.27,Arquitectura del sistema seguro y principios de ingeniería,Responsable TI,TECH,preventivo
+A.8,T.1.28,A.8.28,Codificación segura,Responsable TI,TECH,preventivo
+A.8,T.1.29,A.8.29,Pruebas de seguridad en desarrollo y aceptación,Responsable TI,TECH,preventivo
+A.8,T.1.30,A.8.30,Desarrollo subcontratado,Responsable TI,TECH,preventivo
+A.8,T.1.31,A.8.31,"Separación de los entornos de desarrollo, prueba y producción",Responsable TI,TECH,preventivo
+A.8,T.1.32,A.8.32,Gestión de cambios,Responsable TI,TECH,preventivo
+A.8,T.1.33,A.8.33,Información de prueba,Responsable TI,TECH,preventivo
+A.8,T.1.34,A.8.34,Protección de los sistemas de información durante las pruebas de auditoría,Responsable TI,TECH,preventivo
