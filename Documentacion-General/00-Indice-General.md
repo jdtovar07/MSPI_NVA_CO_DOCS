@@ -5,7 +5,7 @@
 | **Proyecto** | MSPI: Sistema de Gestión de Seguridad y Privacidad de la Información basado en ISO/IEC 27001 |
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Programa** | Ingeniería de Sistemas |
-| **Fecha** | 2026-08-27 (índice inicial); **última revisión API/código** 2026-10-07 |
+| **Fecha** | 2026-08-27 (índice inicial); **última revisión API/código** 2026-10-07; **alineación instrumento MSPI (v2)** 2026-10-08 |
 
 Este índice es el punto de entrada único de toda la documentación generada para el proyecto de grado. Está pensado para que el profesor/asesor pueda revisar el trabajo de lo general a lo particular, sin necesidad de explorar el código fuente directamente.
 
@@ -38,6 +38,7 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`06-Guia-Pruebas-Funcionales.md`](06-Guia-Pruebas-Funcionales.md) | Secuencia de flujos funcionales end-to-end para demostrar el sistema |
 | [`07-Manual-Usuario.md`](07-Manual-Usuario.md) | Qué puede hacer cada rol, en lenguaje de usuario final |
 | [`08-Referencia-API.md`](08-Referencia-API.md) | Índice consolidado de la API de los 6 microservicios (rutas verificadas contra `*Api.java`, 2026-10-07) |
+| [`09-Alineacion-AutodiagnosticoMSPI.md`](09-Alineacion-AutodiagnosticoMSPI.md) | Trazabilidad entre el instrumento oficial `AutodiagnosticoMSPI.xlsx` (ISO 27001:2022 + NIST CSF 2.0) y la plataforma: brechas detectadas, cambios aplicados en la `template_version` v2 (PHVA 56/16/14/14 de 2 niveles, NIST CSF 2.0 con Gobernar, 93 controles Anexo A 2022) y validación (101 pruebas + seed contra PostgreSQL real). Inventario de controles en [`anexo_a_2022_controls.csv`](anexo_a_2022_controls.csv). |
 
 Estos documentos son el **punto de entrada recomendado para el profesor**: en menos de 30 minutos de lectura dan una visión completa de qué se construyó, cómo está arquitecturado y qué dominios de negocio cubre, sin tener que leer los 99 documentos técnicos detallados por componente.
 
