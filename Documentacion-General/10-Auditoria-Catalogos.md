@@ -33,16 +33,17 @@ Todo el dominio del instrumento MSPI está en catálogo versionado por `template
 
 | Dato | Hoy | Problema | Prioridad |
 |---|---|---|---|
-| **Geografía** (países/departamentos/ciudades) | API externa **Country State City** (`https://api.countrystatecity.in/v1`) consumida por `ms_org` (`LocationCatalogAdapter`, `CountryStateCityClientConfig`; API key por Infisical, env `LOCATION_API_KEY`) | No es catálogo local: **depende de un servicio externo** (si cae, no hay geografía), requiere API key y agrega latencia. Es el caso de "reutilizar una API que trae datos que deberían ser catálogo". | **ALTA** |
+| **Geografía** (países/departamentos/ciudades) | API externa **Country State City** (`https://api.countrystatecity.in/v1`) consumida por `ms_org` (`LocationCatalogAdapter`, `CountryStateCityClientConfig`; API key por Infisical, env `LOCATION_API_KEY`) | No es catálogo local: **depende de un servicio externo** (si cae, no hay geografía), requiere API key y agrega latencia. Es el caso de "reutilizar una API que trae datos que deberían ser catálogo". | **ALTA** — decidido mantener API (ver C.1) |
 | **Reglas de workflow** de la evaluación | **Hardcodeadas** en `GetWorkflowRulesUseCase` (`WorkflowRules.builder()...`, sin tabla) | Regla de negocio en código; no configurable ni versionable como catálogo. | MEDIA (discutible) |
 
-## C) Recomendación
+## C) Recomendación y decisión
 
-1. **Geografía → catálogo local (ALTA).** Crear tablas (p. ej. `org.country` / `org.state` / `org.city`, o un esquema `location`) sembradas con los datos de Colombia (fuente DANE) y migrar `ms_org /location/**` a leer de BD. Elimina la dependencia externa y la API key. Alternativa intermedia: mantener la API externa pero con **caché/espejo local** persistido como catálogo.
-2. **Reglas de workflow → catálogo (MEDIA, opcional).** Si se requiere que las transiciones de estado sean configurables, mover a una tabla `workflow_rule`. Si se consideran regla de negocio pura, pueden quedarse en código.
+1. **Geografía — DECISIÓN DEL EQUIPO (2026-10-09): se mantiene la API externa Country State City.**
+   Justificación: la geografía (países/departamentos/ciudades) es un **dato de referencia universal y estable**, no específico del dominio MSPI; usar la API externa **evita mantener y versionar un catálogo geográfico completo** (que quedaría desactualizado frente a cambios administrativos del país). Ante indisponibilidad del servicio, el sistema **degrada de forma controlada** (`ms_org` devuelve listas vacías, no falla el arranque). Los catálogos del **dominio del instrumento** (controles, escala, PHVA, madurez, NIST, tipos de entidad, etc.) **sí** están modelados como tablas en `ms_catalog`. Si en el futuro se requiere operación 100 % offline o independencia total de terceros, la alternativa sería un **espejo/caché local** de la geografía persistido como catálogo (sin migración disruptiva).
+2. **Reglas de workflow → catálogo (MEDIA, opcional).** Si se requiere que las transiciones de estado sean configurables, mover a una tabla `workflow_rule`. Si se consideran regla de negocio pura, pueden quedarse en código. (Sin cambio por ahora.)
 3. **Enums de estado → sin cambios.** No aportan valor como catálogo.
 
-**Conclusión:** el único dato de referencia que claramente *debería ser catálogo y hoy se reutiliza de una API externa* es la **geografía**. El resto está correcto (catálogos de negocio en `ms_catalog`, identidad en Keycloak, estados como enums).
+**Conclusión:** los catálogos del dominio del instrumento están correctamente en tablas (`ms_catalog`); la identidad va en Keycloak y los estados como enums. El único dato de referencia externo es la **geografía**, que **por decisión del equipo se mantiene vía API externa** con degradación controlada, por las razones de C.1.
 
 ## D) Nota operativa — API key de geografía
 
