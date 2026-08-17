@@ -28,7 +28,7 @@
 | 4 | Implementar el cálculo del avance ponderado del ciclo PHVA (planificación 56 %, implementación 16 %, evaluación de desempeño 14 %, mejora continua 14 %), alineado al Autodiagnóstico MSPI / plantilla `template_version` v2. | `ms_assessment` | ✅ Implementado |
 | 5 | Implementar el algoritmo de determinación del nivel de madurez del SGSI (progresión acumulativa de cinco niveles). | `ms_assessment` | ✅ Implementado |
 | 6 | Implementar el módulo de evaluación frente al marco NIST CSF 2.0 (seis funciones, incluyendo Gobernar / GV). | `ms_assessment`, `mf_assessment` | ✅ Implementado |
-| 7 | Implementar un tablero de diagnóstico consolidado (efectividad por dominio, avance PHVA, madurez, NIST, brechas priorizadas). | `ms_assessment`, `mf_reports` | ✅ Implementado |
+| 7 | Implementar un tablero de diagnóstico consolidado (efectividad por dominio, avance PHVA, madurez, NIST, brechas priorizadas). | `ms_assessment`, `mf_assessment` | ✅ Implementado (hub único en la evaluación; `mf_reports` solo exporta PDF/Excel) |
 | 8 | Implementar el subsistema de identidad y control de acceso (autenticación centralizada, 5 roles de negocio, 2FA/TOTP, auditoría centralizada). | `ms_iam`, `mf_auth` | ✅ Implementado |
 | 9 | Implementar la generación de reportes de resultados (PDF/Excel), replicando la plantilla oficial de MinTIC. | `ms_reporting`, `mf_reports` | ⚠️ Implementado con limitaciones (ver hallazgos de `ms_reporting`) |
 

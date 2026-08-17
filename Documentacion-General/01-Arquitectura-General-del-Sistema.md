@@ -41,9 +41,9 @@ flowchart TB
         Shell["mf_shell :4200<br/>Host / Dashboard / Menú"]
         Auth["mf_auth :4201<br/>Login · 2FA · Usuarios"]
         Org["mf_org :4202<br/>Organizaciones"]
-        Assess["mf_assessment :4203<br/>Evaluación · Áreas · Controles · PHVA · Madurez · NIST"]
+        Assess["mf_assessment :4203<br/>Evaluación · Tablero diagnóstico · Controles · PHVA · Madurez · NIST"]
         Evid["mf_evidence :4204<br/>Contexto · Levantamiento"]
-        Rep["mf_reports :4205<br/>Dashboard diagnóstico · Reportes"]
+        Rep["mf_reports :4205<br/>Generación/descarga de reportes"]
     end
 
     subgraph IdP["Identidad"]
@@ -150,9 +150,9 @@ Fuente: `Documentacion-Backend/ms_admin/03-Diseno.md` §1-2 y `Documentacion-Bac
 | `mf_shell` | 4200 | Host/orquestador: layout, menú, guards de ruta y autoridad, tarjetas de dashboard por rol, componentes `*-redirect` que embeben cada MF hijo en un `<iframe>` | Es el host — implementa `shell-iframe-bridge.ts`, el protocolo de mensajería `postMessage` y la lista blanca de orígenes |
 | `mf_auth` | 4201 | Login, 2FA (setup/verify TOTP), cambio de contraseña, gestión de usuarios | **NO Module Federation.** Iframe hijo del shell; además usa navegación de página completa (`window.location.href` a `:4200/dashboard`) tras login exitoso |
 | `mf_org` | 4202 | CRUD de organizaciones; vista de solo lectura `/my-organization` | **NO Module Federation.** Iframe hijo; no origina sesión, solo la consume (lee `localStorage`/`sessionStorage`/cookie) |
-| `mf_assessment` | 4203 | Wizard completo de evaluación: creación, tipo de entidad, áreas, controles administrativos/técnicos, PHVA, madurez, NIST | **NO Module Federation.** Iframe hijo; envía `MSPI_ACTIVE_ASSESSMENT` y `MSPI_SHELL_NAV` al shell |
+| `mf_assessment` | 4203 | Wizard completo de evaluación y **tablero de diagnóstico consolidado único** (`GET /assessments/{id}/diagnostic/dashboard`): creación, tipo de entidad, áreas, controles, PHVA, madurez, NIST, brechas | **NO Module Federation.** Iframe hijo; envía `MSPI_ACTIVE_ASSESSMENT` y `MSPI_SHELL_NAV` al shell |
 | `mf_evidence` | 4204 | Contexto/misión de la entidad y levantamiento de 43 ítems documentales | **NO Module Federation.** Iframe hijo; recibe sesión activamente vía `MSPI_AUTH_REQUEST` → `MSPI_AUTH_SESSION` |
-| `mf_reports` | 4205 | Tablero de diagnóstico consolidado y generación/descarga de reportes | **NO Module Federation.** Iframe hijo; sin guards de autoridad `REPORT_EXPORT` verificados en código |
+| `mf_reports` | 4205 | Generación/descarga de reportes (jobs PDF/Excel); la ruta de “dashboard” redirige a exportación; el diagnóstico vive en `mf_assessment` | **NO Module Federation.** Iframe hijo; sin guards de autoridad `REPORT_EXPORT` verificados en código |
 
 **Hallazgo arquitectónico central (verificado en código, no solo en un microfrontend piloto):** ninguno de los 6 microfrontends usa Module Federation de Webpack. La integración real es:
 

@@ -12,9 +12,9 @@ La autorización de negocio no depende solo del rol global de Keycloak (`Evaluad
 
 Este patrón (RBAC de UI + RBAC de dominio verificado en el backend) es el que se sigue en toda la plataforma: la UI oculta acciones no permitidas por comodidad, pero la autorización real y no evadible vive en el servidor.
 
-## `auditorId` como identificador de texto libre
+## `auditorId` como UUID opcional (sin FK a catálogo de auditores)
 
-El campo `auditor_id` en `assessment.assessment` se modela como texto libre, no como una relación a un catálogo formal de "auditores" — el dominio del instrumento MSPI no define esa entidad como un concepto propio con ciclo de vida (a diferencia de `assessment_member`, que sí es una relación real usuario↔evaluación). Se prefirió mantener el modelo de datos fiel al dominio real en vez de introducir una entidad nueva sin un caso de uso que la sustente.
+El campo `auditor_id` en `assessment.assessment` es **UUID nullable** (misma tipología que el resto de `*_id` de la fila), no texto libre. En el API el request sigue aceptando `auditorId` como *string* JSON (o `null`/omitido); la capa de entrada lo convierte a `UUID` o `null`. No hay FK ni entidad “Auditor” con ciclo de vida propio (a diferencia de `assessment_member`); el UUID suele apuntar a un usuario de IAM cuando se informa, y `auditor_display_name` permanece como etiqueta de presentación (`String`).
 
 ## Manejo de errores uniforme
 
