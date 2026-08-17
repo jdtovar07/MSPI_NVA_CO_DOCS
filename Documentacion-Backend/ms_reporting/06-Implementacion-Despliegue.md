@@ -34,41 +34,38 @@ El jar resultante **no** se renombra con el patrón `${rootProject.name}.jar` vi
 ## 2. Dockerfile (`deployment/Dockerfile`) — build multi-stage
 
 ```dockerfile
-# docker build -f deployment/Dockerfile -t mspi/ms-reporting:dev .
-
+# Runtime Jammy: LibreOffice headless para FULL_DIAGNOSTIC_PDF (plantilla PORTADA).
 FROM eclipse-temurin:21-jdk-alpine AS build
-WORKDIR /workspace
-RUN apk add --no-cache bash
-COPY gradlew gradlew.bat settings.gradle main.gradle build.gradle ./
-COPY gradle gradle
-COPY applications applications
-COPY domain domain
-COPY infrastructure infrastructure
-RUN sed -i 's/\r$//' gradlew && chmod +x gradlew && ./gradlew :app-service:bootJar -x test --no-daemon
+# … Gradle bootJar (sin cambios de lógica) …
 
-FROM eclipse-temurin:21-jre-alpine
-RUN apk add --no-cache wget \
- && addgroup -S mspi && adduser -S mspi -G mspi
+FROM eclipse-temurin:21-jre-jammy
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      wget libreoffice-calc fonts-dejavu fontconfig \
+ && fc-cache -f \
+ && rm -rf /var/lib/apt/lists/* \
+ && groupadd --system mspi \
+ && useradd --system --gid mspi --create-home --home-dir /home/mspi mspi \
+ && soffice --headless --version
 WORKDIR /app
-COPY --from=build /workspace/applications/app-service/build/libs/*.jar /app/app.jar
-RUN mkdir -p /data/report-outputs && chown -R mspi:mspi /data/report-outputs /app/app.jar
-USER mspi
-EXPOSE 8087
-ENV SERVER_PORT=8087 \
-    REPORT_OUTPUT_DIR=/data/report-outputs \
-    JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+COPY --from=build …/app-service/build/libs/*.jar /app/app.jar
+COPY deployment/docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh \
+ && mkdir -p /data/report-outputs \
+ && chown -R mspi:mspi /data/report-outputs /app/app.jar /home/mspi
+ENV HOME=/home/mspi SERVER_PORT=8087 REPORT_OUTPUT_DIR=/data/report-outputs …
 HEALTHCHECK --interval=30s --timeout=5s --start-period=120s --retries=3 \
   CMD wget -qO- "http://127.0.0.1:${SERVER_PORT}/actuator/health" || exit 1
-ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["/docker-entrypoint.sh"]
 ```
 
 **Análisis del multi-stage:**
 
-1. **Etapa `build`** (`eclipse-temurin:21-jdk-alpine`): copia solo lo necesario para compilar (archivos Gradle raíz, `gradle/`, y los 3 directorios de código fuente `applications/`, `domain/`, `infrastructure/`) — **no copia `deployment/` ni `docs/`**, minimizando el contexto de build. Normaliza CRLF→LF del script `gradlew` (tolerancia a checkouts en Windows) y compila con `-x test --no-daemon`, apropiado para un build de CI/imagen efímero.
-2. **Etapa final** (`eclipse-temurin:21-jre-alpine`, solo JRE): agrega usuario/grupo de sistema no privilegiados `mspi`, **crea el directorio de la caché de artefactos** (`/data/report-outputs`, consumido por `FileSystemReportOutputStorage`) con permisos del usuario `mspi`, copia el jar y ejecuta como ese usuario — a diferencia de otros microservicios del sistema, aquí el `Dockerfile` sí prepara explícitamente un directorio de datos porque `ms_reporting` escribe artefactos binarios en el sistema de archivos del contenedor.
-3. **Variables de entorno del contenedor**: `SERVER_PORT=8087`, `REPORT_OUTPUT_DIR=/data/report-outputs` (coincide con el volumen `mspi_report_outputs` declarado en `docker-compose.apps.yml`), `JAVA_OPTS` con detección de límites de contenedor y heap limitado al 75%.
-4. **`HEALTHCHECK` nativo de Docker**: `wget` contra `/actuator/health` cada 30s, con **120s** de periodo de gracia inicial (mayor que el de otros microservicios como `ms_iam`, que usa 90s) — razonable dado que este microservicio puede tener un arranque algo más pesado por las dependencias de generación de documentos, aunque el arranque de Spring Boot en sí no invoca LibreOffice.
-5. **Ausencia notable: LibreOffice no está instalado en la imagen**. Ni la etapa `build` ni la etapa final ejecutan `apk add libreoffice` (o similar); el `README.md` documenta `LIBREOFFICE_PATH` como variable opcional y advierte "Sin LibreOffice el job PDF falla con mensaje explícito". Esto implica que, tal como está definida hoy la imagen `mspi/ms-reporting:dev`, **el tipo de reporte `FULL_DIAGNOSTIC_PDF` fallará en producción** salvo que se: (a) monte un binario de LibreOffice desde el host/volumen y se apunte `LIBREOFFICE_PATH` a él, (b) se extienda esta imagen con una capa que instale LibreOffice, o (c) se desactive expresamente con `REPORT_PDF_CONVERSION_ENABLED=false` (lo cual también deshabilitaría esa funcionalidad, no la resuelve). Es una brecha de despliegue real, coherente con el comentario del `.env.example` de Docker Compose (§4).
+1. **Etapa `build`** (`eclipse-temurin:21-jdk-alpine`): igual que el resto del ecosistema — Gradle `bootJar -x test`, sin copiar `docs/`.
+2. **Etapa final** (`eclipse-temurin:21-jre-jammy`, **excepción deliberada** frente al patrón `-jre-alpine` de los demás MS): instala **LibreOffice Calc** (`libreoffice-calc`), fuentes DejaVu y `fontconfig`, verifica `soffice --headless --version` en el build, y deja `soffice` en `/usr/bin` (PATH). Jammy es más fiable que Alpine para convertir la plantilla PORTADA con gráficos/colores.
+3. **Entrypoint** (`deployment/docker-entrypoint.sh`): arranca como root solo para `chown -R mspi:mspi /data/report-outputs` (el volumen nombrado puede conservar UID de una imagen Alpine anterior) y luego baja a `mspi` con `runuser` (`HOME=/home/mspi` para el perfil de LibreOffice).
+4. **`HEALTHCHECK`**: `wget` → `/actuator/health`, gracia **120s** (imagen más pesada por LibreOffice).
+5. **`FULL_DIAGNOSTIC_PDF` en Docker**: ya no requiere montar un binario externo ni `LIBREOFFICE_PATH` en el compose local; `LibreOfficePdfConverter` encuentra `soffice` en el PATH. En ejecución nativa (Windows/macOS sin contenedor) sigue haciendo falta LibreOffice instalado o `LIBREOFFICE_PATH`.
 
 ## 3. Variables de entorno
 
@@ -96,7 +93,9 @@ ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
 El archivo de ejemplo compartido de Docker Compose contiene una nota explícita sobre este microservicio:
 
 ```env
-# LibreOffice (opcional; PDF en ms_reporting requiere imagen extendida o montar binario)
+# LibreOffice: la imagen mspi/ms-reporting:dev (Jammy) ya incluye soffice en PATH.
+# LIBREOFFICE_PATH solo hace falta fuera de Docker o si se usa un binario custom.
+# LIBREOFFICE_PATH=/usr/bin/soffice
 ```
 
 Y la definición del servicio en `docker-compose.apps.yml` confirma el volumen dedicado para la caché de artefactos:
@@ -164,7 +163,7 @@ Requisitos adicionales documentados en el `README.md`:
 1. PostgreSQL con `schema.sql` aplicado (el servicio **no** ejecuta DDL: `spring.sql.init.mode: never`).
 2. `ms_assessment`, `ms_evidence` y `ms_catalog` en ejecución con la misma `INTERNAL_API_KEY`.
 3. Un JWT con acceso a `/reports/**` (cualquier usuario autenticado, sin restricción de rol adicional).
-4. Para probar `FULL_DIAGNOSTIC_PDF` localmente en Windows, LibreOffice instalado y, si no está en `PATH`, `LIBREOFFICE_PATH` apuntando al ejecutable (p. ej. `C:\Program Files\LibreOffice\program\soffice.exe`, resuelto automáticamente como candidato por `LibreOfficePdfConverter` incluso sin configurar la variable).
+4. Para `FULL_DIAGNOSTIC_PDF` en Docker Compose: basta la imagen `mspi/ms-reporting:dev` (incluye LibreOffice). En ejecución nativa (p. ej. Windows con `bootRun`), instalar LibreOffice o definir `LIBREOFFICE_PATH` (p. ej. `C:\Program Files\LibreOffice\program\soffice.exe`).
 
 ## 7. Resumen de puertos y endpoints técnicos
 

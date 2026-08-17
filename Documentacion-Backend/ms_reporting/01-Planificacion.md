@@ -74,7 +74,7 @@ A partir del código y `docs/openapi.yaml` se identifican los siguientes requeri
 | Cobertura | JaCoCo 0.8.14, umbral 80% de instrucciones (`jacocoTestCoverageVerification`) | `main.gradle` |
 | Mutation testing | Pitest 1.19.0-rc.3 / 1.22.0 (plugin declarado, sin evidencia de ejecución en CI) | `main.gradle` |
 | Calidad estática | Plugin SonarQube 7.2.2.6593 (configurado, sin evidencia de conexión a CI) | `build.gradle` raíz |
-| Contenerización | Docker multi-stage, `eclipse-temurin:21-jdk-alpine` (build) → `eclipse-temurin:21-jre-alpine` (runtime) | `deployment/Dockerfile` |
+| Contenerización | Docker multi-stage, `eclipse-temurin:21-jdk-alpine` (build) → `eclipse-temurin:21-jre-jammy` (runtime) + LibreOffice Calc | `deployment/Dockerfile`, `deployment/docker-entrypoint.sh` |
 | Documentación de API | OpenAPI 3.1.0 estático (`docs/openapi.yaml`), sin `springdoc-openapi` en las dependencias (no hay Swagger UI servido en runtime) | verificado: ninguna dependencia `springdoc` en los `build.gradle` |
 
 ## 6. Actores del sistema
@@ -101,7 +101,7 @@ No existe en el repositorio evidencia de un plan de proyecto formal (cronograma,
 
 | Riesgo | Evidencia en código | Mitigación existente |
 |---|---|---|
-| Dependencia de un binario externo (LibreOffice) no incluido en la imagen Docker de producción | `deployment/Dockerfile` no instala `libreoffice`; `LIBREOFFICE_PATH` se documenta como variable opcional | `LibreOfficePdfConverter` falla con mensaje explícito y `REPORT_PDF_CONVERSION_ENABLED=false` permite deshabilitar la ruta sin tumbar el servicio completo |
+| Dependencia de LibreOffice en runtime (resuelta en la imagen Docker Jammy; pendiente solo fuera de contenedor) | `deployment/Dockerfile` instala `libreoffice-calc` + fuentes; `LIBREOFFICE_PATH` opcional si `soffice` no está en PATH | En Docker, `FULL_DIAGNOSTIC_PDF` usa `/usr/bin/soffice`; `REPORT_PDF_CONVERSION_ENABLED=false` sigue permitiendo deshabilitar la ruta |
 | Procesamiento en memoria sin cola persistente | README: "No aplica (procesamiento en memoria con `CompletableFuture`, sin cola externa)" | Job persistido en PostgreSQL antes de iniciar el procesamiento asíncrono, permitiendo reconsulta de estado aunque el hilo se pierda; no hay reintento automático tras caída del proceso |
 | Archivado a `ms_evidence` no transaccional con la generación | `ReportOutputEvidenceArchiver.archive` atrapa `RuntimeException` y retorna `Optional.empty()` | El job se marca `COMPLETED` igualmente porque el artefacto sigue disponible en `FileSystemReportOutputStorage` |
 | Pool de hilos fijo y pequeño (`maxPoolSize=4`, `queueCapacity=25`) ante picos de generación de reportes (proceso costoso por invocar LibreOffice) | `ReportJobAsyncConfig` | Ninguna mitigación adicional visible (sin *backpressure* explícito ni *rate limiting*) |
