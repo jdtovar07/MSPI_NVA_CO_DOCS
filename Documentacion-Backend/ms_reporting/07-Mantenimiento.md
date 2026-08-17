@@ -36,7 +36,7 @@
 
 ## 4. Puntos de mantenimiento identificados (a partir del código)
 
-1. **Dependencia de LibreOffice no resuelta en la imagen de producción** (ver `06-Implementacion-Despliegue.md`, §2): el `Dockerfile` no instala LibreOffice; cualquier plan de mantenimiento de infraestructura debe decidir cómo resolverlo (imagen extendida, binario montado, o sidecar de conversión) antes de que `FULL_DIAGNOSTIC_PDF` funcione de forma confiable en el entorno objetivo.
+1. **LibreOffice en imagen Jammy** (ver `06-Implementacion-Despliegue.md`, §2): la imagen `mspi/ms-reporting:dev` ya incluye `soffice`; el mantenimiento debe vigilar el tamaño de imagen, actualizaciones de `libreoffice-calc`/fuentes y que el entrypoint siga corrigiendo permisos del volumen `mspi_report_outputs` tras recrear el contenedor.
 2. **Ausencia de pipeline CI/CD** (`bitbucket-pipelines.yml` no existe para este microservicio, a diferencia del resto del ecosistema MSPI) — tarea de mantenimiento de infraestructura de desarrollo pendiente, no solo de código de aplicación.
 3. **Cobertura de pruebas insuficiente** (2 clases de prueba de un total de más de 20 clases con lógica relevante) frente a una regla de cobertura del 80% configurada pero previsiblemente incumplida — ver `05-Pruebas.md`.
 4. **Seeds de base de datos desactualizados** (`data.sql`/`MER-SEED-REPORTING.sql` referencian un motor JasperReports y un libro Excel de 9 hojas que ya no corresponden a la implementación real de una sola hoja PORTADA) — limpieza pendiente para evitar confusión de futuros mantenedores.
