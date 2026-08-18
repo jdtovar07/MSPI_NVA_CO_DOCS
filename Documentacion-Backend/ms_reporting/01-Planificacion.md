@@ -66,7 +66,7 @@ A partir del código y `docs/openapi.yaml` se identifican los siguientes requeri
 | Seguridad | Spring Security OAuth2 Resource Server (JWT vía Keycloak) | `SecurityConfig.java` |
 | Generación PDF | **OpenPDF 1.3.39** (`com.github.librepdf:openpdf`, fork libre de iText, paquete `com.lowagie.text`) | `domain/usecase/build.gradle` |
 | Generación/relleno Excel | **Apache POI 5.2.5** (`poi-ooxml`) | `domain/usecase/build.gradle` |
-| Conversión XLSX→PDF | **LibreOffice** (`soffice --headless`), invocado como proceso externo (`ProcessBuilder`) | `LibreOfficePdfConverter.java` |
+| Conversión XLSX→PDF | **LibreOffice** (`soffice --headless`) vía `ProcessBuilder` con `Redirect.DISCARD` y perfil `UserInstallation` aislado | `LibreOfficePdfConverter.java` |
 | Procesamiento asíncrono | `CompletableFuture.runAsync` + `ThreadPoolTaskExecutor` nombrado (`reportJobExecutor`) | `ReportJobAsyncConfig.java`, `ReportJobApi.java` |
 | Serialización JSON | Jackson (`jackson-databind`) | `domain/usecase/build.gradle`, `JacksonConfig.java` |
 | Gestión de secretos | Infisical SDK 3.0.2 | `applications/app-service/build.gradle`: `com.infisical:sdk:3.0.2` |
