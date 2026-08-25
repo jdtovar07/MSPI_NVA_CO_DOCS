@@ -30,7 +30,7 @@ Esta relación está documentada en `MSPI_NVA_CO_MR_FRONT/docs/README.md`, índi
 - Pantalla de **inicio** (`/reports`): lista evaluaciones reales y/o usa la evaluación activa (`active_assessment_id`) para abrir la exportación.
 - Pantalla de **exportación de reportes** (`/assessments/:id/export`): solicita la generación asíncrona de reportes (PDF diagnóstico, Excel instrumento, PDF/Excel de brechas), hace *polling* del *job* y descarga el archivo; enlace de vuelta al tablero de diagnóstico de la evaluación.
 - La ruta histórica `/assessments/:id/dashboard` **redirige** a `/export` (ya no renderiza un segundo tablero de diagnóstico).
-- Tipos de reporte soportados: `FULL_DIAGNOSTIC_PDF`, `EXCEL_INSTRUMENT_EXPORT`, `GAP_LIST_PDF`, `GAP_LIST_XLSX`, y los comparativos `COMPARATIVE_DIAGNOSTIC_PDF` / `COMPARATIVE_DIAGNOSTIC_XLSX` (soportados a nivel de dominio/infraestructura, sin pantalla propia — ver `03-Diseno.md`).
+- Tipos de reporte soportados (alineados a `ms_reporting`): `FULL_DIAGNOSTIC_PDF` / `_OFFICIAL` (PORTADA), `FULL_INSTRUMENT_PDF` / `_OFFICIAL` (instrumento 11 hojas), `EXCEL_INSTRUMENT_EXPORT` / `EXCEL_INSTRUMENT_PROTECTED`, `GAP_LIST_*`, y comparativos `COMPARATIVE_DIAGNOSTIC_*` (dominio/infra; ver `03-Diseno.md`). Oficiales/protegidos requieren evaluación cerrada.
 - Sincronización de sesión de autenticación recibida desde el shell vía `postMessage` (`installAuthParentBridge`).
 - Consumo **solo API real** (sin mocks).
 

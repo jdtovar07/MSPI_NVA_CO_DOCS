@@ -101,7 +101,7 @@ Los ocho casos de uso son clases planas (`@RequiredArgsConstructor`, sin anotaci
 |---|---|---|---|
 | `ResourceNotFoundException` | 404 | `NOT_FOUND` | Organización inexistente, contacto principal inexistente, `organizationId` nulo en `my-organization` |
 | `BusinessRulesOnFieldsException` | 400 | `BUSINESS_RULES` | Nombre vacío, `(name, identifier)` duplicado, correo de organización faltante en creación |
-| `MethodArgumentNotValidException` (Bean Validation) | 400 | `VALIDATION` | Campos `@NotBlank` de `OrganizationRequest` incumplidos |
+| `MethodArgumentNotValidException` (Bean Validation) | 400 | `VALIDATION` | Campos `@NotBlank` de `OrganizationRequest` incumplidos; cada `ErrorDetail` incluye `field` + `message` (sin prefijo `campo:`) para resaltar inputs en el front |
 | `UserAlreadyExistsException` | 409 | `USER_ALREADY_EXISTS` | `ms_iam` responde `DUPLICATE_EMAIL` al crear el usuario `Lector` |
 | `IamServiceException` | 502 | `IAM_SERVICE_ERROR` | `ms_iam` no responde, error de red, o error no reconocido como duplicado |
 | `DomainException` | 500 | `INTERNAL_ERROR` | Cualquier excepción de dominio no específica (red de seguridad genérica) |

@@ -116,13 +116,17 @@ Igual que en `mf_auth`, `ms_org` responde bajo un formato envolvente `{meta, dat
 
 ```ts
 export interface ApiMeta { traceId: string; timestamp: string; }
-export interface ErrorDetail { code: string; message: string; }
+export interface ErrorDetail { code: string; message: string; field?: string; }
 export class ApiError extends Error {
   constructor(public status: number, public errors: ErrorDetail[], public traceId?: string) { ... }
 }
 ```
 
 El interceptor desenvuelve `event.body.data` cuando detecta `{data, meta}` (y `body.data !== undefined`), de modo que los repositorios reciben directamente el payload útil. A diferencia de `mf_auth`, **no se encontró** un `console.debug('[API]', ...)` de trazabilidad de `traceId` dentro del interceptor de `mf_org` — el interceptor de `mf_org` es funcionalmente más reducido: no registra el `traceId` de las respuestas exitosas en consola.
+
+### 5.1.1 UX de validación de formularios (estándar MSPI)
+
+`organization-form-page` usa el kit `src/app/shared/validation/` (standalone): `mspi-required-label`, `mspi-required-fields-hint`, `mspi-field-error`, `mspi-form-error-summary`, helper `applyFieldErrors`. Patrón: `fieldErrors` + `submitAttempted` (signals), validación de **todos** los campos al enviar, blur/reactivo al corregir, botón Guardar solo deshabilitado por `loading`, toast éxito/error, y mapeo de `errors[].field` en HTTP 400.
 
 ### 5.3 Manejo de errores HTTP
 

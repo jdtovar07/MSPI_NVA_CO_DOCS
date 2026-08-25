@@ -101,11 +101,14 @@ Basado en `docs/API-INTEGRACION.md` y verificado directamente en los repositorio
 
 ```ts
 export interface ApiMeta { traceId: string; timestamp: string; }
+export interface ErrorDetail { code: string; message: string; field?: string; }
 export interface CorrectResponse<T> { meta: ApiMeta; data: T; }
 export interface ErrorResponse { meta: ApiMeta; error: ErrorDetail[]; }
 ```
 
 El interceptor desenvuelve automáticamente `event.body.data` cuando detecta `{data, meta}`, de modo que los repositorios (`ApiAuthRepository`, `ApiUserRepository`, etc.) reciben directamente el payload útil sin tener que desestructurar el sobre en cada llamada. Los `traceId` se registran con `console.debug('[API]', url, 'traceId:', meta.traceId)` — único mecanismo de trazabilidad/observabilidad encontrado en el cliente.
+
+`user-form-page` reutiliza el estándar de validación de `mf_org` (`shared/validation/`): `fieldErrors` + `FormErrorSummary`, RequiredLabel/FieldError, Guardar siempre habilitado salvo `loading`, toast éxito/error, y `applyFieldErrors` sobre `ErrorDetail.field` en HTTP 400.
 
 ### 5.4 Manejo de errores HTTP
 
@@ -132,7 +135,7 @@ Los repositorios de infraestructura capturan `ApiError` y lo traducen a mensajes
 3. **Verificación de 2FA** en logins subsecuentes, con contador de intentos restantes (`attemptsLeft`, inicializado en 3 pero **sin lógica visible que lo decremente** en el componente — posible funcionalidad incompleta, ver `07-Mantenimiento.md`).
 4. **Cambio de contraseña** con validación de complejidad en tiempo real (getters reactivos a cada tecla) y doble modalidad (forzado sin sesión / voluntario con sesión).
 5. **Gestión de sesión** persistente entre recargas, con expiración basada en `expiresAt` (timestamp calculado en el cliente a partir de `expiresIn`) y aviso previo configurable.
-6. **CRUD de usuarios** con paginación server-side (`PageRequest`/`PageResponse`), búsqueda por texto, filtros combinables por rol y estado, y confirmación explícita antes de cambiar el estado de un usuario.
+6. **CRUD de usuarios** con paginación server-side (`PageRequest`/`PageResponse`), búsqueda por texto, filtros combinables por rol y estado, confirmación explícita antes de cambiar el estado, y formulario de alta/edición con UX de validación unificada (asteriscos, summary, errores por campo, toast).
 7. **Autorización basada en autoridades derivadas de roles** (RBAC ligero), reutilizada de forma consistente entre listado y formulario de usuarios.
 8. **Modo mock funcionalmente equivalente al modo API** para los cuatro dominios (auth, users, roles, organizations), permitiendo desarrollo y demostración sin backend, incluyendo réplica de reglas de bloqueo de cuenta.
 

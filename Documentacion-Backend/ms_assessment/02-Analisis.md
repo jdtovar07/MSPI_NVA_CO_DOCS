@@ -28,7 +28,7 @@
 | RF-03 | Asignar el tipo de orden territorial (`entityOrderTypeCode`) a la evaluación, con auditoría en `ms_iam` | `AssignEntityOrderTypeUseCase` |
 | RF-04 | Publicar una evaluación (`BORRADOR` → `CERRADA`), validando tipo de entidad asignado y control de concurrencia optimista (`rowVersion`), con registro de auditoría | `PublishAssessmentUseCase` |
 | RF-05 | Clonar una evaluación **publicada** (`CERRADA`) hacia una nueva evaluación `BORRADOR`, copiando áreas, snapshot de controles/PHVA/madurez/NIST y el levantamiento documental | `CloneAssessmentUseCase` |
-| RF-06 | Listar áreas de la evaluación con sus temas/procesos y responsable por defecto | `GetAssessmentAreasUseCase` |
+| RF-06 | Listar áreas de la evaluación con sus temas/procesos; cada tema incluye funcionario (`staffName` / alias `funcionario`) obligatorio al guardar | `GetAssessmentAreasUseCase`, `ReplaceAssessmentAreaTopicsUseCase`, `AssessmentAreaTopicRequest` |
 | RF-07 | Reemplazar el listado de temas de un área (`PUT` completo, no incremental) | `ReplaceAssessmentAreaTopicsUseCase` |
 | RF-08 | Listar controles de la evaluación (filtrables por `controlType` ADMIN/TECH) y obtener el detalle de un control (incluye contexto de evidencia) | `ListAssessmentControlsUseCase`, `GetControlDetailUseCase` |
 | RF-09 | Calificar un control (score, evidencia, brecha, recomendación, estado) aplicando reglas de completitud del catálogo | `PatchControlScoreUseCase` |

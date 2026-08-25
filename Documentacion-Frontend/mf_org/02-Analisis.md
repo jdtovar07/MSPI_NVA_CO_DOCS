@@ -84,7 +84,7 @@ Extraídas directamente del código (no inventadas):
 ### CU-02 — Crear organización
 - **Actor:** usuario autenticado sin rol `Lector` (administrativo).
 - **Flujo principal:** el usuario accede a `/organizations/new`; el formulario carga el catálogo de países (`loadCountries()`); el usuario completa nombre, tipo, identificador, correo, ubicación en cascada y dirección; al enviar, se validan los campos obligatorios y el formato de correo; se invoca `CreateOrganizationUseCase.execute()`; en éxito, navega a `/organizations`.
-- **Flujo alternativo:** error de validación local (mensaje inline, sin llamada HTTP) o error de backend (p. ej. `USER_ALREADY_EXISTS`), mostrado en `error()`.
+- **Flujo alternativo:** error de validación local (banner `FormErrorSummary` + errores por campo con borde rojo/`FieldError`, sin llamada HTTP) o error de backend (p. ej. `USER_ALREADY_EXISTS` / `ErrorDetail.field` → `fieldErrors` + toast).
 
 ### CU-03 — Editar organización
 - **Actor:** usuario autenticado sin rol `Lector`.
