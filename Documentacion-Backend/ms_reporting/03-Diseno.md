@@ -41,7 +41,10 @@ flowchart TB
   subgraph Engine["Engine — domain/usecase/engine"]
     Doc["ReportDocumentService"]
     Filler["MspiPortadaTemplateFiller"]
+    Instr["MspiInstrumentTemplateFiller"]
     Conv["LibreOfficePdfConverter"]
+    Wm["PdfDraftWatermarker"]
+    Prot["WorkbookFullProtection"]
   end
 
   subgraph Model["domain/model"]
@@ -63,8 +66,7 @@ flowchart TB
   CompUC --> Ports
   ProcessUC --> Ports
   ProcessUC --> Doc
-  Doc --> Filler
-  Doc --> Conv
+  Doc --> Filler & Instr & Conv & Wm & Prot
   DownloadUC --> Ports
   ProcessUC --> Archiver
   Archiver --> Ports
@@ -82,7 +84,7 @@ flowchart TB
   FsAd --> FS[("Volumen local\n/data/report-outputs")]
 ```
 
-**Nota de diseño**: a diferencia de un hexagonal "estricto" donde `domain/usecase` no debería depender de librerías de infraestructura, aquí `ReportDocumentService`/`MspiPortadaTemplateFiller`/`LibreOfficePdfConverter` viven en `domain/usecase/engine` y usan directamente Apache POI, OpenPDF y `ProcessBuilder` del sistema operativo. Esta es una decisión pragmática del equipo (ver DT-03 en §6): se prioriza mantener toda la lógica de composición de documentos junto a las reglas de negocio de generación, en lugar de crear un puerto adicional (`DocumentRenderer`) con un adaptador de infraestructura separado, a costa de acoplar el módulo `usecase` a bibliotecas concretas.
+**Nota de diseño**: a diferencia de un hexagonal "estricto" donde `domain/usecase` no debería depender de librerías de infraestructura, aquí `ReportDocumentService` / `MspiPortadaTemplateFiller` / `MspiInstrumentTemplateFiller` / `LibreOfficePdfConverter` / `PdfDraftWatermarker` / `WorkbookFullProtection` viven en `domain/usecase/engine` y usan Apache POI, OpenPDF, PDFBox y `ProcessBuilder`. Decisión pragmática (DT-03): cohesión del dominio de reportes frente a pureza hexagonal.
 
 ## 2. Estructura real de paquetes
 
@@ -113,7 +115,11 @@ ms_reporting/
 │       └── engine/
 │           ├── ReportDocumentService.java
 │           ├── MspiPortadaTemplateFiller.java
-│           └── LibreOfficePdfConverter.java
+│           ├── MspiInstrumentTemplateFiller.java
+│           ├── LibreOfficePdfConverter.java
+│           ├── PdfDraftWatermarker.java
+│           ├── WorkbookFullProtection.java
+│           └── AssessmentStatusSupport.java
 ├── infrastructure/
 │   ├── entry-points/api-rest/src/main/java/co/com/mspi/api/
 │   │   ├── config/             (CorsConfig, TraceIdFilter)
@@ -137,7 +143,7 @@ ms_reporting/
 │       └── mapper/                ApiResponseMapper.java
 └── docs/
     ├── openapi.yaml
-    └── samples/ (ejemplos históricos; runtime usa classpath `plantilla-portada-2022.xlsx`)
+    └── samples/ (históricos; runtime: `plantilla-portada-2022.xlsx` + `plantilla-instrumento-completo-2022.xlsx`)
 ```
 
 Nota: `common` incluye excepciones (`IamServiceException`, `UserAlreadyExistsException`) heredadas de la plantilla base compartida entre microservicios MSPI; no tienen uso funcional dentro de `ms_reporting` (no hay `throw` de esas clases en el código de este microservicio), lo cual es coherente con que `common` es un módulo *helper* replicado desde un esqueleto común.
@@ -273,7 +279,11 @@ classDiagram
   class ReportType {
     <<enumeration>>
     FULL_DIAGNOSTIC_PDF
+    FULL_DIAGNOSTIC_PDF_OFFICIAL
+    FULL_INSTRUMENT_PDF
+    FULL_INSTRUMENT_PDF_OFFICIAL
     EXCEL_INSTRUMENT_EXPORT
+    EXCEL_INSTRUMENT_PROTECTED
     GAP_LIST_PDF
     GAP_LIST_XLSX
     COMPARATIVE_DIAGNOSTIC_PDF
@@ -320,9 +330,12 @@ classDiagram
 
   class ReportDocumentService {
     -MspiPortadaTemplateFiller portadaTemplateFiller
+    -MspiInstrumentTemplateFiller instrumentTemplateFiller
     -LibreOfficePdfConverter pdfConverter
-    +buildFullDiagnosticPdf(bundle, pageFormat) byte[]
-    +buildPortadaWorkbook(bundle) byte[]
+    -PdfDraftWatermarker draftWatermarker
+    +buildFullDiagnosticPdf(bundle, pageFormat, draftWatermark) byte[]
+    +buildFullInstrumentPdf(bundle, pageFormat, draftWatermark) byte[]
+    +buildFullInstrumentWorkbook(bundle, protect) byte[]
     +buildGapListPdf(gaps) byte[]
     +buildGapListXlsx(gaps) byte[]
     +buildComparativePdf(bundles) byte[]
@@ -404,8 +417,8 @@ sequenceDiagram
   R->>R: status=RUNNING, progressPct=10
   R->>A: GET /internal/assessments/{id}/report-export-bundle (X-Internal-Api-Key)
   A-->>R: bundle { assessment, diagnosticDashboard{...} }
-  R->>R: MspiPortadaTemplateFiller.fillWorkbook(bundle)\n(rellena hoja PORTADA, elimina hojas 2-9)
-  R->>R: LibreOfficePdfConverter.convertXlsxToPdf\n(soffice --headless, DISCARD I/O, UserInstallation tmp)
+  R->>R: MspiPortadaTemplateFiller.fillWorkbook(bundle)\n(PORTADA; o MspiInstrumentTemplateFiller 11 hojas)
+  R->>R: LibreOfficePdfConverter.convertXlsxToPdf\n(+ PdfDraftWatermarker si borrador)
   R->>R: FileSystemReportOutputStorage.save(jobId, pdf)\nprogressPct=90
   R->>E: POST /internal/assessments/{id}/report-outputs (multipart)
   E-->>R: { id: outputFileId } (o error, capturado como best effort)
@@ -424,7 +437,9 @@ sequenceDiagram
 | DT-01 | Procesamiento asíncrono con `CompletableFuture.runAsync` + `ThreadPoolTaskExecutor` propio, en lugar de una cola de mensajería externa (Kafka/RabbitMQ) | README explícito: "No aplica (procesamiento en memoria con `CompletableFuture`, sin cola externa)". Reduce infraestructura operativa a costa de perder durabilidad de la tarea si el proceso JVM se reinicia mientras un job está `RUNNING` (quedaría "atascado" en ese estado hasta una intervención manual, ya que no hay reconciliación al arranque) |
 | DT-02 | Generar el PDF de diagnóstico **convirtiendo el Excel ya diligenciado** con LibreOffice, en vez de dibujar el PDF directamente con OpenPDF | Preserva gráficos nativos de Excel (radar ISO, barras PHVA, radar NIST), colores y logos; `soffice` en imagen Jammy; `ProcessBuilder` con `Redirect.DISCARD` y perfil `UserInstallation` aislado por job (evita deadlock de pipes y contención de perfil) |
 | DT-03 | Ubicar las clases de generación de documentos (`engine/`, con dependencias directas a Apache POI/OpenPDF/`ProcessBuilder`) dentro de `domain/usecase` en lugar de un módulo de infraestructura aparte | Mantiene junta la lógica de "qué se genera" (reglas de mapeo bundle→celda, reglas de qué hoja se conserva) sin fragmentarla en un puerto adicional; compromiso consciente de pureza hexagonal a cambio de cohesión del dominio de reportes |
-| DT-04 | Retener solo la hoja PORTADA del libro de plantilla (`retainOnlyPortadaSheet`) en vez de generar un libro nuevo desde cero | Conserva el 100% del formato, merges de celdas y estilos originales del archivo `.xlsx` de referencia; eliminar hojas es más confiable que recrear el diseño con POI |
+| DT-04 | PORTADA: `retainOnlyPortadaSheet`. Instrumento completo: conservar las 11 hojas de `plantilla-instrumento-completo-2022.xlsx` y escribir solo celdas de entrada | Fidelidad al Autodiagnóstico oficial; fórmulas/gráficos recalculados por LibreOffice (`fullCalcOnLoad`) |
+| DT-09 | Watermark de borrador en PDF con PDFBox (overlay semitransparente), no header/footer POI | Visible en el PDF entregado; no depende de impresión de encabezados de Excel |
+| DT-10 | Protección total de Excel oficial (`WorkbookFullProtection` + `REPORT_PROTECTION_PASSWORD`) | Impide edición casual; **no es cifrado** — inmutabilidad real = PDF oficial |
 | DT-05 | Caché local en disco (`FileSystemReportOutputStorage`, volumen Docker `mspi_report_outputs`) como primera fuente de descarga, con `ms_evidence` como respaldo | Evita una llamada de red adicional en el camino feliz de descarga inmediata tras generación; degrada con gracia si el archivado remoto falló (RN-12) |
 | DT-06 | Archivado a `ms_evidence` desacoplado del resultado del job (best effort, captura `RuntimeException`) | El artefacto ya es útil para el usuario aunque `ms_evidence` esté caído; se prioriza la experiencia del usuario final sobre la completitud de la trazabilidad de evidencias |
 | DT-07 | Autenticación dual: JWT de usuario para la API pública, `X-Internal-Api-Key` para las llamadas server-to-server hacia `ms_assessment`/`ms_evidence`/`ms_catalog` | Evita propagar el JWT del usuario final a servicios internos (que podría expirar durante un procesamiento largo) y separa el plano de confianza "usuario↔gateway" del plano "servicio↔servicio" |
