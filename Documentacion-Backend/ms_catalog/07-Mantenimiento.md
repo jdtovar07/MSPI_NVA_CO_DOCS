@@ -20,8 +20,9 @@
 Dado que no hay API de escritura, cualquier cambio al contenido del instrumento (nuevo control, ajuste de pesos PHVA, nuevo requisito de madurez, actualización de metas NIST) requiere:
 
 1. Editar directamente `schema.sql` (si hay cambio estructural) y/o los seeds `data.sql` / `nist_ciber_data.sql` / `maturity_data.sql`.
-2. Aplicar el script SQL manualmente contra la base de datos del entorno correspondiente (no hay Flyway/Liquibase ni ninguna herramienta de migración versionada evidenciada; `spring.jpa.hibernate.ddl-auto: none` y `spring.sql.init.mode: never` confirman que Spring Boot no participa de este proceso).
-3. Publicar una nueva `template_version` (`status = PUBLISHED`, `published_at` actual) para que `GetActiveTemplateVersionUseCase` la resuelva como activa; no hay endpoint ni script documentado para automatizar este paso — se infiere que se realiza por `UPDATE`/`INSERT` SQL directo.
+2. **Mantener paridad Docker ↔ classpath:** cambios al texto de PRUEBA (`test_guidance`) van en `docker-config/docker/postgres/init/MER-SEED-TESTGUIDANCE.sql` **y** al final de `ms_catalog/.../resources/data.sql` (mismo bloque de 93 `UPDATE`).
+3. Aplicar el script SQL manualmente contra la base de datos del entorno correspondiente (no hay Flyway/Liquibase ni ninguna herramienta de migración versionada evidenciada; `spring.jpa.hibernate.ddl-auto: none` y `spring.sql.init.mode: never` confirman que Spring Boot no participa de este proceso). En Docker, los `MER-SEED-*.sql` solo corren al **crear** el volumen; en volúmenes existentes hay que reaplicar el SQL a mano.
+4. Publicar una nueva `template_version` (`status = PUBLISHED`, `published_at` actual) para que `GetActiveTemplateVersionUseCase` la resuelva como activa; no hay endpoint ni script documentado para automatizar este paso — se infiere que se realiza por `UPDATE`/`INSERT` SQL directo.
 
 Existe un script auxiliar `applications/app-service/src/main/resources/gen_maturity_seeds.py` (Python) para generar los `INSERT` de `maturity_data.sql`, evidencia de que al menos parte de la carga de datos de madurez se generó programáticamente a partir de una fuente externa (probablemente la hoja de cálculo/Excel de línea base ISO 27001 del proyecto), en lugar de escribirse el SQL a mano.
 

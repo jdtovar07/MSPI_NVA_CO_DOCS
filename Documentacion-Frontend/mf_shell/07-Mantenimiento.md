@@ -11,6 +11,10 @@
 - No hay pipeline de CI/CD (`.github/workflows` ausente) que automatice la publicación de versiones o imágenes Docker.
 - Recomendación: adoptar versionado semántico (`MAJOR.MINOR.PATCH`) ligado a cambios en el protocolo `postMessage` (`MSPI_*`), dado que cualquier cambio en el contrato de mensajes entre el shell y sus 5 microfrontends hijos es, de facto, un cambio de interfaz pública que puede romper la integración si no se coordina entre repositorios.
 
+## 1.1. Marca en UI y anti–information disclosure
+
+La UI orientada al usuario final **no** debe exponer nombres internos de microservicio/microfrontend (`ms_*`, `mf_*`), la frase `Micro-frontend` ni puertos locales (`puerto 42xx`). Los `<title>` de pestaña usan la marca **AuditCyber** (p. ej. `AuditCyber`, `AuditCyber — Acceso`). Comentarios de código y `environment*.ts` pueden seguir nombrando servicios; eso no es texto visible. Checklist de regresión: `Documentacion-General/11-Validacion-End-to-End.md` §6.A.
+
 ## 2. Monitoreo
 
 - El único mecanismo de monitoreo presente es el `HEALTHCHECK` de Docker (`curl -f http://127.0.0.1/` cada 30s, definido en `deployment/Dockerfile`), que solo verifica que Nginx sirve el `index.html`, sin comprobar la salud de los microfrontends hijos ni de los microservicios backend.

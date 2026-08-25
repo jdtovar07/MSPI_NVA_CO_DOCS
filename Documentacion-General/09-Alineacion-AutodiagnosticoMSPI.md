@@ -99,7 +99,7 @@ Se levantó un PostgreSQL desechable con los scripts reales de init de Docker (`
 | Referencias de control rotas en madurez | **0** |
 | Herencias PHVA rotas en madurez | **0** (hereda de C.5/C.6/C.7/C.10) |
 
-> **Nota importante de infraestructura:** el stack Docker **no** siembra desde `ms_catalog/.../resources/data.sql` (`spring.sql.init.mode: never`, `ddl-auto: none`), sino desde `docker-config/docker/postgres/init/MER-SEED-CATALOG.sql` (montado en `/docker-entrypoint-initdb.d`). Ambos archivos quedaron sincronizados con v2; para validar contra Docker hay que mirar el MER-SEED, no el `data.sql`.
+> **Nota importante de infraestructura:** el stack Docker **no** siembra desde `ms_catalog/.../resources/data.sql` (`spring.sql.init.mode: never`, `ddl-auto: none`), sino desde `docker-config/docker/postgres/init/` (`MER-SEED-CATALOG.sql` + `MER-SEED-TESTGUIDANCE.sql` y demás `MER-SEED-*.sql`, montados en `/docker-entrypoint-initdb.d`). El texto completo de **PRUEBA** (`test_guidance`) vive en `MER-SEED-TESTGUIDANCE.sql` (93 `UPDATE`) y se replica al final de `ms_catalog/.../resources/data.sql` para el modo no-Docker. En un volumen Postgres ya existente, hay que reaplicar `MER-SEED-TESTGUIDANCE.sql` a mano (o hacer reset del volumen) porque el init solo corre al crear el volumen.
 
 ### 6.3 Validación end-to-end por UI — ⬜ pendiente (requiere entorno con secretos)
 Levantar el stack completo (6 microservicios + Keycloak + UI) con los secretos de Infisical, crear una evaluación, cargar los puntajes de muestra del Excel y comparar la PORTADA **celda a celda**. Procedimiento en la sección 7.

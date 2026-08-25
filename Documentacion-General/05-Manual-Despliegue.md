@@ -54,7 +54,7 @@ cd MSPI_NVA_CO_MR_BACK\docker-config
 .\levantar-todo.ps1 -Reset
 ```
 
-El DDL real de la base de datos vive en `docker-config/docker/postgres/init/MER-MSPI.sql` y solo se ejecuta al **crear** el volumen de Postgres — un reset es necesario para aplicar cambios de esquema.
+El DDL real de la base de datos vive en `docker-config/docker/postgres/init/MER-MSPI.sql` y solo se ejecuta al **crear** el volumen de Postgres — un reset es necesario para aplicar cambios de esquema. Los seeds (`MER-SEED-*.sql`, incluido `MER-SEED-TESTGUIDANCE.sql` con el texto completo de PRUEBA) siguen la misma regla: en un volumen ya existente hay que reaplicarlos a mano o hacer `-Reset`.
 
 ## 6. Verificación
 

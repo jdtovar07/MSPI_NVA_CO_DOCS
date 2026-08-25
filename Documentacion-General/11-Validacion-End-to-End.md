@@ -72,9 +72,12 @@ Se calificaron los sub-numerales de las 7 cláusulas con `80`.
 
 Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 
-**A. Seguridad / limpieza**
+**A. Seguridad / limpieza (sin information disclosure)**
 - [ ] El login **no** muestra la caja de "Usuarios de prueba" ni contraseñas.
-- [ ] En **Auditoría**, el subtítulo no menciona `(ms_iam)`.
+- [ ] Ningún texto visible al usuario menciona `ms_*`, `mf_*`, `Micro-frontend` ni `(puerto XXXX)`.
+- [ ] Títulos de pestaña usan la marca **AuditCyber** (p. ej. `AuditCyber — Evaluaciones`), no el nombre del microfrontend.
+- [ ] En miembros de evaluación, el selector de usuario se etiqueta **Usuario** (sin `(ms_iam)`).
+- [ ] En el panel de control, la ayuda de evidencias dice que se guardan **de forma segura** (sin nombrar el servicio) y el enlace es **Gestionar evidencias →**.
 
 **B. Organización (bug #1 y #2)**
 - [ ] Crear organización con **correo** → al guardar **aparece un toast de éxito** y **redirige a la lista**.
