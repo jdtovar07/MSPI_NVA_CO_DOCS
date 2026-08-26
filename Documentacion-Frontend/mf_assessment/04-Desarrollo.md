@@ -160,9 +160,18 @@ Este componente además carga en paralelo dos dependencias antes de habilitar el
 
 `ControlDetailPanelComponent` separa **diligenciamiento** y **revisión**:
 
-- **Diligenciamiento** (`!reviewMode`): `controlStatus` solo admite `PENDIENTE` \| `EN_PROGRESO` \| `COMPLETADO`. Guarda vía `PatchControlScoreUseCase` → `PATCH .../controls/{nodeId}` (toast de éxito/error).
-- **Revisión** (`reviewMode`, evaluación `EN_REVISION` + rol Revisor/EvaluadorRevisor): select Validado / Requiere ajustes → `ReviewControlUseCase` → `PATCH .../controls/{nodeId}/review` con `{ reviewStatus: VALIDATED|NEEDS_CHANGES, comment? }`. Evidencia/brecha/recomendación quedan en solo lectura. El estado actual se lee de `reviewStatus` del control.
+- **Diligenciamiento** (`!reviewMode`): `controlStatus` solo admite `PENDIENTE` \| `EN_PROGRESO` \| `COMPLETADO`. Guarda vía `PatchControlScoreUseCase` → `PATCH .../controls/{nodeId}` (callbacks `[persistSave]` del padre).
+- **Revisión** (`reviewMode`, evaluación `EN_REVISION` + rol Revisor/EvaluadorRevisor): select Validado / Requiere ajustes → `ReviewControlUseCase` → `PATCH .../controls/{nodeId}/review` con `{ reviewStatus: VALIDATED|NEEDS_CHANGES, comment? }` (`[persistReview]`). Evidencia/brecha/recomendación quedan en solo lectura. El estado actual se lee de `reviewStatus` del control.
 - **% Validado** en `ControlsPageComponent`: cuenta controles con `reviewStatus === 'VALIDATED'` sobre el total de hojas (no usa `controlStatus`).
+
+**Cierre del modal al guardar** (ambos flujos pasan por `persist()`):
+
+| Resultado | Toast | Modal |
+|-----------|-------|-------|
+| Éxito diligenciamiento | «Calificación guardada correctamente» | Cierra (`close` → `closePanel()` limpia `selectedNodeId` / `selectedDetail`) |
+| Éxito revisión | «Revisión guardada correctamente» | Cierra igual |
+| Error | mensaje de error | Se mantiene abierto; `failCount++`. Al 3.er fallo consecutivo en el mismo control, cierra igual |
+| Nuevo control en el panel | — | `failCount = 0` al sincronizar el `@Input detail` (`syncForm`) |
 
 También expone **"Gestionar evidencias →"** vía `openShellRoute('/evidence', assessmentId)`.
 

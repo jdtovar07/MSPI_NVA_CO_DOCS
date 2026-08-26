@@ -19,9 +19,11 @@ src/app/
 └── presentation/        # páginas del wizard, componentes compartidos
 ```
 
-**UX de formularios / guardado:** mismo patrón que `mf_org` — `fieldErrors` + `submitAttempted`, kit `shared/validation/`, toast en guardado de calificación (`control-detail-panel`) y áreas/temas; `ErrorDetail.field` en 400. Temas de área requieren `topic` + `staffName` (funcionario; alias JSON `funcionario` en backend).
+**UX de formularios / guardado:** mismo patrón que `mf_org` — `fieldErrors` + `submitAttempted`, kit `shared/validation/`, toast en guardado de calificación/revisión (`control-detail-panel`) y áreas/temas; `ErrorDetail.field` en 400. Temas de área requieren `topic` + `staffName` (funcionario; alias JSON `funcionario` en backend).
 
 **Revisión vs diligenciamiento:** el select de estado del control en diligenciamiento no incluye Validado/Requiere ajustes; esas decisiones viven en `control_review` (`reviewStatus`) vía endpoint dedicado. El indicador «Validado %» de `mspi-completion-status` se calcula con `reviewStatus === 'VALIDATED'`.
+
+**Modal de control al guardar:** el panel usa `[persistSave]` / `[persistReview]` (await + catch). Éxito → toast + `close`; fallo → toast de error y el modal permanece abierto hasta 3 fallos consecutivos en el mismo control (`failCount`, se resetea al cargar otro control); al 3.er fallo cierra igual. El padre (`controls-page.closePanel`) limpia selección.
 
 Esta organización es idéntica en intención a la de `mf_auth` (mismo patrón replicado en el ecosistema MSPI), pero con un dominio funcional propio: el instrumento de evaluación de madurez.
 

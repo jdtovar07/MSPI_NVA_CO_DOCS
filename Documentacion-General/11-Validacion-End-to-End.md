@@ -83,6 +83,7 @@ Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 **A2. Revisión de controles**
 - [ ] En diligenciamiento, el select de estado del control solo tiene Pendiente / En progreso / Completado (sin Validado / Requiere ajustes).
 - [ ] En `EN_REVISION` con rol revisor, guardar Validado/Requiere ajustes persiste vía revisión (toast «Revisión guardada correctamente») y el % Validado sube al marcar Validado.
+- [ ] Tras guardar calificación u revisión con éxito, el modal se cierra; si falla, permanece abierto (toast de error) y solo cierra tras 3 fallos consecutivos en el mismo control.
 
 **B. Organización (bug #1 y #2)**
 - [ ] Crear organización con **correo** → al guardar **aparece un toast de éxito** y **redirige a la lista**.
