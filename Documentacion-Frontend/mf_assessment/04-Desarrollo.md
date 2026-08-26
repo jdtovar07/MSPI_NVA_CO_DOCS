@@ -156,6 +156,14 @@ async submit(): Promise<void> {
 
 Este componente además carga en paralelo dos dependencias antes de habilitar el formulario: el listado de organizaciones (`ListOrganizationsUseCase`) y el catálogo (`CatalogCacheService.ensureLoaded()`, del cual toma `templateVersion.id`), acumulando mensajes de error independientes si alguna de las dos cargas falla.
 
+## 6.1 Mis evaluaciones asignadas
+
+`MyAssignedEvaluationsPageComponent` (`/evaluations/my-assigned`) consume `GET /assessments/my-assigned`:
+
+- **`dueDate` null** → celda «Sin fecha límite» (muted); `formatDate` / `daysLabel` / `dueClass` no tratan `null` como fecha (evita «31/12/1969 Vencida»).
+- **`progress` null** → «—» y barra al 0%; con valor numérico → `N%` y ancho de barra. El backend calcula el % con el rollup (controles `SCORED` / total hojas).
+- **`overallScore` null/0** → «—».
+
 ## 7. Calificación y revisión de un control
 
 `ControlDetailPanelComponent` separa **diligenciamiento** y **revisión**:

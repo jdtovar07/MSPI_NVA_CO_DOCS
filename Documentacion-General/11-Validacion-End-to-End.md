@@ -85,6 +85,10 @@ Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 - [ ] En `EN_REVISION` con rol revisor, guardar Validado/Requiere ajustes persiste vía revisión (toast «Revisión guardada correctamente») y el % Validado sube al marcar Validado.
 - [ ] Tras guardar calificación u revisión con éxito, el modal se cierra; si falla, permanece abierto (toast de error) y solo cierra tras 3 fallos consecutivos en el mismo control.
 
+**A3. Mis evaluaciones asignadas**
+- [ ] Sin `dueDate`, la columna Fecha límite muestra «Sin fecha límite» (no «31/12/1969» ni «Vencida»).
+- [ ] `progress` muestra un % coherente con controles calificados / total (o «—»/0% si aún no hay datos); nunca el texto «null%».
+
 **B. Organización (bug #1 y #2)**
 - [ ] Crear organización con **correo** → al guardar **aparece un toast de éxito** y **redirige a la lista**.
 - [ ] En la lista de organizaciones se ve la columna **Correo** con el email guardado.
