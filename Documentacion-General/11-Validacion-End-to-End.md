@@ -88,6 +88,7 @@ Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 **A3. Mis evaluaciones asignadas / plazos**
 - [ ] Sin `dueDate`, la columna Fecha límite muestra «Sin fecha límite» (no «31/12/1969» ni «Vencida»).
 - [ ] `progress` muestra un % coherente con controles calificados / total (o «—»/0% si aún no hay datos); nunca el texto «null%».
+- [ ] Una evaluación **nueva** arranca con progreso **0%** (controles en `PENDING`, no `SCORED`/0).
 - [ ] En Configuración → Evaluaciones → Plazos, se pueden guardar días iniciales (1–365, default 30) y días de ampliación (default 15).
 - [ ] Una evaluación nueva tiene `due_date` = creación + días iniciales.
 - [ ] Con evaluación vencida o ≤5 días, el evaluador asignado puede solicitar ampliación (motivo obligatorio); no puede haber 2 PENDING.

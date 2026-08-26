@@ -161,7 +161,7 @@ Este componente además carga en paralelo dos dependencias antes de habilitar el
 `MyAssignedEvaluationsPageComponent` (`/evaluations/my-assigned`) consume `GET /assessments/my-assigned`:
 
 - **`dueDate` null** → celda «Sin fecha límite» (muted); `formatDate` / `daysLabel` / `dueClass` no tratan `null` como fecha (evita «31/12/1969 Vencida»).
-- **`progress` null** → «—» y barra al 0%; con valor numérico → `N%` y ancho de barra. El backend calcula el % con el rollup (controles `SCORED` / total hojas).
+- **`progress` null** → «—» y barra al 0%; con valor numérico → `N%` y ancho de barra. El backend calcula el % con el rollup (controles `SCORED` con valor / total hojas). Evaluaciones nuevas nacen en `PENDING` → progreso 0%.
 - **`overallScore` null/0** → «—».
 - **Ampliación**: si la evaluación está vencida o por vencer (≤5 días) y el miembro es Evaluador/EvaluadorRevisor, botón «Solicitar ampliación» (motivo obligatorio + adjunto opcional `EXTENSION_REQUEST`). Badge de estado de la última solicitud. Bandeja de aprobación en `/evaluations/extension-requests`.
 
