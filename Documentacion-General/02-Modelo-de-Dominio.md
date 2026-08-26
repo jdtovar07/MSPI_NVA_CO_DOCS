@@ -180,7 +180,7 @@ flowchart LR
 | `assessment.assessment_phva_item` / `assessment.phva_item_response` | Snapshot + respuesta manual; incluye `parent_code` y `node_type` (CLAUSE\|ITEM) | v1 ≈17 ítems planos; v2 = 7 cláusulas + 23 sub-numerales |
 | `assessment.assessment_maturity_requirement` / `..._threshold` / `..._response` | `source_type (ADMIN\|TECH\|PHVA\|MATURITY)`, `scoring_mode`, `inherit_rule`, `composite_phva_codes` | ~50 requisitos de madurez (R1..R55) + matriz de 5 umbrales cada uno |
 | `assessment.assessment_nist_ciber_item` / `nist_ciber_item_response` | `function_code`, `subcategory_code`, `scoring_mode`, `iso_control_code` | ~188 filas Ciber por evaluación |
-| `assessment.control_review` / `control_comment_thread` / `control_comment` | `review_status (VALIDATED\|NEEDS_CHANGES)`, `severity`, hilos de comentarios por control | Flujo de revisión (rol `Revisor`) |
+| `assessment.control_review` / `control_comment_thread` / `control_comment` | `control_response_id (UK)`, `review_status (VALIDATED\|NEEDS_CHANGES)`, `comment`, `severity`, `reviewed_by`, `reviewed_at`; hilos de comentarios por control | Revisión activa vía `PATCH /controls/{nodeId}/review` (`ReviewControlUseCase` → UPSERT). El % Validado en UI cuenta `reviewStatus === VALIDATED`, no `controlStatus` |
 | `assessment.assessment_area` / `assessment_area_topic` | `area_preset_code (ref.)`, `default_steward_role_code (ref.)`, `staff_name/role/contact` | Instancia por evaluación de las 8 áreas y sus responsables (Módulo 2) |
 | `assessment.gap_register` / `gap_action` | `gap_text`, `priority`, `owner`, `due_date`, `status` | Extensión opcional de plan de acción; **no sustituye** el listado de brechas calculado on-read (`score < 60`) |
 
@@ -193,7 +193,7 @@ flowchart LR
 
 ### Endpoints principales
 
-`AssessmentApi`, `AssessmentAreasApi`, `AssessmentControlApi` (incluye rollup jerárquico), `ControlStewardApi`, `AssessmentPhvaApi`, `AssessmentMaturityApi`, `AssessmentNistApi`, `AssessmentDiagnosticApi` (`/diagnostic/dashboard`), `AssessmentGapsApi`, `InternalAssessmentReportingApi` (interno, consumido por `ms_reporting`).
+`AssessmentApi`, `AssessmentAreasApi`, `AssessmentControlApi` (incluye rollup jerárquico y `PATCH .../controls/{nodeId}/review`), `ControlStewardApi`, `AssessmentPhvaApi`, `AssessmentMaturityApi`, `AssessmentNistApi`, `AssessmentDiagnosticApi` (`/diagnostic/dashboard`), `AssessmentGapsApi`, `InternalAssessmentReportingApi` (interno, consumido por `ms_reporting`).
 
 ---
 

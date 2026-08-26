@@ -36,7 +36,8 @@
 | Workflow | `GET /assessments/my-assigned`, `GET /assessments/workflow-rules`, `POST /assessments/{id}/status`, `POST .../reopen`, `GET .../status-history` | Rol de miembro + estado |
 | Miembros | `GET/POST /assessments/{id}/members`, `DELETE /assessments/{id}/members/{memberId}` | `AdminSistema` (mutación) |
 | Áreas y responsables | `GET/PUT /assessments/{id}/areas`, `PUT .../areas/{areaId}/topics` | Rol de miembro editor |
-| Controles | `GET /assessments/{id}/controls`, `GET/PATCH .../controls/{nodeId}`, `GET .../scores/rollup` | Rol de miembro editor |
+| Controles | `GET /assessments/{id}/controls`, `GET/PATCH .../controls/{nodeId}`, `GET .../scores/rollup` | Rol de miembro editor (`controlStatus`: PENDIENTE\|EN_PROGRESO\|COMPLETADO). `GET` incluye `reviewStatus` (VALIDATED\|NEEDS_CHANGES\|null) |
+| Revisión de control | `PATCH .../controls/{nodeId}/review` body `{ reviewStatus, comment?, severity? }` | `AssessmentAccessGuard.requireReview` (Revisor/EvaluadorRevisor + estado EN_REVISION). UPSERT en `assessment.control_review` |
 | Stewardship | `GET .../controls/stewardship`, `PATCH .../controls/{nodeId}/steward` | Rol de miembro editor |
 | PHVA / Madurez / NIST | `GET/PATCH .../phva/items[/{id}]`, `.../maturity/requirements[/{id}]`, `.../nist/items[/{id}]` (+ `.../summary`) | Rol de miembro editor |
 | Diagnóstico | `GET /assessments/{id}/diagnostic/dashboard`, `.../diagnostic/domain-effectiveness`, `GET .../gaps` | Autenticado |
