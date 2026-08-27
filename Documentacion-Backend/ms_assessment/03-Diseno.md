@@ -175,6 +175,8 @@ Esquema `assessment` en PostgreSQL (`applications/app-service/src/main/resources
 erDiagram
     "assessment.assessment" ||--o{ "assessment.assessment_member" : tiene
     "assessment.assessment" ||--o{ "assessment.assessment_status_history" : historial
+    "assessment.assessment" ||--o{ "assessment.assessment_extension_request" : ampliacion
+    "assessment.assessment" ||--o{ "assessment.assessment_deletion_request" : eliminacion_logica
     "assessment.assessment" ||--o{ "assessment.assessment_area" : contiene
     "assessment.assessment" ||--o{ "assessment.assessment_control_node" : snapshot
     "assessment.assessment" ||--o{ "assessment.assessment_phva_item" : snapshot
@@ -200,8 +202,36 @@ erDiagram
         varchar entity_order_type_code
         numeric phva_expected_advance_snapshot
         varchar status "BORRADOR/CERRADA"
+        date due_date
         UUID cloned_from_assessment_id
         int row_version "concurrencia optimista"
+        timestamptz deleted_at "soft-delete; NULL=activa"
+        timestamptz created_at
+    }
+    "assessment.assessment_deletion_request" {
+        UUID id PK
+        UUID assessment_id FK
+        UUID requested_by FK
+        text reason
+        UUID attachment_file_id "FK evidence opcional"
+        varchar status "PENDING/APPROVED/REJECTED/CANCELLED"
+        timestamptz scheduled_deletion_at "gracia tras APPROVED"
+        UUID decision_by FK
+        timestamptz decision_at
+        text decision_comment
+        timestamptz created_at
+    }
+    "assessment.assessment_extension_request" {
+        UUID id PK
+        UUID assessment_id FK
+        UUID requested_by FK
+        text reason
+        UUID attachment_file_id "FK evidence opcional"
+        int days
+        varchar status "PENDING/APPROVED/REJECTED"
+        UUID decision_by FK
+        timestamptz decision_at
+        text decision_comment
         timestamptz created_at
     }
     "assessment.assessment_control_node" {
@@ -259,7 +289,8 @@ erDiagram
 - **Todas las tablas `*_response`** (`control_response`, `phva_item_response`, `assessment_maturity_requirement_response`, `nist_ciber_item_response`) comparten el mismo patrón de score: dominio `PENDING`/`SCORED`/`NA` (en controles ISO el snapshot nace en `PENDING` con `score_value` nulo; PHVA/madurez/NIST manuales aún pueden inicializar en `SCORED`/`0`). Al PATCH, `score_value IS NULL` si `NA`/`PENDING`, o valor de escala si `SCORED`. La capa de dominio (`PatchControlScoreUseCase`, etc.) valida además contra la escala publicada por `ms_catalog`.
 - **`assessment_maturity_requirement`** es la tabla más compleja del esquema: combina cuatro estrategias de origen de valor (`source_type`) y cinco reglas de herencia (`inherit_rule`), con columnas de referencia condicionales según el tipo (`source_assessment_control_node_id`, `source_assessment_phva_item_id`, `composite_phva_codes` JSONB para la regla `INHERIT_PHVA_COMPOSITE_AVG`). `assessment_maturity_threshold` es una tabla hija 1:5 (un umbral por nivel CMMI 1–5), con `is_na` para marcar niveles donde el requisito no aplica.
 - **`row_version` en `assessment`** implementa el control de concurrencia optimista de `PublishAssessmentUseCase` (RI-2/RNF-05 en `01-Planificacion.md`) a nivel de aplicación (no usa `@Version` de JPA con excepción automática; la comparación es explícita en el caso de uso, devolviendo `BusinessRulesOnFieldsException` → HTTP 409 vía `GlobalExceptionHandler`, que no tiene un manejador específico para conflicto de versión y por tanto lo mapea igual que cualquier regla de negocio — ver `05-Pruebas.md`/`07-Mantenimiento.md`).
-- **Índices**: 21 índices explícitos, mayoritariamente compuestos por `assessment_id` + una columna de filtro/orden frecuente (`position`, `iso_code`, `component`, `function_code`, `source_type`), reflejando que casi todo acceso de lectura es "todo lo de una evaluación, en su orden natural" — patrón coherente con el cálculo on-read que recorre el árbol completo en cada rollup.
+- **Borrado lógico**: `assessment.deleted_at` marca la eliminación; las consultas de listado/get/dashboard filtran `deleted_at IS NULL`. La solicitud vive en `assessment_deletion_request` (análoga a `assessment_extension_request`): al aprobar se calcula `scheduled_deletion_at = now + assessmentDeletionGraceDays` (config `ms_iam`); el sweeper horario (`AssessmentDeletionSweeper`) setea `deleted_at` de forma idempotente. Cancelar durante la gracia anula la programación sin borrar el historial de la solicitud.
+- **Índices**: índices compuestos por `assessment_id` + filtro/orden frecuente (`position`, `iso_code`, `component`, `function_code`, `source_type`, y `(assessment_id, status)` en extension/deletion request), reflejando que casi todo acceso de lectura es "todo lo de una evaluación, en su orden natural" — patrón coherente con el cálculo on-read que recorre el árbol completo en cada rollup.
 - **`maturity_data.sql`** no forma parte del ciclo de vida de `ms_assessment`: es un script de siembra de datos de **catálogo** (`catalog.maturity_requirement_catalog`, `catalog.maturity_threshold`, `catalog.template_version.maturity_crit_thresholds`) usado para poblar un entorno de prueba con el que `ms_assessment` genera snapshots reales; documenta indirectamente la forma exacta de las estructuras JSON/relacionales que `CatalogGateway` espera recibir de `ms_catalog` (p. ej. `maturity_crit_thresholds` como JSONB `{"nivel": {"sufficientMax": n, "intermediateMax": n}}`, consumido por `ComputeMaturitySummaryUseCase` para clasificar SUFICIENTE/INTERMEDIO/CRÍTICO).
 
 ## 6. Diseño de la API (REST)
@@ -269,7 +300,7 @@ Contrato formal en `docs/openapi.yaml` (OpenAPI 3.1.0 en el header aunque `info.
 Convenciones de diseño observadas, consistentes con las del resto del ecosistema MSPI (mismo patrón que `ms_iam`):
 
 - **Envoltorio uniforme de respuesta**: éxito → `CorrectResponse{meta:{traceId,timestamp}, data}`; error → `ErrorResponse{meta, error:[{code,message}]}`, construidos por `ApiResponseMapper` (`:common`). Las operaciones `PATCH` de calificación/steward devuelven `data: null` (efecto puramente de escritura, sin cuerpo de retorno).
-- **Un `RestController` por subdominio funcional**, no por tabla: `AssessmentApi` (`/assessments`), `AssessmentAreasApi` (`/assessments/{id}/areas`), `AssessmentControlApi` (`/assessments/{id}/controls`, incluye rollup), `ControlStewardApi` (`/assessments/{id}/controls/stewardship`), `AssessmentPhvaApi`, `AssessmentMaturityApi`, `AssessmentNistApi`, `AssessmentDiagnosticApi`, `AssessmentGapsApi`, y `InternalAssessmentReportingApi` bajo `/internal/assessments`.
+- **Un `RestController` por subdominio funcional**, no por tabla: `AssessmentApi` (`/assessments`), `AssessmentAreasApi`, `AssessmentControlApi` (incluye rollup), `ControlStewardApi`, `AssessmentPhvaApi`, `AssessmentMaturityApi`, `AssessmentNistApi`, `AssessmentDiagnosticApi`, `AssessmentGapsApi`, `AssessmentExtensionApi`, `AssessmentDeletionApi` (solicitud/aprobación/gracia/cancelar + listado soft-deleted), y `InternalAssessmentReportingApi` bajo `/internal/assessments`.
 - **Recursos jerárquicos anidados bajo `/assessments/{assessmentId}`**: todo el modelo de rutas cuelga del identificador de evaluación (excepto la creación), reflejando que la evaluación es el agregado raíz de todo el dominio.
 - **DTO de entrada validado con Bean Validation** (`@Valid`) y mapeo explícito DTO↔dominio en 9 clases `*Mapper` — el controlador nunca recibe/retorna objetos de `domain/model` directamente.
 - **Manejo de errores centralizado** en `GlobalExceptionHandler` (`@RestControllerAdvice`), con solo **6 manejadores específicos** (`ResourceNotFoundException`→404, `BusinessRulesOnFieldsException`→400, `UserAlreadyExistsException`→409, `IamServiceException`→502, `MethodArgumentNotValidException`→400, `DomainException`→500) y **sin manejador genérico `Exception.class`** — a diferencia de `ms_iam`, que sí define una red de seguridad final. `UserAlreadyExistsException` e `IamServiceException` son excepciones heredadas del módulo `:common` compartido con `ms_iam`, pero no se detectó ningún caso de uso de `ms_assessment` que las lance: son manejadores presentes por reutilización del módulo `common`, no por necesidad funcional propia (ver ausencias en `07-Mantenimiento.md`).

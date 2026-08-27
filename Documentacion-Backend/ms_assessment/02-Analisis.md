@@ -156,6 +156,6 @@ Algoritmo documentado en el propio código (`ComputeAssessmentRollupUseCase`), d
 
 ## 6. Ausencias explícitas
 
-- No se encontró código de **workflow de aprobación multiusuario** (roles diferenciados como "Revisor" no aparecen en `SecurityConfig`; toda ruta bajo `/assessments/**` solo exige `authenticated()`, sin `@PreAuthorize` por rol específico en los controladores revisados).
-- No hay soft-delete ni endpoint de eliminación de evaluaciones en el código (`AssessmentPersistenceGateway` no declara ningún método `delete`).
+- No se encontró código de **workflow de aprobación multiusuario genérico** más allá de los flujos ya implementados de ampliación y eliminación lógica (guards `requireExtension*` / `requireDeletion*` en `AssessmentAccessGuard`); `SecurityConfig` sigue exigiendo `authenticated()` y la autorización de negocio vive en esos guards.
+- La **eliminación física** de evaluaciones no existe a propósito: el borrado es lógico (`assessment.deleted_at`) tras aprobación + periodo de gracia (`assessment_deletion_request` + sweeper). El registro permanece para auditoría.
 - No se encontró notificación (correo/webhook) al publicar o calificar; el único efecto colateral observado es la auditoría best-effort hacia `ms_iam`.

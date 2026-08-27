@@ -117,7 +117,7 @@ Ambas son *factories* de `CanActivateFn` (funciones que devuelven una función g
 
 ## 7. Parámetros del sistema
 
-`SystemSettingsPageComponent` (`/system-settings`) consume `GET/PUT /system/config` de `ms_iam`. En la pestaña **Evaluaciones** incluye la sección **Plazos de evaluación** (`assessmentDueDays` default 30, `assessmentExtensionDays` default 15; rango 1–365).
+`SystemSettingsPageComponent` (`/system-settings`) consume `GET/PUT /system/config` de `ms_iam`. En la pestaña **Evaluaciones** incluye la sección **Plazos de evaluación** (`assessmentDueDays` default 30, `assessmentExtensionDays` default 15, `assessmentDeletionGraceDays` default 5; rango 1–365).
 
 ## 8. Módulos placeholder
 

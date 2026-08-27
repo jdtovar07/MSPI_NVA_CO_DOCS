@@ -172,7 +172,9 @@ flowchart LR
 
 | Entidad | Atributos clave reales | Notas |
 |---|---|---|
-| `assessment.assessment` | `id (PK)`, `organization_id (ref. lógica)`, `template_version_id (ref. lógica, snapshot aplicado)`, `name`, `organization_name_snapshot`, `evaluation_date`, `period_label`, `entity_order_type_code`, `phva_expected_advance_snapshot`, `status (BORRADOR\|EN_DILIGENCIAMIENTO\|EN_REVISION\|CERRADA)`, `cloned_from_assessment_id`, `row_version (int, bloqueo optimista)` | Agregado raíz; 13 pasos de inicialización obligatoria al crear (ver `DB-MER.txt` líneas 1022-1048) |
+| `assessment.assessment` | `id (PK)`, `organization_id (ref. lógica)`, `template_version_id (ref. lógica, snapshot aplicado)`, `name`, `organization_name_snapshot`, `evaluation_date`, `due_date`, `period_label`, `entity_order_type_code`, `phva_expected_advance_snapshot`, `status (BORRADOR\|EN_DILIGENCIAMIENTO\|EN_REVISION\|CERRADA)`, `cloned_from_assessment_id`, `row_version (int, bloqueo optimista)`, `deleted_at (timestamptz, soft-delete)` | Agregado raíz; listados/get filtran `deleted_at IS NULL`; el registro no se borra físicamente |
+| `assessment.assessment_extension_request` | `id`, `assessment_id`, `requested_by`, `reason`, `attachment_file_id`, `days`, `status (PENDING\|APPROVED\|REJECTED)`, `decision_*` | Flujo de ampliación de `due_date` con aprobación |
+| `assessment.assessment_deletion_request` | `id`, `assessment_id`, `requested_by`, `reason`, `attachment_file_id`, `status (PENDING\|APPROVED\|REJECTED\|CANCELLED)`, `scheduled_deletion_at`, `decision_*` | Eliminación lógica con gracia (`assessmentDeletionGraceDays`); cancelar = recuperar antes del sweeper |
 | `assessment.assessment_edit_lock` | `assessment_id (PK)`, `locked_by_user_id`, `lock_token`, `expires_at` | Bloqueo pesimista opcional, complementario al optimista |
 | `assessment.assessment_member` | `assessment_id + user_id (PK compuesta)`, `member_role (EVALUATOR\|REVIEWER\|READER)`, `is_leader (bool)` | Equipo de trabajo de la evaluación — base del control de acceso por membresía |
 | `assessment.assessment_control_node` | `id (PK)`, `assessment_id (FK)`, `source_catalog_node_id (ref. lógica al catálogo)`, `parent_id (FK, árbol, auto-referencia)`, `node_type`, `control_type (ADMIN\|TECH)`, `code`, `iso_code`, `is_scored`, `default_steward_role_code` | **Snapshot congelado** del árbol de controles al momento de crear la evaluación |
@@ -193,7 +195,7 @@ flowchart LR
 
 ### Endpoints principales
 
-`AssessmentApi`, `AssessmentAreasApi`, `AssessmentControlApi` (incluye rollup jerárquico y `PATCH .../controls/{nodeId}/review`), `ControlStewardApi`, `AssessmentPhvaApi`, `AssessmentMaturityApi`, `AssessmentNistApi`, `AssessmentDiagnosticApi` (`/diagnostic/dashboard`), `AssessmentGapsApi`, `InternalAssessmentReportingApi` (interno, consumido por `ms_reporting`).
+`AssessmentApi`, `AssessmentAreasApi`, `AssessmentControlApi` (incluye rollup jerárquico y `PATCH .../controls/{nodeId}/review`), `ControlStewardApi`, `AssessmentPhvaApi`, `AssessmentMaturityApi`, `AssessmentNistApi`, `AssessmentDiagnosticApi` (`/diagnostic/dashboard`), `AssessmentGapsApi`, `AssessmentExtensionApi`, `AssessmentDeletionApi` (solicitud/aprobación/gracia/cancelar + `GET /assessments/deleted`), `InternalAssessmentReportingApi` (interno, consumido por `ms_reporting`).
 
 ---
 
@@ -208,7 +210,7 @@ flowchart LR
 | Entidad | Atributos clave reales | Notas |
 |---|---|---|
 | `evidence.assessment_context` | `assessment_id (PK, 1:1 con assessment)`, `mission`, `context_analysis`, `process_map`, `organigram`, `self_perception_concern`, `self_perception_maturity`, `self_perception_phva_component`, `version` | Solo texto libre; no participa en cálculos numéricos. La auto-percepción se compara en el tablero de diagnóstico contra los resultados objetivos calculados |
-| `evidence.evidence_file` | `id (PK)`, `assessment_id (ref. lógica)`, `relation_type (CONTROL_RESPONSE\|LIFTING_DOC\|CONTEXT\|GLOBAL\|GAP_ACTION\|REPORT_OUTPUT)`, `relation_id`, `filename`, `content_type`, `size_bytes`, `sha256`, `bucket`, `object_key`, `uploaded_by`, `deleted_at` (borrado lógico) | Modelo polimórfico de adjunto; un mismo archivo físico puede sustentar un control, un ítem de levantamiento, el contexto, o ser la salida de un reporte generado |
+| `evidence.evidence_file` | `id (PK)`, `assessment_id (ref. lógica)`, `relation_type (CONTROL_RESPONSE\|LIFTING_DOC\|CONTEXT\|GLOBAL\|GAP_ACTION\|REPORT_OUTPUT\|EXTENSION_REQUEST\|DELETION_REQUEST)`, `relation_id`, `filename`, `content_type`, `size_bytes`, `sha256`, `bucket`, `object_key`, `uploaded_by`, `deleted_at` (borrado lógico) | Modelo polimórfico de adjunto; también sustenta solicitudes de ampliación/eliminación |
 | `evidence.lifting_answer` | `id (PK)`, `assessment_id (ref.)`, `question_catalog_id (ref. lógica al catálogo)`, `answer_json (jsonb)` | Respuestas a preguntas de levantamiento parametrizadas (complementario a `assessment_context`) |
 | `evidence.lifting_document_delivery` | `id (PK)`, `assessment_id (ref.)`, `document_item_catalog_id (ref. lógica)`, `delivery_status (DELIVERED\|NOT_DELIVERED\|PARTIAL)`, `delivered_name`, `validated_by/at` | Una fila por cada uno de los 43 ítems documentales por evaluación |
 | `evidence.process_scope_metric` | `assessment_id (PK, 1:1)`, `total_processes`, `in_scope_processes`, `coverage (numeric)`, `in_scope_exceeds_total (bool)` | Ítem 43 del levantamiento: % de cobertura MSPI por procesos |
