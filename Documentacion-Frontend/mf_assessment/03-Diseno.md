@@ -19,7 +19,7 @@ src/app/
 └── presentation/        # páginas del wizard, componentes compartidos
 ```
 
-**UX de formularios / guardado:** mismo patrón que `mf_org` — `fieldErrors` + `submitAttempted`, kit `shared/validation/`, toast en guardado de calificación/revisión (`control-detail-panel`) y áreas/temas; `ErrorDetail.field` en 400. Temas de área requieren `topic` + `staffName` (funcionario; alias JSON `funcionario` en backend).
+**UX de formularios / guardado:** mismo patrón que `mf_org` — `fieldErrors` + `submitAttempted`, kit `shared/validation/`, toast en guardado de calificación/revisión (`control-detail-panel`) y áreas/temas; `ErrorDetail.field` en 400. Temas de área requieren `topic` + `staffName` (funcionario; alias JSON `funcionario` en backend). En el panel de control, el adjunto de evidencia se sube al seleccionar el archivo (auto-upload + toast), alineado con el patrón de un solo clic de ampliación/eliminación.
 
 **Revisión vs diligenciamiento:** el select de estado del control en diligenciamiento no incluye Validado/Requiere ajustes; esas decisiones viven en `control_review` (`reviewStatus`) vía endpoint dedicado. El indicador «Validado %» de `mspi-completion-status` se calcula con `reviewStatus === 'VALIDATED'`.
 

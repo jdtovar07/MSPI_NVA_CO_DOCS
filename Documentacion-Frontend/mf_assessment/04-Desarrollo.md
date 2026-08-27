@@ -183,7 +183,7 @@ Este componente además carga en paralelo dos dependencias antes de habilitar el
 | Error | mensaje de error | Se mantiene abierto; `failCount++`. Al 3.er fallo consecutivo en el mismo control, cierra igual |
 | Nuevo control en el panel | — | `failCount = 0` al sincronizar el `@Input detail` (`syncForm`) |
 
-También expone **"Gestionar evidencias →"** vía `openShellRoute('/evidence', assessmentId)`.
+**Evidencias de archivo** en el panel: al seleccionar un archivo se valida tipo/tamaño (PDF/DOCX/XLSX/PNG/JPG, máx. 20 MB) y se sube de inmediato a `ms_evidence` (`relationType=CONTROL_RESPONSE`) sin botón «Subir evidencia»; toast de éxito («Evidencia subida correctamente») o error; el `<input type="file">` se resetea al terminar. También expone **"Gestionar evidencias →"** vía `openShellRoute('/evidence', assessmentId)`.
 
 ## 8. Árbol de controles (rollup) recursivo
 
