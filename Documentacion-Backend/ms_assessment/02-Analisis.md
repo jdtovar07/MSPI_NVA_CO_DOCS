@@ -25,8 +25,8 @@
 |---|---|---|
 | RF-01 | Crear una evaluación en estado `BORRADOR`, validando organización, resolviendo la plantilla activa (o una explícita) y materializando snapshots de controles, PHVA, madurez, NIST y áreas | `CreateAssessmentUseCase` |
 | RF-02 | Consultar y actualizar metadatos de una evaluación existente | `GetAssessmentUseCase`, `UpdateAssessmentUseCase` |
-| RF-03 | Asignar el tipo de orden territorial (`entityOrderTypeCode`) a la evaluación, con auditoría en `ms_iam` | `AssignEntityOrderTypeUseCase` |
-| RF-04 | Publicar una evaluación (`BORRADOR` → `CERRADA`), validando tipo de entidad asignado y control de concurrencia optimista (`rowVersion`), con registro de auditoría | `PublishAssessmentUseCase` |
+| RF-03 | Asignar el tipo de orden territorial (`entityOrderTypeCode`; si `OTRA`, exigir `entityTypeOther`) a la evaluación, con auditoría en `ms_iam` | `AssignEntityOrderTypeUseCase` |
+| RF-04 | Publicar una evaluación (`BORRADOR` → `CERRADA`), validando tipo de entidad (y texto libre si `OTRA`) y control de concurrencia optimista (`rowVersion`), con registro de auditoría | `PublishAssessmentUseCase` |
 | RF-05 | Clonar una evaluación **publicada** (`CERRADA`) hacia una nueva evaluación `BORRADOR`, copiando áreas, snapshot de controles/PHVA/madurez/NIST y el levantamiento documental | `CloneAssessmentUseCase` |
 | RF-06 | Listar áreas de la evaluación con sus temas/procesos; cada tema incluye funcionario (`staffName` / alias `funcionario`) obligatorio al guardar | `GetAssessmentAreasUseCase`, `ReplaceAssessmentAreaTopicsUseCase`, `AssessmentAreaTopicRequest` |
 | RF-07 | Reemplazar el listado de temas de un área (`PUT` completo, no incremental) | `ReplaceAssessmentAreaTopicsUseCase` |

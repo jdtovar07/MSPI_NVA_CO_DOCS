@@ -26,7 +26,7 @@ Derivados de rutas (`app.routes.ts`), casos de uso (`application/**`) y pantalla
 |---|---|---|
 | RF-01 | Listar evaluaciones creadas localmente, con botón para crear una nueva o continuar una existente | `EvaluationListPageComponent`, `AssessmentIndexService.listIds()` |
 | RF-02 | Crear una evaluación indicando organización, nombre, fecha, periodo y contacto | `EvaluationCreatePageComponent`, `CreateAssessmentUseCase`, `CreateAssessmentRequest` |
-| RF-03 | Asignar el tipo de entidad territorial (nacional/territorial) a la evaluación | `EntityOrderTypePageComponent`, `AssignEntityOrderTypeUseCase` |
+| RF-03 | Asignar el tipo de entidad territorial (Nacional / Territorial A–C / Otra + texto libre obligatorio) a la evaluación | `EntityOrderTypePageComponent`, `AssignEntityOrderTypeUseCase`, campo `entityTypeOther` |
 | RF-04 | Definir áreas y temas (topics) de la organización, con responsable, cargo y contacto por tema | `AreasPageComponent`, `ListAreasUseCase`, `ReplaceAreaTopicsUseCase` |
 | RF-05 | Asignar responsables (stewardship) por control, heredado del área o personalizado (`CUSTOM`) | `StewardshipPageComponent`, `PatchControlStewardUseCase`, `PatchControlStewardRequest` |
 | RF-06 | Calificar controles administrativos y técnicos mediante árbol jerárquico (dominio → objetivo → control) | `ControlsPageComponent`, `ControlTreeComponent`, `GetRollupUseCase` |

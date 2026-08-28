@@ -200,6 +200,7 @@ erDiagram
         UUID template_version_id "FK lógica a ms_catalog"
         varchar name
         varchar entity_order_type_code
+        varchar entity_type_other
         numeric phva_expected_advance_snapshot
         varchar status "BORRADOR/CERRADA"
         date due_date

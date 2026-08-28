@@ -20,7 +20,9 @@
 Dado que no hay API de escritura, cualquier cambio al contenido del instrumento (nuevo control, ajuste de pesos PHVA, nuevo requisito de madurez, actualización de metas NIST) requiere:
 
 1. Editar directamente `schema.sql` (si hay cambio estructural) y/o los seeds `data.sql` / `nist_ciber_data.sql` / `maturity_data.sql`.
-2. **Mantener paridad Docker ↔ classpath:** cambios al texto de PRUEBA (`test_guidance`) van en `docker-config/docker/postgres/init/MER-SEED-TESTGUIDANCE.sql` **y** al final de `ms_catalog/.../resources/data.sql` (mismo bloque de 93 `UPDATE`).
+2. **Mantener paridad Docker ↔ classpath:**
+   - texto de PRUEBA (`test_guidance`) → `MER-SEED-TESTGUIDANCE.sql` **y** bloque equivalente en `ms_catalog/.../resources/data.sql` (93 `UPDATE`);
+   - títulos del levantamiento documental → `MER-SEED-LIFTING-NAMES.sql` **y** el mismo bloque de 43 `UPDATE` por `position` en `data.sql`.
 3. Aplicar el script SQL manualmente contra la base de datos del entorno correspondiente (no hay Flyway/Liquibase ni ninguna herramienta de migración versionada evidenciada; `spring.jpa.hibernate.ddl-auto: none` y `spring.sql.init.mode: never` confirman que Spring Boot no participa de este proceso). En Docker, los `MER-SEED-*.sql` solo corren al **crear** el volumen; en volúmenes existentes hay que reaplicar el SQL a mano.
 4. Publicar una nueva `template_version` (`status = PUBLISHED`, `published_at` actual) para que `GetActiveTemplateVersionUseCase` la resuelva como activa; no hay endpoint ni script documentado para automatizar este paso — se infiere que se realiza por `UPDATE`/`INSERT` SQL directo.
 

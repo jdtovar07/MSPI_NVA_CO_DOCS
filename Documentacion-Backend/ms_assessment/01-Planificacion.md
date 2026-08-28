@@ -45,7 +45,7 @@ Quedan **fuera de alcance** de `ms_assessment` (responsabilidad de otros microse
 A partir del código, `docs/openapi.yaml` y `docs/MVP-MSPI-CONTRATOS-Y-MER.md` se identifican los siguientes requerimientos que dieron forma al microservicio:
 
 - **RI-1** — Toda evaluación nace en estado `BORRADOR` y solo puede transicionar a `CERRADA` mediante publicación explícita; una vez `CERRADA` no admite edición (`PatchControlScoreUseCase`, `PublishAssessmentUseCase`).
-- **RI-2** — Publicar exige que la evaluación tenga asignado `entity_order_type_code` (tipo de orden territorial) y un `rowVersion` coincidente con el estado actual (control de concurrencia optimista, HTTP 409 si no coincide).
+- **RI-2** — Publicar exige que la evaluación tenga asignado `entity_order_type_code` (tipo de orden territorial; si es `OTRA`, también `entity_type_other`) y un `rowVersion` coincidente con el estado actual (control de concurrencia optimista, HTTP 409 si no coincide).
 - **RI-3** — Toda calificación numérica debe pertenecer a la escala publicada por `ms_catalog` (`GET /catalog/.../scale-levels`) — valores típicos `0,20,40,60,80,100` — o ser `NA`.
 - **RI-4** — Marcar un control como `COMPLETADO` obliga, según las reglas del catálogo (`ControlRuleInfo`), a que existan evidencia, brecha y/o recomendación (esta última condicionada a un umbral configurable `THRESHOLD`).
 - **RI-5** — El cálculo de agregaciones (`rollup`, resúmenes PHVA/madurez/NIST, diagnóstico, brechas) es **on-read**: no existen tablas de resultados persistidos; toda evaluación se recalcula bajo demanda a partir de las respuestas capturadas y el snapshot.

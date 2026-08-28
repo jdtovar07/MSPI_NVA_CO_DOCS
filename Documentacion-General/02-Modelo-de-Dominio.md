@@ -154,7 +154,7 @@ flowchart LR
 | NIST CSF | `catalog.nist_ciber_item_catalog` | `id`, `function_id (FK)`, `subcategory_id (FK)`, `source_control_node_id (FK)`, `scoring_mode` — v1: filas heredadas + MANUAL; v2: 22 ítems MANUAL CSF 2.0 (uno por categoría) |
 | Levantamiento | `catalog.lifting_question_catalog` | `id`, `code`, `section`, `field_type` — complementario |
 | Levantamiento | `catalog.lifting_document_item_catalog` | `id`, `item_number (1..43)`, `block (BASICA\|IMPLEMENTACION\|EVALUACION\|MEJORA_CONTINUA)`, `is_process_metric` — 43 ítems documentales fijos |
-| Orden territorial | `catalog.entity_order_type` | `code (PK: NACIONAL\|TERRITORIAL_A\|TERRITORIAL_B\|TERRITORIAL_C)`, `phva_expected_advance (numeric)` |
+| Orden territorial | `catalog.entity_order_type` | `code (PK: NACIONAL\|TERRITORIAL_A\|TERRITORIAL_B\|TERRITORIAL_C\|OTRA)`, `phva_expected_advance (numeric)`. Los 4 primeros son oficiales MSPI; `OTRA` exige texto libre en `assessment.entity_type_other` |
 
 ### Endpoints principales
 
@@ -172,7 +172,7 @@ flowchart LR
 
 | Entidad | Atributos clave reales | Notas |
 |---|---|---|
-| `assessment.assessment` | `id (PK)`, `organization_id (ref. lógica)`, `template_version_id (ref. lógica, snapshot aplicado)`, `name`, `organization_name_snapshot`, `evaluation_date`, `due_date`, `period_label`, `entity_order_type_code`, `phva_expected_advance_snapshot`, `status (BORRADOR\|EN_DILIGENCIAMIENTO\|EN_REVISION\|CERRADA)`, `cloned_from_assessment_id`, `row_version (int, bloqueo optimista)`, `deleted_at (timestamptz, soft-delete)` | Agregado raíz; listados/get filtran `deleted_at IS NULL`; el registro no se borra físicamente |
+| `assessment.assessment` | `id (PK)`, `organization_id (ref. lógica)`, `template_version_id (ref. lógica, snapshot aplicado)`, `name`, `organization_name_snapshot`, `evaluation_date`, `due_date`, `period_label`, `entity_order_type_code`, `entity_type_other` (obligatorio si tipo `OTRA`), `phva_expected_advance_snapshot`, `status (BORRADOR\|EN_DILIGENCIAMIENTO\|EN_REVISION\|CERRADA)`, `cloned_from_assessment_id`, `row_version (int, bloqueo optimista)`, `deleted_at (timestamptz, soft-delete)` | Agregado raíz; listados/get filtran `deleted_at IS NULL`; el registro no se borra físicamente |
 | `assessment.assessment_extension_request` | `id`, `assessment_id`, `requested_by`, `reason`, `attachment_file_id`, `days`, `status (PENDING\|APPROVED\|REJECTED)`, `decision_*` | Flujo de ampliación de `due_date` con aprobación |
 | `assessment.assessment_deletion_request` | `id`, `assessment_id`, `requested_by`, `reason`, `attachment_file_id`, `status (PENDING\|APPROVED\|REJECTED\|CANCELLED)`, `scheduled_deletion_at`, `decision_*` | Eliminación lógica con gracia (`assessmentDeletionGraceDays`); cancelar = recuperar antes del sweeper |
 | `assessment.assessment_edit_lock` | `assessment_id (PK)`, `locked_by_user_id`, `lock_token`, `expires_at` | Bloqueo pesimista opcional, complementario al optimista |

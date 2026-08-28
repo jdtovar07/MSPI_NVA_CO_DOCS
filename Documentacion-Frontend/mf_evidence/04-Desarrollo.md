@@ -52,7 +52,7 @@ Las 3 páginas de presentación son **standalone components** con plantilla y es
 1. Inyección de casos de uso por constructor (`private readonly` en cada uno).
 2. Lectura de `assessmentId` desde `ActivatedRoute.snapshot.paramMap` en `ngOnInit()`.
 3. Método privado `load()` async que llama a uno o varios casos de uso (en `InventoryPageComponent`, en paralelo con `Promise.all`) y actualiza signals.
-4. Métodos públicos de mutación (`save()`, `saveMetric()`, `updateStatus()`, `uploadMission()`, etc.) que envuelven la llamada en `try/catch`, actualizan un signal `message` con el resultado (éxito o `err.message`) y, en el caso del levantamiento, recargan el estado completo tras cada mutación.
+4. Métodos públicos de mutación (`save()`, `saveMetric()`, `updateStatus()`, `uploadProcessMap()` / `uploadOrganigram()`, etc.) que envuelven la llamada en `try/catch`, actualizan un signal `message` con el resultado (éxito o `err.message`) y, en el caso del levantamiento, recargan el estado completo tras cada mutación. Los adjuntos de contexto se etiquetan como **Mapa de Procesos** (`PROCESS_MAP`) y **Organigrama** (`ORGANIGRAM`). El inventario de levantamiento enriquece `documentName` desde `ms_catalog` (`lifting-document-items`) para mostrar los títulos reales del instrumento.
 
 Extracto real representativo — `InventoryPageComponent.updateDeliveredName()`, mostrando el patrón de "solo mutar si cambió" y recarga completa:
 
