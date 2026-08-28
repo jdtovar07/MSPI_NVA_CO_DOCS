@@ -104,9 +104,9 @@ Basado en `docs/API-INTEGRACION.md` y verificado directamente en `api-organizati
 | `/organizations` | `POST` | `ApiOrganizationRepository.create()` | Body: `{name, type, identifier, address, city, department, country, organizationEmail}`. Respuesta esperada: `{id}`; tras crear, se hace un segundo `GET /organizations/{id}` para devolver la entidad completa |
 | `/organizations/{id}` | `PUT` | `ApiOrganizationRepository.update()` | Mismo body que `create`; respuesta: DTO completo de la organización actualizada |
 | `/organizations/my-organization` | `GET` | `ApiOrganizationRepository.getMyOrganization()` | Sin parámetros; el backend resuelve la organización a partir del JWT del rol `Lector` |
-| `/location/countries` | `GET` | `ApiLocationRepository.getCountries()` | DTO `{iso2, name}` → `{code, name}` |
-| `/location/countries/{iso2}/states` | `GET` | `ApiLocationRepository.getStates()` | DTO `{iso2, name}` → `{code, name, countryCode}` |
-| `/location/countries/{iso2}/states/{iso2}/cities` | `GET` | `ApiLocationRepository.getCities()` | DTO `{name}` → `{name, stateCode}` |
+| `/location/countries` | `GET` | `ApiLocationRepository.getCountries()` | DTO `{iso2, name}` → `{code, name}`; UI muestra «Cargando…» y deshabilita el select mientras llega |
+| `/location/countries/{iso2}/states` | `GET` | `ApiLocationRepository.getStates()` | Idem loading encadenado |
+| `/location/countries/{iso2}/states/{iso2}/cities` | `GET` | `ApiLocationRepository.getCities()` | Idem loading encadenado |
 
 **Nota sobre el DTO de creación/edición:** el body enviado usa **claves distintas** a las del tipo de dominio `Organization`/`CreateOrganizationPayload` en dos campos: `state` (dominio) se envía como `department` (API), y `email` (dominio) se envía como `organizationEmail` (API) — traducción explícita realizada inline en `create()`/`update()` de `ApiOrganizationRepository`, sin pasar por `organization-api.mapper.ts` (que solo traduce el campo `type`).
 

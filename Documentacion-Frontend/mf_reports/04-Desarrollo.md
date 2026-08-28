@@ -46,7 +46,7 @@ El manejo de estado de `mf_reports` es **local por componente**, usando **Angula
 - **`AuthSessionService`** (único estado verdaderamente compartido/singleton): usa `signal<StoredSession | null>` y expone `token`/`isAuthenticated` como `computed()`. Se recarga (`reload()`) tanto al recibir un mensaje del shell como en cada solicitud HTTP saliente (`api.interceptor.ts` llama `authSession.reload()` antes de leer el token), garantizando que un cambio de sesión detectado por cualquier vía se refleje inmediatamente.
 - **`DiagnosticDashboardPageComponent`**: 3 signals — `loading`, `error`, `data` — que gobiernan de forma exhaustiva los 3 estados de UI posibles (cargando / error / datos), usando el bloque `@if/@else if` del template.
 - **`ReportsExportPageComponent`**: 4 signals — `busy`, `message`, `isError`, `job` — más dos variables de instancia no reactivas (`pollTimer`, `pollStartedAt`, `autoDownloaded`) que controlan el temporizador de *polling* y evitan doble descarga automática.
-- **`ReportsHomePageComponent`**: 1 signal — `assessmentId` — leída de `localStorage` en `ngOnInit`.
+- **`ReportsHomePageComponent`**: signals `assessments` / `loading` / `error` + `selectedId`; lista evaluaciones vía `GET /assessments` y exige selección explícita antes de exportar.
 
 No se usa RxJS para el estado de UI (solo internamente en el interceptor y en `ApiReportingRepository.downloadReport`, donde se combinan operadores `switchMap`/`catchError`/`from` para adaptar la llamada HTTP basada en `Observable` a una función que interopera con `async/await` vía `firstValueFrom`).
 
@@ -158,9 +158,9 @@ const score = d.currentScore ?? d.combinedScore ?? d.adminScore ?? d.techScore ?
 
 ## 5. Componentes de presentación — funcionalidades desarrolladas
 
-### 5.1 `ReportsHomePageComponent` (`/reports`)
+### 5.1 `ReportsHomePageComponent` (`/`)
 
-Pantalla mínima de enrutamiento condicional. No llama a ningún backend: solo lee `localStorage.getItem('active_assessment_id')` y decide entre dos botones de acción (`openDashboard()` navega con el id real; `openDemo()` navega con `mock-assessment-1` fijo).
+Selector de evaluación (`GET ms_assessment/assessments`). Sin selección no navega; al continuar guarda `active_assessment_id` y abre `/assessments/:id/export`.
 
 ### 5.2 `DiagnosticDashboardPageComponent` (`/assessments/:id/dashboard`)
 

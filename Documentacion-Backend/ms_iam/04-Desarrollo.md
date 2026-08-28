@@ -131,7 +131,7 @@ Punto de ensamblaje final. Contiene:
 1. **Autenticación ROPC contra Keycloak** con traducción de errores del IdP a resultados de dominio y auditoría incondicional (`LoginUseCase` → `LoginService` → `KeycloakAuthAdapter`).
 2. **Flujo de primer acceso con contraseña temporal** y bloqueo de login hasta cambiar la contraseña (`must_change_password`).
 3. **2FA TOTP completo**: generación de secreto (`TotpAdapter.generateSecret`, HmacSHA1/Base32), construcción de URL `otpauth://` para QR (`TotpSetupUseCase`), verificación con tolerancia de reloj y habilitación persistente (`iam.user_totp.enabled_at`).
-4. **CRUD administrativo de usuarios** con sincronización bidireccional Keycloak↔BD local (creación, actualización de nombre/correo/roles, activación/inactivación, reset de contraseña).
+4. **CRUD administrativo de usuarios** con sincronización bidireccional Keycloak↔BD local (creación, actualización de nombre/correo/roles, activación/inactivación, reset de contraseña). El listado `GET /users` aplica filtros `q`, `status` y `role` (nombre exacto del rol: `AdminSistema`, `Lector`, etc.) en `UserJpaAdapter.findAll` → `findAllFiltered`.
 5. **Integración cross-microservicio de validación de organización** (`OrganizationGatewayAdapter` → `GET /organizations/{id}` en `ms_org`).
 6. **Bitácora de auditoría de doble propósito**: registro interno de intentos de login y API pública interna (`POST /internal/audit/events`) para que otros microservicios registren sus propios eventos de negocio en la misma tabla.
 7. **Catálogo de roles con etiquetas en español** para consumo directo por frontends, sin necesidad de tabla de traducción propia en el cliente.

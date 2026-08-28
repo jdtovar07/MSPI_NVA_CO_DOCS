@@ -32,6 +32,8 @@ public GetLeafControlCatalogUseCase getLeafControlCatalogUseCase(
 
 `domain/usecase/catalog/*.java` usa Lombok `@RequiredArgsConstructor` para generar el constructor con los campos `final` inyectados, manteniendo el código de caso de uso libre de imports de Spring.
 
+Administración de escalas (`ScaleAdminApi` bajo `/catalog/scales`): `GET` listado/detalle, `POST` crear escala, `POST /{id}/versions`, `PUT /versions/{versionId}`, `POST .../publish` (roles AdminSistema/AdminInstrumento). Casos de uso `CreateScaleUseCase` / `CreateScaleVersionUseCase` + `ScaleAdminJpaAdapter`.
+
 ## 3. Adaptador de persistencia (`CatalogJpaAdapter`)
 
 Clase única (`infrastructure/driven-adapters/jpa-repository/.../adapter/CatalogJpaAdapter.java`, 696 líneas) que implementa los 26 métodos de `CatalogPersistenceGateway`, inyectando 16 repositorios Spring Data JPA (`@RequiredArgsConstructor`). Patrones observados:
