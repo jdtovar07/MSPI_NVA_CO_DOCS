@@ -15,7 +15,9 @@
 ```mermaid
 flowchart TB
   subgraph EP["Entry Points (infrastructure)"]
-    CatalogApi["CatalogApi<br/>17 endpoints GET"]
+    CatalogApi["CatalogApi<br/>GETs de referencia"]
+    ScaleAdmin["ScaleAdminApi / QuestionBankApi"]
+    CatDel["CatalogDeletionApi<br/>request/approve/reject/cancel"]
     GEH["GlobalExceptionHandler"]
     Security["SecurityConfig<br/>JWT Resource Server + InternalApiKeyFilter"]
     TraceF["TraceIdFilter"]
@@ -26,7 +28,7 @@ flowchart TB
     UC1["GetActiveTemplateVersionUseCase"]
     UC2["GetLeafControlCatalogUseCase"]
     UC3["GetScalePublishedUseCase"]
-    UCN["… +14 use cases GET"]
+    UCN["… GET + Scale/Bank admin + CatalogDeletion*"]
   end
 
   subgraph DM["Domain — Model (:model)"]
@@ -41,14 +43,16 @@ flowchart TB
     DB[(PostgreSQL schema catalog)]
   end
 
-  Client["Cliente JWT<br/>FE / ms_assessment / ms_reporting"] --> TraceF --> Security --> CatalogApi
-  CatalogApi --> UC1 & UC2 & UC3 & UCN
+  Client["Cliente JWT<br/>FE / ms_assessment / ms_reporting"] --> TraceF --> Security --> CatalogApi & ScaleAdmin & CatDel
+  CatalogApi & ScaleAdmin & CatDel --> UC1 & UC2 & UC3 & UCN
   UC1 & UC2 & UC3 & UCN --> GW
   GW -.implementa.-> JPA
   JPA --> REPO --> ENT --> DB
   CatalogApi --> GEH
   CatalogApi --> CorsF
 ```
+
+Soft-delete de escalas/bancos: columnas `is_base` + `deleted_at`; solicitudes en `catalog.catalog_deletion_request`; sweeper `CatalogDeletionSweeper`. Ver `Documentacion-General/12-Tipos-Entidad-MSPI-y-Eliminacion-Catalogo.md`.
 
 ## 2. Estructura real de paquetes
 

@@ -198,6 +198,8 @@ Table catalog.scale {
   id uuid [pk]
   name varchar(140) [unique, not null]
   description varchar(400)
+  is_base boolean [not null, default: false, note: "true = base del instrumento MSPI (no eliminable)"]
+  deleted_at timestamptz [note: "soft-delete tras aprobación + gracia; NULL = activa"]
   created_at timestamptz [not null, default: `now()`]
 }
 
@@ -424,8 +426,30 @@ Table catalog.question_bank {
   description varchar(500)
   scale_id uuid [ref: > catalog.scale.id]
   status varchar(20) [not null, default: 'DRAFT']
+  is_base boolean [not null, default: false, note: "true = base del instrumento MSPI (no eliminable)"]
+  deleted_at timestamptz [note: "soft-delete tras aprobación + gracia; NULL = activa"]
   created_at timestamptz [not null, default: `now()`]
   updated_at timestamptz [not null, default: `now()`]
+}
+
+Table catalog.catalog_deletion_request {
+  id uuid [pk]
+  target_type varchar(20) [not null, note: "SCALE|QUESTION_BANK"]
+  target_id uuid [not null]
+  requested_by uuid [not null, ref: > iam.user.id]
+  reason text [not null]
+  attachment_file_id uuid [ref: > evidence.evidence_file.id]
+  status varchar(20) [not null, default: 'PENDING', note: "PENDING|APPROVED|REJECTED|CANCELLED"]
+  scheduled_deletion_at timestamptz
+  decision_by uuid [ref: > iam.user.id]
+  decision_at timestamptz
+  decision_comment text
+  created_at timestamptz [not null, default: `now()`]
+
+  indexes {
+    (target_type, target_id, status)
+    (status, scheduled_deletion_at)
+  }
 }
 
 Table catalog.question_bank_question {

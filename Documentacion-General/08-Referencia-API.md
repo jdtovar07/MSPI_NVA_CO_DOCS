@@ -50,8 +50,9 @@
 | Grupo | Rutas | Rol requerido |
 |---|---|---|
 | Catálogo de referencia (lectura) | `GET /catalog/entity-order-types`, `/template-versions/active`, `/lifting-document-items`, `/steward-roles`, `/iso-domains`, `/assessment-area-presets`, `/control-catalog-leaves`, `/control-catalog-tree`, `/control-rules`, `/scales/published`, `/nist-mappings`, `/phva-items`, `/phva-config`, `/maturity-requirements`, `/maturity-config`, `/nist-ciber-items`, `/nist-config` | Autenticado |
-| Escalas (admin) | `GET/POST /catalog/scales`, `GET /catalog/scales/{id}`, `POST .../{id}/versions`, `PUT .../versions/{versionId}`, `POST .../versions/{versionId}/publish` | `AdminSistema`, `AdminInstrumento` en mutación |
-| Bancos de preguntas | `GET/POST/PUT/DELETE /catalog/question-banks` (+ `.../questions`, `.../config`, duplicate) | `AdminSistema`, `AdminInstrumento` en mutación |
+| Escalas (admin) | `GET/POST /catalog/scales`, `GET /catalog/scales/{id}`, `POST .../{id}/versions`, `PUT .../versions/{versionId}`, `POST .../versions/{versionId}/publish` | `AdminSistema`, `AdminInstrumento` en mutación. Respuesta incluye `base`, estado de solicitud de eliminación |
+| Bancos de preguntas | `GET/POST/PUT/DELETE /catalog/question-banks` (+ `.../questions`, `.../config`, duplicate) | `AdminSistema`, `AdminInstrumento` en mutación. Soft-delete vía solicitud (no DELETE físico del banco). Filtra `deleted_at IS NULL` |
+| Eliminación lógica catálogo | `POST/GET /catalog/deletion-requests`, `GET .../pending`, `POST .../{id}/approve\|reject\|cancel` | Solicitar: AdminInstrumento/AdminSistema. Aprobar: AdminSistema. Bloquea `is_base=true`. Gracia `catalogDeletionGraceDays` (default 5) |
 
 > **Nota:** no existe un endpoint único `GET /catalog/bundle`; el front consume los `GET /catalog/*` de referencia anteriores.
 

@@ -139,7 +139,9 @@ flowchart LR
 |---|---|---|
 | Plantilla | `catalog.template` | `id`, `name (UK)` |
 | Plantilla | `catalog.template_version` | `id`, `template_id (FK)`, `scale_version_id (FK)`, `version`, `status (DRAFT\|PUBLISHED)`, `phva_weights (jsonb)`, `phva_caps (jsonb)`, `maturity_crit_thresholds (jsonb)`, `nist_function_targets (jsonb)`. **v1** (id `d000…001`): PHVA plano 40/20/20/20 y NIST CSF 1.1 (5 funciones). **v2** (id `d000…002`, `PUBLISHED`, activa por `published_at` más reciente): PHVA jerárquico 56/16/14/14 (7 cláusulas + 23 sub-numerales), Anexo A 2022 (93 controles / temas A.5–A.8), NIST CSF 2.0 (6 funciones incl. GV) |
-| Escala | `catalog.scale`, `catalog.scale_version`, `catalog.scale_level`, `catalog.scale_band` | Escala 0/20/40/60/80/100 + N/A; bandas de etiqueta (INEXISTENTE…OPTIMIZADO) |
+| Escala | `catalog.scale`, `catalog.scale_version`, `catalog.scale_level`, `catalog.scale_band` | Escala 0/20/40/60/80/100 + N/A; `is_base` (instrumento vs creado); `deleted_at` (soft-delete; listados filtran `IS NULL`) |
+| Bancos | `catalog.question_bank`, `catalog.question_bank_question` | Plantillas de preguntas; mismos flags `is_base` / `deleted_at` |
+| Eliminación catálogo | `catalog.catalog_deletion_request` | Soft-delete con aprobación (`SCALE`\|`QUESTION_BANK`); gracia `catalogDeletionGraceDays`; **no** elimina `is_base=true` |
 | Controles Anexo A | `catalog.iso_domain` | `code (PK)` — catálogo de referencia A.5..A.18 (metadatos de portada); la efectividad por dominio se deriva de los `DOMAIN` presentes en el **snapshot** de la evaluación (v1 → hasta 14; v2 → A.5–A.8), `control_type (ADMIN\|TECH)`, `display_position` |
 | Controles Anexo A | `catalog.control_catalog_node` | `id`, `template_version_id (FK)`, `parent_id (FK, árbol)`, `node_type (DOMAIN\|OBJECTIVE\|SUB_OBJECTIVE\|CONTROL)`, `control_type`, `code (AD.x / T.x)`, `iso_code` (v1: estilo 2013 `A.x.y.z`; v2: numeración ISO 27001:2022 tipo `5.1` / `A.5.1`), `is_scored (bool)`, `default_steward_role_code (ref.)`. **v2**: ~93 controles hoja del Anexo A 2022 |
 | Controles Anexo A | `catalog.control_rule` | `control_node_id (FK, UK)`, `requires_evidence`, `requires_gap`, `requires_recommendation`, `recommendation_rule_type` |
@@ -154,11 +156,11 @@ flowchart LR
 | NIST CSF | `catalog.nist_ciber_item_catalog` | `id`, `function_id (FK)`, `subcategory_id (FK)`, `source_control_node_id (FK)`, `scoring_mode` — v1: filas heredadas + MANUAL; v2: 22 ítems MANUAL CSF 2.0 (uno por categoría) |
 | Levantamiento | `catalog.lifting_question_catalog` | `id`, `code`, `section`, `field_type` — complementario |
 | Levantamiento | `catalog.lifting_document_item_catalog` | `id`, `item_number (1..43)`, `block (BASICA\|IMPLEMENTACION\|EVALUACION\|MEJORA_CONTINUA)`, `is_process_metric` — 43 ítems documentales fijos |
-| Orden territorial | `catalog.entity_order_type` | `code (PK: NACIONAL\|TERRITORIAL_A\|TERRITORIAL_B\|TERRITORIAL_C\|OTRA)`, `phva_expected_advance (numeric)`. Los 4 primeros son oficiales MSPI; `OTRA` exige texto libre en `assessment.entity_type_other` |
+| Orden territorial | `catalog.entity_order_type` | Códigos oficiales MSPI: `NACIONAL` (0.40), `TERRITORIAL_A` (0.35), `TERRITORIAL_B` (0.30), `TERRITORIAL_C` (0.25) — «categorías territoriales» que agrupan entidades por categoría Ley 617/2000 según el [instructivo MinTIC](https://gobiernodigital.mintic.gov.co/692/articles-5482_Instructivo_instrumento_Evaluacion_MSPI.pdf). Más `OTRA` (texto libre en `assessment.entity_type_other`). Detalle: [`12-Tipos-Entidad-MSPI-y-Eliminacion-Catalogo.md`](12-Tipos-Entidad-MSPI-y-Eliminacion-Catalogo.md) |
 
 ### Endpoints principales
 
-`CatalogApi` — 17 endpoints GET agrupados en `catalog-core`, `catalog-controls`, `catalog-phva`, `catalog-maturity`, `catalog-nist`, `catalog-scale`. Sin escritura pública (la publicación de nuevas versiones no está expuesta en el listado de endpoints revisado).
+`CatalogApi` — GETs de referencia del instrumento. Además: `ScaleAdminApi`, `QuestionBankApi` (escritura admin) y `CatalogDeletionApi` (`/catalog/deletion-requests`: request/approve/reject/cancel/list/pending). Las escalas/bancos base del instrumento no son eliminables.
 
 ---
 
@@ -397,6 +399,8 @@ Dirigido a un lector académico que puede no conocer en profundidad el dominio d
 | **Snapshot** | Copia congelada de una parte del catálogo (controles, ítems PHVA, requisitos de madurez, ítems NIST) hecha al crear una evaluación, para que cambios futuros en el catálogo no alteren evaluaciones ya existentes |
 | **rowVersion / version** | Contador entero que se incrementa en cada modificación de un registro; usado para implementar bloqueo optimista: si dos usuarios intentan modificar el mismo registro con versiones distintas, el segundo `PATCH` recibe `HTTP 409 Conflict` |
 | **Rollup** | Cálculo recursivo on-read que agrega las calificaciones de los nodos hoja de un árbol de controles hacia sus nodos padre (objetivo → dominio → total Anexo A), aplicando promedio con exclusión de valores N/A y redondeo *half-up* |
+| **Tipo de entidad / categoría territorial** | Clasificación oficial MSPI (Nacional / Territorial A–C) con metas PHVA 40/35/30/25 %; opcional «Otra» + texto libre. Ver doc. 12 |
+| **Elemento base del catálogo** | Escala o banco con `is_base=true` sembrado del instrumento; no admite solicitud de eliminación |
 | **Brecha (gap)** | Diferencia entre la calificación obtenida de un control y la calificación objetivo (100); el sistema calcula on-read la lista de brechas priorizadas (`score < 60`) |
 | **Bounded context (contexto delimitado)** | Concepto de Domain-Driven Design: una frontera explícita dentro de la cual un modelo de dominio es válido y consistente; en este proyecto, cada esquema de base de datos (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`) corresponde a un bounded context con un microservicio propietario |
 | **N/A (No Aplica)** | Valor especial de calificación que excluye un control de cualquier promedio; distinto de 0 (que sí participa y penaliza el promedio) |

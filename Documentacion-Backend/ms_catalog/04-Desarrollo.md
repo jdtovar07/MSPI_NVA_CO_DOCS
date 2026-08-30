@@ -32,7 +32,9 @@ public GetLeafControlCatalogUseCase getLeafControlCatalogUseCase(
 
 `domain/usecase/catalog/*.java` usa Lombok `@RequiredArgsConstructor` para generar el constructor con los campos `final` inyectados, manteniendo el código de caso de uso libre de imports de Spring.
 
-Administración de escalas (`ScaleAdminApi` bajo `/catalog/scales`): `GET` listado/detalle, `POST` crear escala, `POST /{id}/versions`, `PUT /versions/{versionId}`, `POST .../publish` (roles AdminSistema/AdminInstrumento). Casos de uso `CreateScaleUseCase` / `CreateScaleVersionUseCase` + `ScaleAdminJpaAdapter`.
+Administración de escalas (`ScaleAdminApi` bajo `/catalog/scales`): `GET` listado/detalle, `POST` crear escala, `POST /{id}/versions`, `PUT /versions/{versionId}`, `POST .../publish` (roles AdminSistema/AdminInstrumento). Casos de uso `CreateScaleUseCase` / `CreateScaleVersionUseCase` + `ScaleAdminJpaAdapter`. Listados filtran `deleted_at IS NULL` y exponen `base` + estado de eliminación.
+
+**Eliminación lógica de escalas/bancos** (`CatalogDeletionApi` bajo `/catalog/deletion-requests`): mismo patrón que `assessment_deletion_request` — `POST` request (motivo obligatorio, adjunto opcional `CATALOG_DELETE` en `ms_evidence`), approve/reject/cancel, `GET` list/pending. Tabla `catalog.catalog_deletion_request` (`target_type` SCALE\|QUESTION_BANK). Bloqueo si `is_base=true` («No se puede eliminar un elemento base del instrumento MSPI.»). Una sola PENDING por target. Gracia `catalogDeletionGraceDays` (IAM, default 5). Sweeper `CatalogDeletionSweeper` setea `deleted_at`. Solicita AdminInstrumento/AdminSistema; aprueba AdminSistema. Patch DDL: `patch-catalog-soft-delete.sql`.
 
 ## 3. Adaptador de persistencia (`CatalogJpaAdapter`)
 

@@ -19,7 +19,7 @@ MSPI es un sistema de gestión de seguridad de la información construido como u
 
 `ms_catalog` cubre exclusivamente la responsabilidad de negocio de **definición y publicación del instrumento MSPI como catálogo paramétrico de solo lectura**. Concretamente, según el código (`CatalogApi.java`, 17 endpoints `GET`) y `docs/openapi.yaml`:
 
-- **Tipos de orden territorial** (`entity-order-types`): Nacional, Territorial A/B/C, con el porcentaje de avance PHVA esperado por tipo.
+- **Tipos de orden territorial** (`entity-order-types`): categorías oficiales MSPI Nacional / Territorial A–C (metas PHVA 40/35/30/25 %, instructivo MinTIC / Ley 617) más opción `OTRA` (texto libre).
 - **Versión de plantilla activa** (`template-versions/active`): resuelve la versión del instrumento en estado `PUBLISHED` vigente, base para el resto de consultas cuando no se especifica `templateVersionId`.
 - **Inventario documental de levantamiento** (`lifting-document-items`): 43 ítems por bloques temáticos.
 - **Cargos responsables** (`steward-roles`) y **áreas predefinidas** (`assessment-area-presets`) del instrumento (Módulo 2 / HU-AR-01).
