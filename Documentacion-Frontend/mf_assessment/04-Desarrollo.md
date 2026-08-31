@@ -163,8 +163,8 @@ Este componente además carga en paralelo dos dependencias antes de habilitar el
 - **`dueDate` null** → celda «Sin fecha límite» (muted); `formatDate` / `daysLabel` / `dueClass` no tratan `null` como fecha (evita «31/12/1969 Vencida»).
 - **`progress` null** → «—» y barra al 0%; con valor numérico → `N%` y ancho de barra. El backend calcula el % con el rollup (controles `SCORED` con valor / total hojas). Evaluaciones nuevas nacen en `PENDING` → progreso 0%.
 - **`overallScore` null/0** → «—».
-- **Ampliación**: si la evaluación está vencida o por vencer (≤5 días) y el miembro es Evaluador/EvaluadorRevisor, botón «Solicitar ampliación» (motivo obligatorio + adjunto opcional `EXTENSION_REQUEST`). Badge de estado de la última solicitud. Bandeja de aprobación en `/evaluations/extension-requests`.
-- **Eliminación lógica**: «Solicitar eliminación» (mismo rol) → motivo + adjunto `DELETION_REQUEST`. Si APPROVED en gracia: aviso de fecha + «Recuperar». Bandeja `/evaluations/deletion-requests`. Soft-deleted no aparecen; admin puede ver `/evaluations/deleted`.
+- **Ampliación**: si la evaluación está vencida o por vencer (≤5 días) y el miembro es Evaluador/EvaluadorRevisor, botón solo-ícono «Solicitar ampliación» (`mspi-request-action-icon-btn`, `aria-label`/`title`, SVG `currentColor`) → motivo obligatorio + adjunto opcional `EXTENSION_REQUEST`. Badge de estado de la última solicitud. Bandeja de aprobación en `/evaluations/extension-requests`.
+- **Eliminación lógica**: mismo patrón solo-ícono «Solicitar eliminación» (mismo rol; también en listas de escalas/bancos) → motivo + adjunto `DELETION_REQUEST`. Si APPROVED en gracia: aviso de fecha + «Recuperar». Bandeja `/evaluations/deletion-requests`. Soft-deleted no aparecen; admin puede ver `/evaluations/deleted`.
 
 ## 7. Calificación y revisión de un control
 
