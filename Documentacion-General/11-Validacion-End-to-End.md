@@ -56,15 +56,15 @@ Se calificaron los sub-numerales de las 7 cláusulas con `80`.
 
 ## 4. Diferencias / matices frente al Excel (honesto)
 
-1. **Escala NIST.** La plataforma restringe la calificación NIST a la escala publicada `0/20/40/60/80/100` (+ N/A). El Excel, en su hoja NIST, tiene valores **fuera de escala** (p. ej. `GV.OC=50`, `ID.AM=26.67`) que parecen **derivados/promediados** de los controles ISO. Por eso el número exacto del Excel (`GOBERNAR=42`, que requiere `GV.OC=50`) **no es reproducible** con entrada manual sobre la escala. La **fórmula** (promedio de categorías) sí coincide. → Para paridad NIST exacta habría que modelar las categorías NIST como **derivadas** de controles (no manuales), o ampliar la escala; es una decisión de diseño pendiente.
+1. **NIST derivado.** Las 22 categorías CSF 2.0 son `DERIVED` (`ISO_CODES_AVG`): promedio de controles Anexo A y/o cláusulas PHVA según `iso_control_code` (fiel a las fórmulas Excel). La UI es solo lectura; valores como `GV.OC=50` o `ID.AM≈27` aparecen al calificar las fuentes, sin entrada manual NIST ni restricción artificial de escala en la categoría.
 2. **Madurez** no se calificó en esta corrida (requisitos sin puntuar → sin nivel); el cálculo de madurez está cubierto por pruebas unitarias.
 3. **Entorno:** el reset de BD (`down -v`) vacía `iam.user`; el usuario principal (`admin@mspi.local`) debe sembrarse tras el reseed (hoy vía `seed-usuario-principal.ps1` en Windows). Recomendado: incluirlo en el MER seed para que sobreviva al reseed.
 
 ## 5. Veredicto
 
-- **Flujo funcional:** ✅ crear organización (con email), crear evaluación, calificar (controles/PHVA/NIST), ver tablero único, sin mocks.
+- **Flujo funcional:** ✅ crear organización (con email), crear evaluación, calificar (controles/PHVA), ver NIST derivado y tablero único, sin mocks.
 - **Motor de cálculo:** ✅ reproduce las fórmulas del instrumento (validado a mano + 101 pruebas unitarias).
-- **Paridad celda-a-celda con el Excel:** ✅ en estructura y fórmulas; **parcial en NIST** por la escala (ver §4.1).
+- **Paridad celda-a-celda con el Excel:** ✅ en estructura y fórmulas; NIST por derivación desde Anexo A / cláusulas (ver §4.1).
 
 ---
 
@@ -110,10 +110,11 @@ Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 **D. Instrumento (93 controles, PHVA, NIST)**
 - [ ] En controles del Anexo A aparecen **93 controles** en **4 dominios** (A.5 Organizacionales 37 · A.6 Personas 8 · A.7 Físicos 14 · A.8 Tecnológicos 34).
 - [ ] En **PHVA** se ven las **7 cláusulas** con **sub-numerales** (4.1…10.2) y pesos **56 / 16 / 14 / 14**.
-- [ ] En **NIST** hay **6 funciones** empezando por **GOBERNAR**.
+- [ ] En **NIST** hay **6 funciones** empezando por **GOBERNAR**; la pantalla es **solo lectura** (valores derivados del Anexo A / cláusulas).
+- [ ] En **PHVA** se pueden adjuntar archivos de evidencia por ítem (`relationType=PHVA_ITEM`).
 
 **E. Prueba de paridad (reproducible)**
-- [ ] En NIST → GOBERNAR, califica las 6 categorías con `100, 0, 100, 100, 0, 0` → la función debe promediar **50**. *(Nota: el `50` exacto del Excel no es ingresable por la escala 0/20/40/60/80/100; esta prueba usa valores válidos.)*
+- [ ] Tras calificar Anexo A + PHVA según la muestra del instrumento, NIST → GOBERNAR se acerca al Excel (p. ej. promedio **42**).
 - [ ] En un dominio (p. ej. A.6), califica todos sus controles con `40` → la efectividad del dominio debe dar **40**.
 - [ ] En PHVA, califica todos los sub-numerales con `80` → el total debe dar **80** y cada fase su aporte ponderado (PLAN 44.8→, DO 12.8, etc.).
 
@@ -121,4 +122,4 @@ Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 - [ ] El **tablero de diagnóstico es uno solo** (en el hub de la evaluación); la sección de **Reportes** solo **genera y descarga** el PDF/Excel (no duplica el tablero).
 - [ ] Generar el reporte y descargarlo.
 
-**G. Estado "100% funcional"**: todos los anteriores en verde = flujo completo operativo con datos reales y motor de cálculo que reproduce las fórmulas del instrumento (con el matiz de la escala NIST del §4.1).
+**G. Estado "100% funcional"**: todos los anteriores en verde = flujo completo operativo con datos reales y motor de cálculo que reproduce las fórmulas del instrumento.

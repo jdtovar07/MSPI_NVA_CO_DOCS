@@ -63,12 +63,14 @@ Mapeo fase → cláusulas:
 | CHECK | 14 % | 9 Evaluación del desempeño (9.1–9.3) |
 | ACT | 14 % | 10 Mejora (10.1–10.2) |
 
-### 5.2 NIST — CSF 2.0 (6 funciones, 22 categorías)
+### 5.2 NIST — CSF 2.0 (6 funciones, 22 categorías) — **DERIVADO / solo lectura**
 - `nist_function`: agregada **GV 'Gobernar'** (posición 1). Orden: GV, ID, PR, DE, RS, RC.
-- 22 categorías CSF 2.0 (ítems `MANUAL`, `source_type='NIST'`) con referencia ISO 27001:2022:
+- 22 categorías CSF 2.0 (`scoring_mode='DERIVED'`, `inherit_rule='ISO_CODES_AVG'`, `source_type='NIST'`):
   GV: OC, RM, RR, PO, OV, SC · ID: AM, RA, IM · PR: AA, AT, DS, PS, IR · DE: CM, AE · RS: MA, AN, CO, MI · RC: RP, CO.
+- Cada categoría se calcula como **promedio** de los `scoreValue` de los controles del **Anexo A** y/o ítems **PHVA (cláusulas)** referenciados en `iso_control_code` (prefijos `A.x.y` = Anexo A; `C.x` / `cl.x.y` = cláusula PHVA), fiel a las fórmulas de la hoja NIST del instrumento.
+- **No** admite calificación ni evidencia manual en UI/API; el radar, tablero y reportes siguen mostrando las 6 funciones con valores derivados.
 - `nist_function_targets` incluye `GV`.
-- Backend: `ComputeNistSummaryUseCase` ahora deriva las funciones **dinámicamente** del snapshot (sin lista hardcodeada); se añadió `functionName`/`position` al snapshot/DTO/catálogo.
+- Backend: `NistCiberScoreResolver` + `ComputeNistSummaryUseCase` (funciones dinámicas del snapshot).
 - El promedio de una función = media de sus categorías (ej. **GOBERNAR = avg(50,0,100,100,0,0) = 42**, idéntico a la PORTADA).
 
 ### 5.3 Controles del Anexo A 2022 (93)

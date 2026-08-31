@@ -28,7 +28,7 @@ MSPI es un sistema de gestión de seguridad de la información construido como u
 - **Mapeo de controles a NIST CSF** (`nist-mappings`).
 - **Ciclo PHVA**: catálogo versionado (`phva-items`) con `parent_code`/`node_type` (CLAUSE\|ITEM) y pesos/topes Plan/Do/Check/Act (`phva-config`). **template_version v2**: 7 cláusulas `C.4`–`C.10` + 23 sub-numerales, pesos/caps **56/16/14/14**; v1 conserva ~17 ítems planos `P.1`…`M.2` con 40/20/20/20.
 - **Requisitos de madurez**: ~50 ítems Rn (`maturity-requirements`) con umbrales por nivel 1–5, y configuración de umbrales críticos (`maturity-config`).
-- **Hoja Ciber (NIST CSF)**: filas `nist-ciber-items` y metas (`nist-config`). **v2 = CSF 2.0**: 6 funciones (**GV/Gobernar**, ID, PR, DE, RS, RC) y 22 categorías MANUAL; v1 = enfoque CSF 1.1 (5 funciones + filas heredadas).
+- **Hoja Ciber (NIST CSF)**: filas `nist-ciber-items` y metas (`nist-config`). **v2 = CSF 2.0**: 6 funciones (**GV/Gobernar**, ID, PR, DE, RS, RC) y 22 categorías **DERIVED** (promedio desde Anexo A / cláusulas vía `iso_control_code`); v1 = enfoque CSF 1.1 (5 funciones + filas MANUAL/INHERITED).
 
 Todo el catálogo es **inmutable en tiempo de ejecución** desde la perspectiva del microservicio: `ms_catalog` no expone ningún endpoint de escritura (no hay `POST`/`PUT`/`PATCH`/`DELETE` en `CatalogApi`); la administración del contenido del instrumento se realiza fuera de este microservicio (scripts SQL versionados, `schema.sql` + `data.sql`/`nist_ciber_data.sql`/`maturity_data.sql`).
 

@@ -56,9 +56,9 @@ No existe un rol de negocio diferenciado (p. ej. `AdminSistema`, `Evaluador`) de
 ### 4.1 Subida de evidencia (`UploadEvidenceFileUseCase`)
 
 1. `assessmentId` es obligatorio.
-2. `relationType` debe ser uno de `CONTEXT`, `LIFTING_DOC`, `REPORT_OUTPUT`.
+2. `relationType` debe ser uno de `CONTEXT`, `LIFTING_DOC`, `REPORT_OUTPUT`, `CONTROL_RESPONSE`, `PHVA_ITEM`, `EXTENSION_REQUEST`, `DELETION_REQUEST`, `CATALOG_DELETE`.
 3. Si `relationType = CONTEXT`, `contextField` es obligatorio y debe ser `MISSION` o `CONTEXT`; el `relationId` real que se persiste se fuerza al propio `assessmentId` (no se toma del comando del cliente).
-4. Si `relationType = LIFTING_DOC` o `REPORT_OUTPUT`, `relationId` es obligatorio (identifica el ítem de levantamiento o el `jobId` del reporte).
+4. Si `relationType = LIFTING_DOC`, `REPORT_OUTPUT`, `CONTROL_RESPONSE` o `PHVA_ITEM`, `relationId` es obligatorio (ítem de levantamiento, `jobId` de reporte, control o ítem PHVA).
 5. `filename` no puede ser nulo ni estar en blanco.
 6. `contentType` debe estar en el conjunto permitido: `application/pdf`, `application/msword`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (DOCX), `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` (XLSX), `image/png`, `image/jpeg`. **No se permite ZIP ni ningún otro tipo**, tal como documenta el `README.md`.
 7. El tamaño debe ser mayor que 0 y no exceder el límite: 20 MB para `CONTEXT`/`LIFTING_DOC`, 50 MB para `REPORT_OUTPUT`.
