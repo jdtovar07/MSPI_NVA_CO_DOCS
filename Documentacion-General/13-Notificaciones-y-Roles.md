@@ -60,16 +60,16 @@ Se requiere `userId` y/o `targetRoles`. El fan-out por rol usa `iam.user_role` (
 
 | Evento | Destinatarios | Tipo | `actionUrl` típica |
 |---|---|---|---|
-| Solicitud de ampliación creada | AdminSistema, AdminInstrumento | `EXTENSION_REQUEST` | `/evaluations/extension-requests` |
+| Solicitud de ampliación creada | AdminSistema + AdminInstrumento **y** miembros Revisor/EvaluadorRevisor de esa evaluación (se excluye al solicitante) | `EXTENSION_REQUEST` | `/evaluations/extension-requests` |
 | Ampliación aprobada / rechazada | Solicitante | `EXTENSION_APPROVED` / `EXTENSION_REJECTED` | `/evaluations/my-assigned` |
-| Solicitud eliminación evaluación | AdminSistema, AdminInstrumento | `DELETION_REQUEST` | `/evaluations/deletion-requests` |
+| Solicitud eliminación evaluación creada | Igual que ampliación (admins globales + revisores de la evaluación) | `DELETION_REQUEST` | `/evaluations/deletion-requests` |
 | Eliminación evaluación aprobada / rechazada | Solicitante | `DELETION_APPROVED` / `DELETION_REJECTED` | `/evaluations/my-assigned` |
-| Solicitud eliminación catálogo | AdminSistema | `CATALOG_DELETION_REQUEST` | `/catalog/deletion-requests` |
-| Eliminación catálogo aprobada / rechazada | Solicitante | `CATALOG_DELETION_*` | catálogo / escalas |
+| Solicitud eliminación catálogo creada | AdminSistema (aprobador; se excluye al solicitante) | `CATALOG_DELETION_REQUEST` | `/catalog/deletion-requests` |
+| Eliminación catálogo aprobada / rechazada | Solicitante | `CATALOG_DELETION_APPROVED` / `CATALOG_DELETION_REJECTED` | catálogo / escalas |
 | Miembro agregado a evaluación | Usuario asignado | `MEMBER_ADDED` | `/evaluations/{id}` |
 | Fecha límite ≤ 5 días / vencida | Miembros Evaluador o EvaluadorRevisor | `DUE_SOON` / `OVERDUE` | `/evaluations/my-assigned` |
 
-Productores: `ms_assessment` y `ms_catalog` vía `IamNotificationGateway` → `POST /internal/notifications` (best-effort). Job diario 08:00 America/Bogota: `AssessmentDueDateNotificationSweeper`.
+Productores: `ms_assessment` (`AssessmentApproverNotifier`, `AddAssessmentMemberUseCase`, approve/reject, job de plazos) y `ms_catalog` vía `IamNotificationGateway` → `POST /internal/notifications` (best-effort). Si el fan-out por rol queda vacío tras `excludeUserId`, la API interna responde 201 sin filas (no 400). Dedup 20 h solo para `DUE_SOON`/`OVERDUE`. Job diario 08:00 America/Bogota: `AssessmentDueDateNotificationSweeper`.
 
 ### 2.4 Cómo se ven / activan
 
