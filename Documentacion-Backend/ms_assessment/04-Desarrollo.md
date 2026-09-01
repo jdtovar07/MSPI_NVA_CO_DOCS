@@ -93,7 +93,7 @@ Implementa el único puerto de persistencia (`AssessmentPersistenceGateway`, 39 
 - Mapeo bidireccional entidad↔dominio (métodos `toDomain`/`toEntity` por tipo).
 - **Materialización de snapshots**: `snapshotControlTree`, `snapshotPhvaItems`, `snapshotMaturityRequirements`, `snapshotNistCiberItems` reciben listas de DTOs de catálogo (`external.*CatalogInfo`) y las traducen a filas `assessment_*`, resolviendo referencias cruzadas (p. ej. `Map<UUID, UUID> catalogControlToAssessmentNode` para traducir el id de control del catálogo al id del nodo ya materializado en la evaluación).
 - **Clonación de snapshot completo**: `cloneAssessmentAreas`, `cloneAssessmentControlSnapshot`, `clonePhvaSnapshot`, `cloneMaturitySnapshot`, `cloneNistCiberSnapshot`, invocados en cadena por `CloneAssessmentUseCase` para duplicar íntegramente el árbol de una evaluación `CERRADA` hacia una nueva `BORRADOR`.
-- **Resolución de stewardship**: `findControlStewardshipByAssessmentId` construye la vista `ControlStewardshipRow` combinando el `default_steward_role_code` heredado del área/tema con el override `CUSTOM` capturado en `control_response`.
+- **Resolución de stewardship**: `patchControlSteward` con `FROM_AREA` guarda snapshot del tema elegido en `control_response.steward_custom_*`; `buildScoreView` / listados usan ese snapshot si existe, si no emparejan por `default_steward_role_code` ↔ `assessment_area_topic`. `CUSTOM` sigue siendo override explícito por control.
 
 ### 2.4 `infrastructure/driven-adapters/rest-consumer` (`:rest-consumer`)
 

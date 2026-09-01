@@ -274,7 +274,9 @@ Dos responsabilidades combinadas: (1) inyecta el `Authorization: Bearer <token>`
 | Alta y listado de evaluaciones | `EvaluationCreatePageComponent`, `EvaluationListPageComponent`, `AssessmentIndexService` |
 | Configuración de tipo de entidad territorial | `EntityOrderTypePageComponent`, `AssignEntityOrderTypeUseCase` (con manejo de conflicto) |
 | Gestión de áreas y temas con responsables | `AreasPageComponent`, `ReplaceAreaTopicsUseCase` |
-| Asignación de responsables por control (heredado/personalizado) | `StewardshipPageComponent`, `PatchControlStewardUseCase` |
+| Asignación de responsables por control (área/tema + snapshot o personalizado) | `StewardshipPageComponent`, `PatchControlStewardUseCase` |
+| Admin escalas (validación ES + toast / `RequiredLabel`) | `ScaleDetailPageComponent`, `UpdateScaleVersionUseCase` (backend) |
+| Selección activas/orden/obligatorias del banco (no edición de texto) | `QuestionBankConfigPageComponent` |
 | Árbol de controles ISO con calificación (ADMIN/TECH) | `ControlsPageComponent`, `ControlTreeComponent`, `ControlDetailPanelComponent` |
 | Ciclo PHVA con resumen de avance por componente | `PhvaPageComponent`, casos de uso de `score-modules.use-cases.ts` |
 | Requisitos de madurez, matriz por nivel y bloqueantes | `MaturityPageComponent` |

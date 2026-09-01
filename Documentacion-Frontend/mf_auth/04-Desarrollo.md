@@ -67,6 +67,7 @@ if (!result.ok) {
 - **Strategy vía DI**: la elección de adaptador (mock/API) es una decisión de configuración centralizada en `app.config.ts`, no dispersa en los componentes.
 - **Interceptor / Middleware HTTP**: `apiInterceptor` centraliza autenticación saliente y manejo de errores entrantes, evitando repetir lógica de headers/try-catch en cada repositorio API.
 - **Adapter de formato de API**: funciones puras `toUser()` (en `api-user.repository.ts`) y `mapRoles()` (en `api-auth.repository.ts`) traducen el DTO crudo del backend al tipo de dominio (`User`, `AuthSession`), aislando a la UI del contrato exacto de `ms_iam`.
+- **Normalización de roles en cliente**: `normalize-roles.ts` replica las reglas de `RoleNormalizer` (incl. `AdminInstrumento`+`Evaluador`+`Revisor`+`Lector` → `AdminSistema`); `UserFormPageComponent` muestra aviso y envía el conjunto ya consolidado en create/update.
 - **Composición de UI condicionada por autorización**: `hasAuthority(roles, 'USER_MANAGE')` se reutiliza igual en `UserListPageComponent` y `UserFormPageComponent`, centralizando la regla en `authority.ts` (función pura, sin estado).
 
 ## 5. Integración con APIs backend

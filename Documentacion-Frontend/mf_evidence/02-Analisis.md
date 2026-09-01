@@ -25,7 +25,7 @@ Basados en `docs/RUTAS-Y-PANTALLAS.md`, `docs/FLUJOS.md`, `docs/API-INTEGRACION.
 
 | ID | Requerimiento | Evidencia en código |
 |---|---|---|
-| RF-01 | El sistema debe redirigir automáticamente a la pantalla de contexto de la evaluación activa cuando existe `active_assessment_id` en `localStorage` | `EvidenceHomePageComponent.ngOnInit()` → `goContext()` |
+| RF-01 | El sistema debe permitir elegir la evaluación en la home antes de abrir contexto (selector explícito; sin auto-redirección al cargar `/`) | `EvidenceHomePageComponent` |
 | RF-02 | El sistema debe informar explícitamente cuando no hay evaluación activa, sin bloquear la carga de la aplicación | Bloque `@else` en `EvidenceHomePageComponent` ("No hay evaluación activa…") |
 | RF-03 | El sistema debe permitir consultar el contexto de una evaluación (misión, análisis de contexto, mapa de procesos, organigrama, autopercepción) | `GetContextUseCase`, `ApiEvidenceRepository.getContext()` (`GET /assessments/{id}/context`) |
 | RF-04 | El sistema debe permitir editar y guardar de forma incremental los campos de contexto | `PatchContextUseCase`, `ContextPageComponent.save()` (`PATCH /assessments/{id}/context`) |
@@ -68,7 +68,7 @@ Basados en `docs/RUTAS-Y-PANTALLAS.md`, `docs/FLUJOS.md`, `docs/API-INTEGRACION.
 Extraídas directamente del código (no inventadas):
 
 1. **Evaluación activa obligatoria para operar**: sin `active_assessment_id` en `localStorage`, la pantalla de inicio no navega a ningún flujo y muestra el aviso "No hay evaluación activa" (`EvidenceHomePageComponent`).
-2. **Redirección automática si hay evaluación activa**: al entrar a `/`, si existe `active_assessment_id`, el sistema navega inmediatamente a `/assessments/{id}/context` sin interacción del usuario (`ngOnInit()` llama `goContext()` directamente).
+2. **Selector explícito de evaluación**: en `/`, el usuario elige la evaluación en un `<select>` («Evaluación a la que pertenecen las evidencias») y continúa a contexto; no hay redirección automática por `active_assessment_id` al cargar la home.
 3. **Dos campos de contexto documental diferenciados**: los adjuntos de contexto se clasifican con `contextField: 'MISSION' | 'CONTEXT'`, cada uno con su propia zona de carga (`ContextPageComponent`).
 4. **43 ítems fijos de levantamiento**: el catálogo de entregables documentales es de exactamente 43 posiciones (`buildMockDeliveries` genera `Array.from({length: 43}, ...)`); el ítem 43 tiene un significado especial como métrica de alcance de procesos, según `docs/DESCRIPCION.md` ("métrica ítem 43 — alcance de procesos").
 5. **Tres estados de entrega posibles**: `DELIVERED` (entregado), `PARTIAL` (parcial), `NOT_DELIVERED` (no entregado) — tipo `DeliveryStatus`, sin estados intermedios adicionales.

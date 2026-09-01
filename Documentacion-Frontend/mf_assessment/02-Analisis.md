@@ -62,7 +62,7 @@ Extraídas del dominio (`assessment.types.ts`) y de los mappers/handlers de apli
 2. **Escala de calificación fija**: los valores permitidos para calificar un control, ítem PHVA, requisito de madurez o ítem NIST son `0, 20, 40, 60, 80, 100` o `N/A` (constante `RATING_SCALE_VALUES`), reflejada en `RatingSelectorComponent`.
 3. **Estado de calificación por ítem**: cada elemento calificable tiene `scoreStatus` en `{PENDING, SCORED, NA}` (`ScoreStatus`).
 4. **Tipos de control**: `ADMIN` (administrativo) y `TECH` (técnico) son mutuamente excluyentes por ruta (`/controls/admin` vs `/controls/tech`), aunque ambas usan el mismo componente `ControlsPageComponent` parametrizado por `controlType`.
-5. **Stewardship heredado vs. personalizado**: el responsable de un control puede provenir del área (`FROM_AREA`) o ser un valor personalizado (`CUSTOM`) con nombre, rol y contacto propios (`PatchControlStewardRequest`).
+5. **Stewardship heredado vs. personalizado**: en `StewardshipPageComponent`, «Del área» obliga a elegir **área y tema/funcionario** desde **Áreas y temas**; el PATCH `FROM_AREA` envía el snapshot del tema y el backend lo persiste en `control_response`. «Personalizado» (`CUSTOM`) permite otro responsable solo para ese control.
 6. **Editable vs. heredado en PHVA/Madurez/NIST**: cada ítem tiene una bandera `editable`; cuando no es editable, se muestra el `effectiveScore` (heredado de otra calificación), no un campo de edición directa — regla de negocio replicada en el mock (`mock-assessment.repository.ts`) y en el mapeo API (`mapPhvaItemFromApi`, `mapNistItemFromApi`, `mapMaturityRequirementFromApi`).
 7. **Control de concurrencia optimista**: toda operación de escritura sobre la evaluación (asignar tipo de entidad, calificar) puede fallar con HTTP 409 si `rowVersion` está desactualizado; en ese caso se recarga la evaluación desde el backend y se lanza `AssessmentConflictError` con el objeto actualizado, en vez de sobrescribir silenciosamente.
 8. **Nivel de madurez alcanzado**: se deriva del campo `nivelAlcanzado` devuelto por el backend (p. ej. `"Nivel 1"`), del cual el frontend extrae el número (`parseInt` sobre dígitos) para uso interno (`currentLevel`); el frontend no calcula el nivel, solo lo interpreta para presentación.
@@ -137,23 +137,30 @@ sequenceDiagram
 4. Éxito → toast («Calificación…» / «Revisión guardada correctamente») y el panel emite `close` (el padre limpia selección). Error → toast de error; el modal permanece abierto para reintentar; tras 3 fallos consecutivos en el mismo control también cierra.
 5. Si el backend detecta conflicto de versión, se captura `AssessmentConflictError` y se informa al usuario que "otro usuario modificó esta evaluación" y que los datos se recargaron.
 
-### 6.4 Stewardship personalizado
+### 6.4 Stewardship — del área o personalizado
 
-El body enviado al backend (`PATCH .../controls/{nodeId}/steward`) sigue el contrato OpenAPI documentado:
+- **`FROM_AREA`**: selects de área y tema; body incluye `stewardCustomName` / rol / contacto copiados del tema elegido (snapshot).
+- **`CUSTOM`**: formulario libre de nombre, rol y contacto.
 
-```json
-{
-  "stewardSource": "CUSTOM",
-  "stewardCustomName": "...",
-  "stewardCustomStaffRole": "..."
-}
-```
+Errores de validación en pantalla con `RequiredLabel` / `FieldError`; guardado con toast de éxito o error.
 
-### 6.5 Ir a Evidencias o Reportes
+### 6.5 Escalas (admin)
+
+`ScaleDetailPageComponent`: guardar borrador vía `PUT .../versions/{versionId}`; errores 400 del backend (mensajes en español) se muestran con toast y `FieldError` en niveles/bandas.
+
+### 6.6 Banco — pantalla «config»
+
+`/security-baseline/:id/config` (`QuestionBankConfigPageComponent`): **no edita el texto** de las preguntas; marca cuáles del banco están **activas**, su **orden** y cuáles son **obligatorias** por dominio. Crear/editar enunciados → `/security-baseline/:id/questions`.
+
+### 6.7 Workflow de evaluación
+
+Modal en listado (`EvaluationListPageComponent`): etiquetas legibles de estado (`labelOf`), texto de ayuda por transición (`transitionHint`) y selector «Estado destino» al reabrir.
+
+### 6.8 Ir a Evidencias o Reportes
 
 Desde la pantalla NIST (botón **Reportes**) o desde el panel de control, se invoca `openShellRoute('/reports' | '/evidence', assessmentId)`, que envía un mensaje `MSPI_SHELL_NAV` al padre; el shell navega internamente sin abrir una pestaña nueva.
 
-### 6.6 Listado → Continuar
+### 6.9 Listado → Continuar
 
 Desde `/evaluations`, el botón **Continuar** lleva al último paso configurado; por defecto, si no hay información adicional, redirige a `entity-order-type`.
 

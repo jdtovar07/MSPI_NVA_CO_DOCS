@@ -32,7 +32,7 @@
 | RF-07 | Reemplazar el listado de temas de un área (`PUT` completo, no incremental) | `ReplaceAssessmentAreaTopicsUseCase` |
 | RF-08 | Listar controles de la evaluación (filtrables por `controlType` ADMIN/TECH) y obtener el detalle de un control (incluye contexto de evidencia) | `ListAssessmentControlsUseCase`, `GetControlDetailUseCase` |
 | RF-09 | Calificar un control (score, evidencia, brecha, recomendación, estado) aplicando reglas de completitud del catálogo | `PatchControlScoreUseCase` |
-| RF-10 | Consultar y modificar el responsable (steward) de un control, ya sea heredado del área (`FROM_AREA`) o explícito (`CUSTOM`) | `GetControlStewardsUseCase`, `PatchControlStewardUseCase` |
+| RF-10 | Consultar y modificar el responsable (steward) de un control: `CUSTOM` (override explícito) o `FROM_AREA` eligiendo **área y tema** definidos en la evaluación; al guardar `FROM_AREA` se persiste **snapshot** del funcionario en `control_response` (`steward_custom_*`) y la resolución efectiva **prefiere ese snapshot** antes de volver a emparejar por `default_steward_role_code` | `GetControlStewardsUseCase`, `PatchControlStewardUseCase`, `AssessmentJpaAdapter.patchControlSteward` |
 | RF-11 | Calcular el **rollup** (agregación jerárquica recursiva) del árbol de controles, con promedio, banda de madurez y contadores de calificación/completitud | `ComputeAssessmentRollupUseCase` |
 | RF-12 | Listar ítems PHVA (filtrables por componente P/H/V/A) y calificarlos | `ListPhvaItemsUseCase`, `PatchPhvaItemScoreUseCase` |
 | RF-13 | Calcular el avance PHVA esperado vs. real (`overallBreach`) | `ComputePhvaAdvanceUseCase` |

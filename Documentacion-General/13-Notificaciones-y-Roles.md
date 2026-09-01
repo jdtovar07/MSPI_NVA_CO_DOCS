@@ -18,6 +18,7 @@ Aplicada en **front** (`mf_auth` · `normalizeRoles` / `user-form-page`) y de fo
 | Entrada | Resultado | Mensaje (ES) |
 |---|---|---|
 | Contiene `AdminSistema` (+ cualquier otro) | Solo `AdminSistema` | «La combinación con AdminSistema se consolidó en AdminSistema (acceso total).» |
+| `AdminInstrumento` + (`Evaluador`+`Revisor` o `EvaluadorRevisor`) + `Lector` | Solo `AdminSistema` | «AdminInstrumento + Evaluador + Revisor + Lector se consolidó en AdminSistema (acceso total).» |
 | `Evaluador` + `Revisor` | `EvaluadorRevisor` (se quitan los sueltos) | «Evaluador + Revisor se consolidó en EvaluadorRevisor.» |
 | `EvaluadorRevisor` + `Evaluador`/`Revisor` | Solo `EvaluadorRevisor` | Idem |
 
