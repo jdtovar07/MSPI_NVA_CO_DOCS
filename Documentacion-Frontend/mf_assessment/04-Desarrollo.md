@@ -257,7 +257,7 @@ export const apiInterceptor: HttpInterceptorFn = (req, next) => {
 };
 ```
 
-Dos responsabilidades combinadas: (1) inyecta el `Authorization: Bearer <token>` leído de la sesión sincronizada con el shell, y (2) **desenvuelve el sobre de respuesta** `{ data, meta }` usado por el backend, de forma que el resto de la aplicación trabaja directamente con el payload (`data`) sin conocer el formato de envoltura. Los errores HTTP se normalizan a `ApiError` con código, mensaje y `traceId` de diagnóstico.
+Dos responsabilidades combinadas: (1) inyecta el `Authorization: Bearer <token>` solo si la sesión sigue vigente (`isAuthenticated`), y (2) **desenvuelve el sobre de respuesta** `{ data, meta }` usado por el backend. Ante **401**, no se muestra el error crudo de Angular: se lanza `SESSION_EXPIRED` («Tu sesión expiró, vuelve a iniciar sesión»), se limpia la sesión y se redirige al login del shell. El puente de auth también re-pide sesión al volver a la pestaña.
 
 ### 10.2 Repositorio API real
 

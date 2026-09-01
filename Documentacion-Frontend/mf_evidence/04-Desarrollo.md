@@ -17,7 +17,7 @@
   readonly isAuthenticated = computed(() => { ... });
   reload(): void { this.sessionSignal.set(this.read()); }
   ```
-  A diferencia de `mf_auth`, esta versión de `AuthSessionService` es de **solo lectura**: no expone `setSession()`/`clearSession()`, únicamente `reload()`. Esto es consistente con el rol de `mf_evidence` en la integración (consume la sesión, no la origina — ver `03-Diseno.md`, sección 4.3). La lectura contempla tres fuentes en orden: `localStorage`, `sessionStorage`, y como último recurso la cookie `auth_session`.
+  Consume la sesión originada por el shell/`mf_auth` (`reload()` al recibir `MSPI_AUTH_SESSION`) y expone `clearSession()` para el interceptor ante 401. La lectura contempla tres fuentes: `localStorage`, `sessionStorage` y cookie `auth_session`.
 
 - **Estado local de página** — cada una de las tres páginas usa `signal()` para banderas de UI:
   - `EvidenceHomePageComponent`: `assessmentId = signal<string | null>(null)`.
@@ -117,18 +117,15 @@ Con una salvedad explícita en el interceptor: si el cuerpo de la respuesta es u
 ```ts
 catchError((err: HttpErrorResponse) => {
   if (err.status === 401) {
-    inject(AuthSessionService).reload();
+    authSession.clearSession();
+    redirectToLogin();
+    return throwError(() => new ApiError(401, [{ code: 'SESSION_EXPIRED', message: SESSION_EXPIRED_MSG }]));
   }
-  const apiError = new ApiError(
-    err.status,
-    err.error?.error ?? [{ code: 'UNKNOWN', message: err.message }],
-    err.error?.meta?.traceId
-  );
-  return throwError(() => apiError);
+  // ...
 })
 ```
 
-**Diferencia relevante frente a `mf_auth`:** en 401, `mf_evidence` **recarga** la sesión (`reload()`) en vez de **limpiarla** (`clearSession()`), lo cual es coherente con que `AuthSessionService` de este microfrontend no expone un método de limpieza — la responsabilidad de invalidar la sesión persistida recae en `mf_auth`/el shell, no en `mf_evidence`.
+**401 / sesión expirada:** limpia sesión, mensaje «Tu sesión expiró, vuelve a iniciar sesión» y redirección al login del shell (mismo criterio que el resto de MFs).
 
 A nivel de repositorio, `ApiEvidenceRepository` reutiliza la función privada `toApiError()` para relanzar el `ApiError` en todas las llamadas HTTP; a nivel de página, el `catch` de cada método (`save()`, `saveMetric()`, `uploadContext()`) usa `err instanceof Error ? err.message : 'Error al guardar'` como mensaje mostrado al usuario — sin mapeo a códigos de negocio legibles como sí ocurre en `mf_auth` (`errorMessage(code)`), es decir, se muestra el mensaje crudo devuelto por el backend.
 

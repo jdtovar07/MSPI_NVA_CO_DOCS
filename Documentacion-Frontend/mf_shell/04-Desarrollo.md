@@ -56,7 +56,7 @@ Función de interceptor (`HttpInterceptorFn`, API funcional de Angular 19) que:
 
 1. Inyecta `AuthSessionService` y adjunta `Authorization: Bearer {token}` si existe token.
 2. Desenvuelve automáticamente respuestas con forma `{ data, meta }` (patrón de paginación/envelope de las APIs backend MSPI), exponiendo solo `data` al código consumidor — excepto si el cuerpo es un `Blob` (descargas de archivo).
-3. Ante un `401`, limpia la sesión (`authSession.clearSession()`) y relanza un `ApiError` tipado con código, mensaje y `traceId` si el backend lo provee.
+3. Ante un `401`, limpia la sesión (`authSession.clearSession()`), redirige a `/login` y relanza `ApiError` con mensaje «Tu sesión expiró, vuelve a iniciar sesión» (no el texto crudo de Angular).
 
 ### 3.4 Puente de sesión entre iframes (`shell-iframe-bridge.ts`)
 

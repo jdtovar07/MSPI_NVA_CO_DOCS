@@ -248,7 +248,7 @@ Puntos de diseño verificados en el código:
 
 - El token se relee (`authSession.reload()`) en **cada** solicitud, no una sola vez al arrancar — asegura que un cambio de sesión reciente (por ejemplo, recién notificado por el shell) se aplique de inmediato.
 - El desempaquetado de `CorrectResponse` (`{ data, meta }` → `data`) es genérico para toda la aplicación: ningún repositorio necesita desempaquetar manualmente la respuesta.
-- Un `401` fuerza una recarga de la sesión (para reflejar una posible expiración detectada por el backend), pero el interceptor **no redirige** ni cierra sesión activamente — esa reacción, si existe, queda fuera del alcance de `mf_reports`.
+- Un `401` limpia la sesión, muestra «Tu sesión expiró, vuelve a iniciar sesión» y redirige al login del shell.
 
 ## 8. Conclusión de la fase de desarrollo
 
