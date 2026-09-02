@@ -117,6 +117,10 @@ Ambas son *factories* de `CanActivateFn` (funciones que devuelven una función g
 
 El menú **Evaluaciones** (`/evaluations`) siempre carga el listado en el iframe (`4203/evaluations`); no reabre `active_assessment_id` (esa clave se conserva para evidencias/reportes y otros flujos). Un segundo clic en el mismo ítem dispara el evento `mspi-evaluations-list` para forzar recarga del listado.
 
+**Reportes / Evidencias con contexto:** `MSPI_SHELL_NAV` con `assessmentId` navega a `/reports?assessmentId=` o `/evidence?assessmentId=` y el iframe abre export/contexto directo. El menú superior limpia el query y muestra el selector (autocomplete con búsqueda).
+
+**Notificaciones:** además de marcar leídas, se puede **limpiar** (borrado lógico `cleared_at` en `ms_iam`) solo notificaciones ya leídas (`POST /notifications/{id}/clear` y `POST /notifications/clear-read`). El listado excluye las limpiadas.
+
 ## 7. Parámetros del sistema
 
 `SystemSettingsPageComponent` (`/system-settings`) consume `GET/PUT /system/config` de `ms_iam`. En la pestaña **Evaluaciones** incluye la sección **Plazos de evaluación** (`assessmentDueDays` default 30, `assessmentExtensionDays` default 15, `assessmentDeletionGraceDays` default 5; rango 1–365).
