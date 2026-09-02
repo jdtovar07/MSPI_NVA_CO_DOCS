@@ -131,7 +131,7 @@ A nivel de repositorio, `ApiEvidenceRepository` reutiliza la función privada `t
 
 ## 6. Funcionalidades desarrolladas (resumen funcional)
 
-1. **Selector de evaluación** en la pantalla de inicio (`GET /assessments`); el usuario elige explícitamente y luego entra a contexto (se guarda `active_assessment_id` solo al continuar).
+1. **Selector de evaluación** en la pantalla de inicio (`GET /assessments`); el usuario elige explícitamente y luego entra a contexto (se guarda `active_assessment_id` solo al continuar). La página de contexto muestra el **nombre/entidad** (no el UUID) y contiene el layout de adjuntos con `max-width`/`overflow` para evitar desbordes.
 2. **Formulario de contexto de evaluación** con 7 campos de texto (misión, análisis de contexto, mapa de procesos, organigrama, y 3 de autopercepción), persistencia incremental vía `PATCH`.
 3. **Carga de archivos de contexto** (Mapa de procesos / Organigrama): al terminar la subida, toast de éxito o error y fila con nombre de archivo + **«Subido ✓»** (reemplazar opcional).
 4. **Levantamiento documental de 43 ítems** con guía desplegable por documento (estado, nombre entregado, archivo, observaciones), hints en columnas de la tabla, edición inline y **«Subido ✓»** tras adjuntar el soporte.

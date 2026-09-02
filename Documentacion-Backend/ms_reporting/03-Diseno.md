@@ -110,7 +110,7 @@ ms_reporting/
 │       ├── ProcessReportJobUseCase.java
 │       ├── GetReportJobUseCase.java
 │       ├── DownloadReportJobUseCase.java
-│       ├── ReportArtifactDescriptor.java   (package-private, nombres/MIME)
+│       ├── ReportArtifactDescriptor.java   (nombres/MIME sin UUID; slug entidad + fecha)
 │       ├── ReportOutputEvidenceArchiver.java
 │       └── engine/
 │           ├── ReportDocumentService.java

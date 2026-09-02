@@ -129,20 +129,21 @@ if (contentType.includes('application/json') || contentType.includes('json')) {
 
 ### 4.3 Resolución de nombre de archivo (`report-filename.util.ts`)
 
+**Seguridad:** ni la UI de exportación ni el fallback de nombre muestran `assessmentId`/`jobId`. El subtítulo usa el nombre/entidad de la evaluación; el backend genera `instrumento-mspi-<slug>-<fecha>` vía `ReportArtifactDescriptor`.
+
+### 4.3.1 Detalle de resolución
+
 ```typescript
 export function resolveReportFilename(
   fromHeader: string | null,
   reportType: ReportType,
   assessmentId: string,
-  jobId: string
+  jobId: string,
+  entityLabel?: string
 ): string {
-  const fallback = fallbackReportFilename(reportType, assessmentId, jobId);
-  const dot = fallback.lastIndexOf('.');
-  const expectedExt = dot >= 0 ? fallback.slice(dot + 1) : 'pdf';
-  const base = fromHeader && fromHeader.includes('.')
-    ? fromHeader.slice(0, fromHeader.lastIndexOf('.'))
-    : fallback.slice(0, dot >= 0 ? dot : fallback.length);
-  return `${base}.${expectedExt}`;
+  // fallback: instrumento-mspi-<slug>-<yyyyMMdd>.ext — sin UUID/jobId
+  const fallback = fallbackReportFilename(reportType, assessmentId, jobId, entityLabel);
+  // … fuerza extensión según reportType
 }
 ```
 

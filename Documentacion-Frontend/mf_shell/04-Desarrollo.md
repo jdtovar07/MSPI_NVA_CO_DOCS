@@ -110,10 +110,12 @@ Ambas son *factories* de `CanActivateFn` (funciones que devuelven una función g
 `DashboardPageComponent` combina:
 
 - `GetDashboardUserUseCase` para obtener el usuario y derivar `cards` (computed) filtradas por autoridad.
-- `DashboardStatsService.load()` (infraestructura), que dispara 5 peticiones en paralelo con `Promise.all`, cada una envuelta en `safeCount` para que un fallo individual no rompa el resto (retorna `'—'` en ese caso).
+- `DashboardStatsService.load()` (infraestructura), que dispara en paralelo con `Promise.all` (cada una envuelta en `safeCount`): org, users, assessments, my-assigned, evidence, reports, audit, **escalas** (`msCatalogUrl/catalog/scales?page=0&size=1`), **banco de preguntas** (`…/question-banks?page=0&size=1`) y **configuración** (nº de claves en `GET /system/config` o etiqueta `OK`). Un fallo individual no rompe el resto (retorna `'—'`).
 - Lectura de `accessDenied` desde el `queryParamMap` de la ruta activa (`ActivatedRoute.snapshot`), reflejando la redirección hecha por `roleGuard`/`systemAdminGuard`.
 
 `DashboardStatsService` no usa un puerto de dominio (no está detrás de una interfaz `GetDashboardStatsPort`); se inyecta y consume directamente como servicio de infraestructura desde el componente de presentación — una excepción al patrón estricto de puertos aplicado al usuario del dashboard.
+
+El menú **Evaluaciones** (`/evaluations`) siempre carga el listado en el iframe (`4203/evaluations`); no reabre `active_assessment_id` (esa clave se conserva para evidencias/reportes y otros flujos). Un segundo clic en el mismo ítem dispara el evento `mspi-evaluations-list` para forzar recarga del listado.
 
 ## 7. Parámetros del sistema
 
