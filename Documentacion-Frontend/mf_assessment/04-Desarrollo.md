@@ -163,8 +163,23 @@ Este componente además carga en paralelo dos dependencias antes de habilitar el
 - **`dueDate` null** → celda «Sin fecha límite» (muted); `formatDate` / `daysLabel` / `dueClass` no tratan `null` como fecha (evita «31/12/1969 Vencida»).
 - **`progress` null** → «—» y barra al 0%; con valor numérico → `N%` y ancho de barra. El backend calcula el % con el rollup (controles `SCORED` con valor / total hojas). Evaluaciones nuevas nacen en `PENDING` → progreso 0%.
 - **`overallScore` null/0** → «—».
-- **Ampliación**: si la evaluación está vencida o por vencer (≤5 días) y el miembro es Evaluador/EvaluadorRevisor, botón solo-ícono «Solicitar ampliación» (`mspi-request-action-icon-btn`, `aria-label`/`title`, SVG `currentColor`) → motivo obligatorio + adjunto opcional `EXTENSION_REQUEST`. Badge de estado de la última solicitud. Bandeja de aprobación en `/evaluations/extension-requests`.
-- **Eliminación lógica**: mismo patrón solo-ícono «Solicitar eliminación» (mismo rol; también en listas de escalas/bancos) → motivo + adjunto `DELETION_REQUEST`. Si APPROVED en gracia: aviso de fecha + «Recuperar». Bandeja `/evaluations/deletion-requests`. Soft-deleted no aparecen; admin puede ver `/evaluations/deleted`.
+- **Ampliación**: si la evaluación está vencida o por vencer (≤5 días) y el miembro es Evaluador/EvaluadorRevisor, botón solo-ícono «Solicitar ampliación» (`mspi-action-icon-btn` / legacy `mspi-request-action-icon-btn`, `kind="extension"`, `aria-label`/`title`, SVG `stroke="currentColor"`) → motivo obligatorio + adjunto opcional `EXTENSION_REQUEST`. Badge de estado de la última solicitud. Bandeja de aprobación en `/evaluations/extension-requests`.
+- **Eliminación lógica**: mismo patrón solo-ícono «Solicitar eliminación» (`kind="deletion"`, tono danger; también en listas de escalas/bancos) → motivo + adjunto `DELETION_REQUEST`. Si APPROVED en gracia: aviso de fecha + ícono «Recuperar» (`kind="recover"`). Bandeja `/evaluations/deletion-requests`. Soft-deleted no aparecen; admin puede ver `/evaluations/deleted`.
+
+## 6.2 Botones de acción como ícono (TANDA C)
+
+`ActionIconButtonComponent` (`mf_assessment/src/app/shared/actions/action-icon-button.component.ts`, selectores `mspi-action-icon-btn` y legacy `mspi-request-action-icon-btn`) unifica las acciones de fila/toolbar:
+
+| `kind` | aria-label / title | Tono CSS | Apariciones típicas |
+|--------|--------------------|----------|---------------------|
+| `recover` | Recuperar | neutro | my-assigned, escalas, bancos (gracia) |
+| `view` | Ver detalles | neutro | lista de escalas (routerLink) |
+| `edit` | Ver y editar | neutro | versiones de escala, stewardship, preguntas |
+| `add` | Agregar | primario | nivel/banda, área/tema |
+| `extension` | Solicitar ampliación | neutro | my-assigned |
+| `deletion` | Solicitar eliminación | danger | my-assigned, escalas, bancos |
+
+En viewport ≥900px el texto puede mostrarse al lado del SVG (`showLabel`); en estrecho solo el ícono. La lógica de rol/estado/`disabled` no cambia; solo la presentación. Los envíos de modal (p. ej. confirmar solicitud) siguen en texto.
 
 ## 7. Calificación y revisión de un control
 

@@ -136,7 +136,7 @@ Los repositorios de infraestructura capturan `ApiError` y lo traducen a mensajes
 3. **Verificación de 2FA** en logins subsecuentes, con contador de intentos restantes (`attemptsLeft`, inicializado en 3 pero **sin lógica visible que lo decremente** en el componente — posible funcionalidad incompleta, ver `07-Mantenimiento.md`).
 4. **Cambio de contraseña** con validación de complejidad en tiempo real (getters reactivos a cada tecla) y doble modalidad (forzado sin sesión / voluntario con sesión).
 5. **Gestión de sesión** persistente entre recargas, con expiración basada en `expiresAt` (timestamp calculado en el cliente a partir de `expiresIn`) y aviso previo configurable.
-6. **CRUD de usuarios** con paginación server-side (`PageRequest`/`PageResponse`), búsqueda por texto, filtros combinables por rol y estado, confirmación explícita antes de cambiar el estado, y formulario de alta/edición con UX de validación unificada (asteriscos, summary, errores por campo, toast).
+6. **CRUD de usuarios** con paginación server-side (`PageRequest`/`PageResponse`), búsqueda por texto, filtros combinables por rol y estado, confirmación explícita antes de cambiar el estado, y formulario de alta/edición con UX de validación unificada (asteriscos, summary, errores por campo, toast). En el listado, «Editar» es `mspi-action-icon-btn` (`kind="edit"`, aria-label «Ver y editar», SVG `currentColor`).
 7. **Autorización basada en autoridades derivadas de roles** (RBAC ligero), reutilizada de forma consistente entre listado y formulario de usuarios.
 8. **Modo mock funcionalmente equivalente al modo API** para los cuatro dominios (auth, users, roles, organizations), permitiendo desarrollo y demostración sin backend, incluyendo réplica de reglas de bloqueo de cuenta.
 

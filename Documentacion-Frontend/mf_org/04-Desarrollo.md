@@ -148,7 +148,7 @@ catchError((err: HttpErrorResponse) => {
 
 ## 6. Funcionalidades desarrolladas (resumen funcional)
 
-1. **Listado paginado de organizaciones** con búsqueda por nombre y filtro por tipo (`PUBLICA`/`PRIVADA`/`Todos`), con insignias de color diferenciadas por tipo.
+1. **Listado paginado de organizaciones** con búsqueda por nombre y filtro por tipo (`PUBLICA`/`PRIVADA`/`Todos`), con insignias de color diferenciadas por tipo. La acción «Ver detalles» es `mspi-action-icon-btn` (`kind="view"`, `aria-label`/`title`, SVG `currentColor`). En áreas base, «Agregar área» / «+ Tema» usan `kind="add"` (tono primario).
 2. **Alta de organización** con formulario validado (campos obligatorios secuenciales, formato de correo) y selector geográfico en cascada.
 3. **Edición de organización** con precarga de datos, incluyendo recuperación tolerante de la selección geográfica (por código o por nombre).
 4. **Vista "Mi organización"** de solo lectura, exclusiva para el rol `Lector`, con redirección automática desde el listado administrativo.
