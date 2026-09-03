@@ -9,7 +9,7 @@
 | Programa académico | Ingeniería de Sistemas |
 | Dirigido a | Profesor/asesor de trabajo de grado |
 | Fecha de elaboración | 2026-08-27 |
-| Fuentes primarias | `Documentacion-investigacion/Documento-Investigacion.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; los 6 `03-Diseno.md` de `Documentacion-Frontend/`; `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` y `DBvsExcel.md`; `docker-compose.apps.yml` / `docker-compose.front.yml` / `docker-compose.yml` (postgres, keycloak) |
+| Fuentes primarias | `Documentacion-investigacion/Documento-Investigacion.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; los 6 `03-Diseno.md` de `Documentacion-Frontend/`; [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI); `Documentacion-General/MER-MSPI.sql`; `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` y `DBvsExcel.md`; `docker-compose.apps.yml` / `docker-compose.front.yml` / `docker-compose.yml` (postgres, keycloak) |
 
 > **Nota de trazabilidad.** Cada afirmación técnica de este documento cita, entre paréntesis, el archivo del repositorio en el que se verificó. Cuando un dato no pudo confirmarse en ningún documento fuente, se declara explícitamente como no verificado en lugar de asumirse.
 
@@ -24,7 +24,7 @@ El sistema se construyó bajo dos estilos arquitectónicos combinados:
 - **Backend de microservicios** (Java 21 / Spring Boot, arquitectura hexagonal): 8 carpetas de microservicio, de las cuales **6 están activas** con lógica de negocio real y **2 son placeholders documentales** (`ms_admin`, `ms_audit`) — verificado directamente en `Documentacion-Backend/ms_admin/03-Diseno.md` y `Documentacion-Backend/ms_audit/03-Diseno.md`.
 - **Frontend de microfrontends** (Angular 19): 6 aplicaciones independientes compuestas por un *shell* host. La composición real **no usa Module Federation de Webpack** (mecanismo estándar de la industria para microfrontends), sino **iframes embebidos + `window.postMessage` + almacenamiento compartido (`localStorage`/cookie)** — hallazgo verificado explícitamente en el propio código y documentado en `Documentacion-Frontend/mf_shell/03-Diseno.md` y `Documentacion-Frontend/mf_auth/03-Diseno.md` (ver secc. 4 y 9 de este documento).
 
-La base de datos es una única instancia PostgreSQL particionada en **seis esquemas** (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`), cada uno propiedad de un microservicio, con claves foráneas físicas entre esquemas (`DB-MER.txt`, líneas 13-22, 194-209). La identidad se delega a **Keycloak** como IdP externo (realm `iam`), y el sistema aplica sobre sí mismo controles de seguridad equivalentes a los que audita (2FA/TOTP, auditoría centralizada) — coherencia señalada en `Documento-Investigacion.md`, secc. 4.
+La base de datos es una única instancia PostgreSQL particionada en **seis esquemas** (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`), cada uno propiedad de un microservicio, con claves foráneas físicas entre esquemas (`DB-MER.txt`, líneas 13-22, 194-209). El MER interactivo está en [dbdocs.io/jdtovar-2021a/MER-MSPI](https://dbdocs.io/jdtovar-2021a/MER-MSPI); la fuente SQL local es [`MER-MSPI.sql`](MER-MSPI.sql). La identidad se delega a **Keycloak** como IdP externo (realm `iam`), y el sistema aplica sobre sí mismo controles de seguridad equivalentes a los que audita (2FA/TOTP, auditoría centralizada) — coherencia señalada en `Documento-Investigacion.md`, secc. 4.
 
 ---
 

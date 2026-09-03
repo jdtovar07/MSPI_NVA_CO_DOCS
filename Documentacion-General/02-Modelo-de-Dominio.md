@@ -9,9 +9,9 @@
 | Programa académico | Ingeniería de Sistemas |
 | Dirigido a | Profesor/asesor de trabajo de grado |
 | Fecha de elaboración | 2026-08-27 |
-| Fuentes primarias | `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` (DBML v2.9, fuente de verdad del modelo físico); `DBvsExcel.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; `Historias_Usuario_MSPI_v2.md`; `Documentacion-investigacion/Documento-Investigacion.md` |
+| Fuentes primarias | [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI); [`MER-MSPI.sql`](MER-MSPI.sql); `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` (DBML v2.9); `DBvsExcel.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; `Historias_Usuario_MSPI_v2.md`; `Documentacion-investigacion/Documento-Investigacion.md` |
 
-> **Nota de trazabilidad y alcance.** Todas las entidades, atributos y relaciones citadas en este documento provienen de `DB-MER.txt` (líneas exactas citadas donde aporta valor) o de los `03-Diseno.md` de cada microservicio. Donde una relación cruza dos esquemas sin clave foránea física (lo habitual entre `assessment`/`evidence`/`reporting` hacia `org`/`catalog`), se indica explícitamente como "referencia lógica, sin FK física" — dato confirmado en los reportes de diseño de `ms_org`, `ms_assessment` y `ms_reporting`. Ninguna entidad de este documento fue inventada; donde la evidencia era insuficiente se declara así.
+> **Nota de trazabilidad y alcance.** El MER interactivo está publicado en [dbdocs.io/jdtovar-2021a/MER-MSPI](https://dbdocs.io/jdtovar-2021a/MER-MSPI). La fuente SQL local es [`MER-MSPI.sql`](MER-MSPI.sql) (exportación del mismo modelo) y el diagrama está también en [`MER-MSPI.pdf`](MER-MSPI.pdf). Las entidades, atributos y relaciones citadas en este documento coinciden con ese MER y con `DB-MER.txt` / los `03-Diseno.md` de cada microservicio. Donde una relación cruza dos esquemas sin clave foránea física (lo habitual entre `assessment`/`evidence`/`reporting` hacia `org`/`catalog`), se indica explícitamente como "referencia lógica, sin FK física" — dato confirmado en los reportes de diseño de `ms_org`, `ms_assessment` y `ms_reporting`. Ninguna entidad de este documento fue inventada; donde la evidencia era insuficiente se declara así.
 
 ---
 

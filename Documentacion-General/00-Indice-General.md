@@ -32,6 +32,7 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) | Arquitectura completa del sistema: diagrama C4 de contenedores, tabla de los 8 microservicios y 6 microfrontends, diagrama de despliegue Docker, arquitectura de seguridad (Keycloak/JWT/RBAC/2FA/auditoría), capas hexagonales, decisiones arquitectónicas y deuda técnica conocida. |
 | [`02-Modelo-de-Dominio.md`](02-Modelo-de-Dominio.md) | Los 7 dominios (bounded contexts) del sistema + 2 placeholders, entidades principales con atributos reales, diagrama entidad-relación consolidado, patrón catálogo-vs-ejecución, mapa de módulos funcionales → microservicios y glosario de dominio (SGSI, PHVA, Anexo A, NIST CSF, etc.). |
 | [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) | Objetivo general y objetivos específicos en formato de referencia rápida, con trazabilidad a los módulos que los implementan y su estado real (implementado / con limitaciones / no implementado). |
+| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación interactivo de PostgreSQL (esquemas `iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`). Fuente local: [`MER-MSPI.sql`](MER-MSPI.sql) y [`MER-MSPI.pdf`](MER-MSPI.pdf). |
 
 Estos tres documentos son el **punto de entrada recomendado para el profesor**: en menos de 30 minutos de lectura dan una visión completa de qué se construyó, cómo está arquitecturado y qué dominios de negocio cubre, sin tener que leer los 99 documentos técnicos detallados por componente.
 
@@ -97,8 +98,9 @@ Estos hallazgos están documentados con detalle y trazabilidad en cada component
 2. [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) — qué se propuso lograr.
 3. [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) — cómo está construido.
 4. [`02-Modelo-de-Dominio.md`](02-Modelo-de-Dominio.md) — qué dominios de negocio cubre.
-5. Uno o dos componentes de la sección 4 en detalle (por ejemplo, `ms_iam` y `mf_auth`, que fueron los primeros documentados como piloto y sirven de referencia de profundidad) — para verificar el nivel de detalle técnico disponible por componente.
-6. [`Documentacion-investigacion/Documento-Investigacion.md`](../Documentacion-investigacion/Documento-Investigacion.md) — como referencia ampliada si se requiere profundizar en algún punto académico.
+5. [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) — modelo físico de la base de datos (también [`MER-MSPI.sql`](MER-MSPI.sql) / [`MER-MSPI.pdf`](MER-MSPI.pdf)).
+6. Uno o dos componentes de la sección 4 en detalle (por ejemplo, `ms_iam` y `mf_auth`, que fueron los primeros documentados como piloto y sirven de referencia de profundidad) — para verificar el nivel de detalle técnico disponible por componente.
+7. [`Documentacion-investigacion/Documento-Investigacion.md`](../Documentacion-investigacion/Documento-Investigacion.md) — como referencia ampliada si se requiere profundizar en algún punto académico.
 
 ---
 
