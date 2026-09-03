@@ -73,7 +73,7 @@ ms_assessment/
 │   │   │   ├── repository/ 13 interfaces Spring Data JPA
 │   │   │   └── config/     DBSecret, JpaConfig
 │   │   └── rest-consumer/                  (:rest-consumer — co.com.mspi.consumer)
-│   │       ├── adapter/    CatalogGatewayAdapter, EvidenceGatewayAdapter, IamAuditGatewayAdapter,
+│   │       ├── adapter/    CatalogGatewayAdapter, EvidenceGatewayAdapter, AuditGatewayAdapter,
 │   │       │              IamUserGatewayAdapter, OrganizationGatewayAdapter
 │   │       ├── config/     RestConsumerConfig (4 beans RestClient nombrados)
 │   │       └── support/    ApiDataExtractor (helper de deserialización del envoltorio
@@ -108,7 +108,7 @@ A diferencia de `ms_iam` (94 clases de entrada/salida repartidas en 9 módulos c
 | `CatalogGateway` | Plantilla activa, árboles de controles/PHVA/madurez/NIST, presets de áreas, dominios ISO, escala/bandas, reglas de control | `CatalogGatewayAdapter` | `:rest-consumer` |
 | `OrganizationGateway` | Validación de organización (`GET /organizations/{id}`) | `OrganizationGatewayAdapter` | `:rest-consumer` |
 | `EvidenceGateway` | Init/clone de levantamiento documental, archivos de evidencia, contexto de auto-percepción | `EvidenceGatewayAdapter` | `:rest-consumer` |
-| `IamAuditGateway` | Registro best-effort de eventos de auditoría en `ms_iam` | `IamAuditGatewayAdapter` | `:rest-consumer` |
+| `AuditGateway` | Registro best-effort de eventos de auditoría en `ms_audit` | `AuditGatewayAdapter` | `:rest-consumer` |
 | `IamUserGateway` | Resolución del `userId` interno a partir del `sub` del JWT | `IamUserGatewayAdapter` | `:rest-consumer` |
 
 El ensamblaje puerto↔adaptador↔caso de uso ocurre exclusivamente en `applications/app-service/.../config/UseCaseConfig.java`, que declara **27 `@Bean`** (uno por caso de uso), inyectando explícitamente los gateways y, en varios casos, otros casos de uso ya construidos (p. ej. `ComputeDiagnosticDashboardUseCase` depende de otros cuatro casos de uso `Compute*`, y `BuildReportExportBundleUseCase` depende de siete). Esto forma una **composición en cadena** de casos de uso dentro del propio `:usecase`, no solo de gateways — patrón distinto al de `ms_iam`, donde los casos de uso son mayormente *pass-through* a un único `:service`.
@@ -131,7 +131,7 @@ flowchart TB
 
     subgraph DrivenAdapters["infrastructure/driven-adapters"]
         JPA["jpa-repository<br/>AssessmentJpaAdapter (39 métodos, 13 entidades)"]
-        REST["rest-consumer<br/>CatalogGatewayAdapter · OrganizationGatewayAdapter<br/>EvidenceGatewayAdapter · IamAuditGatewayAdapter · IamUserGatewayAdapter"]
+        REST["rest-consumer<br/>CatalogGatewayAdapter · OrganizationGatewayAdapter<br/>EvidenceGatewayAdapter · AuditGatewayAdapter · IamUserGatewayAdapter"]
     end
 
     subgraph AppService["applications/app-service (ejecutable Spring Boot)"]

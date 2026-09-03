@@ -179,7 +179,7 @@ Este componente además carga en paralelo dos dependencias antes de habilitar el
 | `extension` | Solicitar ampliación | neutro | my-assigned |
 | `deletion` | Solicitar eliminación | danger | my-assigned, escalas, bancos |
 
-En viewport ≥900px el texto puede mostrarse al lado del SVG (`showLabel`); en estrecho solo el ícono. La lógica de rol/estado/`disabled` no cambia; solo la presentación. Los envíos de modal (p. ej. confirmar solicitud) siguen en texto.
+Por defecto solo ícono (tooltip vía `title`/`aria-label`); `showLabel` puede mostrar el texto al lado en viewport ≥900px si se activa. La lógica de rol/estado/`disabled` no cambia; solo la presentación. Los envíos de modal (p. ej. confirmar solicitud) siguen en texto.
 
 ## 7. Calificación y revisión de un control
 

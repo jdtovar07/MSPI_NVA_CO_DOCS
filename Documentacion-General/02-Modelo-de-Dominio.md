@@ -62,14 +62,14 @@ flowchart LR
 
 | Contexto | Propósito de negocio | Microservicio(s) | Estado |
 |---|---|---|---|
-| **Identidad (IAM)** | Autenticación federada, perfil local de usuario, 2FA, roles, auditoría centralizada | `ms_iam` | Activo |
+| **Identidad (IAM)** | Autenticación federada, perfil local de usuario, 2FA, roles | `ms_iam` | Activo |
 | **Organización** | Maestro de entidades públicas evaluadas y sus contactos | `ms_org` | Activo |
 | **Catálogo** | Definición versionable del instrumento MSPI (la "plantilla vacía") | `ms_catalog` | Activo |
 | **Evaluación (Assessment)** | Ciclo de vida de una evaluación concreta, snapshot congelado del instrumento, calificación y cálculo | `ms_assessment` | Activo |
 | **Evidencia** | Contexto/misión de la entidad, levantamiento documental, archivos adjuntos | `ms_evidence` | Activo |
 | **Reportería** | Generación asíncrona de reportes PDF/Excel, comparativos temporales | `ms_reporting` | Activo |
 | **Administración** | Consola administrativa transversal (previsto: resumen del sistema, configuración global) | `ms_admin` (previsto) | **Placeholder** |
-| **Auditoría** | Auditoría transversal dedicada, separada de `ms_iam` | `ms_audit` (previsto) | **Placeholder** — funcionalidad real hoy vive en `ms_iam.iam.audit_log` |
+| **Auditoría** | Auditoría transversal dedicada | `ms_audit` | **Activo** — `audit.audit_log` (puerto 8088) |
 
 ---
 
@@ -88,16 +88,16 @@ flowchart LR
 | `iam.user_role` | `user_id (FK)`, `role_id (FK)`, `assigned_at` — PK compuesta única `(user_id, role_id)` | Relación N:M usuario↔rol |
 | `iam.user_totp` | `keycloak_sub (varchar, PK, FK a user.keycloak_sub)`, `secret (varchar, Base32)`, `enabled_at (nullable hasta primera verificación)` | 2FA/TOTP; Keycloak no almacena este secreto |
 | `iam.system_config` | `key (varchar, PK)`, `value_json (jsonb)`, `version (int)`, `updated_by`, `updated_at` | Parámetros globales (ej. `evidence.allowedMimeTypes`, `assessment.autosaveIntervalSeconds`); existe en el DDL pero, según el agente de extracción backend, sin código que la use activamente todavía |
-| `iam.audit_log` | `id (bigserial, PK)`, `event_type (varchar)`, `entity_type`, `entity_id`, `assessment_id (ref. lógica)`, `actor_user_id (FK a user.id)`, `occurred_at`, `ip`, `user_agent`, `before_json/after_json/metadata_json (jsonb)` | Tabla polimórfica; sumidero de eventos de autenticación propios y eventos de negocio de otros microservicios (ver Documento 1, secc. 6.4) |
+| `audit.audit_log` *(ms_audit)* | `id (bigserial, PK)`, `event_type`, `entity_type`, `entity_id`, `assessment_id (UUID sin FK)`, `actor_user_id (UUID sin FK)`, `occurred_at`, `ip`, `user_agent`, `before_json/after_json/metadata_json (jsonb)` | Bitácora central; productores: ms_iam (AUTH) y ms_assessment vía `POST /internal/audit/events` |
 
 ### Relaciones cruzando esquemas
 
 - `iam.user.organization_id` → referencia lógica a `org.organization.id` (validada por `ms_org` al crear, sin constraint física entre esquemas independientes en despliegue — `03-Diseno.md` de `ms_org`).
-- `iam.audit_log.assessment_id` → referencia lógica a `assessment.assessment.id`.
+- `audit.audit_log.assessment_id` → UUID opcional **sin FK** a `assessment.assessment`.
 
 ### Endpoints principales (`Documentacion-Backend/ms_iam/03-Diseno.md`)
 
-`AuthApi` (`/auth/login`, `/auth/totp/*`, `/auth/change-password`), `UsersApi` (`/users` CRUD + paginado), `RolesApi` (`/roles`), `InternalAuditApi` (`POST /internal/audit/events`, canal interno con `X-Internal-Api-Key`).
+`AuthApi` (`/auth/login`, `/auth/totp/*`, `/auth/change-password`), `UsersApi` (`/users` CRUD + paginado), `RolesApi` (`/roles`), La ingesta/consulta de auditoría vive en **ms_audit** (`POST /internal/audit/events`, `GET /audit/events`).
 
 ---
 
@@ -261,7 +261,7 @@ Públicos (JWT): `GET/PATCH /assessments/{id}/context`, `GET/PATCH .../process-s
 | Contexto | Esquema previsto | Estado real |
 |---|---|---|
 | **Administración** (`ms_admin`) | Ninguno (no hay modelo de datos) | Placeholder puro: `README.md` + `docs/ROADMAP.md` + `docs/openapi.yaml` con `paths: {}`. Arquitectura objetivo descrita (`AdminDashboardApi`, `SystemConfigApi`, gateways agregadores `IamAdminGateway`/`OrgAdminGateway`/`AssessmentReadGateway`) pero **sin una sola clase de código** |
-| **Auditoría** (`ms_audit`) | Previsto: `audit` (tabla `audit.audit_log`) | Placeholder documental: `README.md` + `docs/MIGRATION-NOTES.md` + `docs/openapi.yaml` 100% `deprecated` que reenvía al contrato real de `ms_iam`. La funcionalidad de auditoría **ya existe y opera hoy dentro de `iam.audit_log`** (ver secc. 2) |
+| **Auditoría** (`ms_audit`) | `audit.audit_log` | Microservicio activo en `:8088`; MER + `patch-audit-schema.sql`; sin FK cross-dominio |
 
 ---
 

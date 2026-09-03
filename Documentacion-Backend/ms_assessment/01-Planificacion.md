@@ -49,7 +49,7 @@ A partir del código, `docs/openapi.yaml` y `docs/MVP-MSPI-CONTRATOS-Y-MER.md` s
 - **RI-3** — Toda calificación numérica debe pertenecer a la escala publicada por `ms_catalog` (`GET /catalog/.../scale-levels`) — valores típicos `0,20,40,60,80,100` — o ser `NA`.
 - **RI-4** — Marcar un control como `COMPLETADO` obliga, según las reglas del catálogo (`ControlRuleInfo`), a que existan evidencia, brecha y/o recomendación (esta última condicionada a un umbral configurable `THRESHOLD`).
 - **RI-5** — El cálculo de agregaciones (`rollup`, resúmenes PHVA/madurez/NIST, diagnóstico, brechas) es **on-read**: no existen tablas de resultados persistidos; toda evaluación se recalcula bajo demanda a partir de las respuestas capturadas y el snapshot.
-- **RI-6** — Debe existir un canal de auditoría hacia `ms_iam` (`POST /internal/audit/events`) para eventos de negocio (`ASSESSMENT_PUBLISHED`, asignación de tipo de entidad), protegido con `X-Internal-Api-Key`, y tolerante a fallos (no debe abortar la operación de negocio si la auditoría no responde).
+- **RI-6** — Debe existir un canal de auditoría hacia `ms_audit` (`POST /internal/audit/events`) para eventos de negocio (`ASSESSMENT_PUBLISHED`, asignación de tipo de entidad), protegido con `X-Internal-Api-Key`, y tolerante a fallos (no debe abortar la operación de negocio si la auditoría no responde).
 - **RI-7** — Debe existir una API interna (`/internal/assessments/**`) sin JWT pero protegida por `X-Internal-Api-Key`, consumida por `ms_reporting`, para exponer el bundle de exportación y las brechas sin requerir que ese microservicio reimplemente el cálculo.
 - **RI-8** — El servicio debe exponer *health checks* (`/actuator/health`, `/actuator/info`) para orquestación por Docker Compose/Railway.
 - **RI-9** — El identificador del usuario autenticado no proviene directamente del JWT (`sub`), sino que se resuelve contra el perfil espejo de `ms_iam` (`IamUserGateway.resolveInternalUserId`, usado por `CurrentUserResolver`), lanzando `IamServiceException` si el usuario no está registrado.
@@ -115,7 +115,7 @@ Documento de referencia funcional local:
 | `ms_org` | Proveedor de `GET /organizations/{id}`, consultado para validar la organización al crear una evaluación |
 | `ms_catalog` | Proveedor de la plantilla activa, árbol de controles, PHVA, madurez, NIST, presets de áreas, dominios ISO, escala y reglas — fuente de todo lo que se "snapshotea" al crear una evaluación |
 | `ms_evidence` | Consumidor/proveedor de levantamiento documental por evaluación (`init`/`clone` de *lifting*), adjuntos por control y contexto de auto-percepción usado en el tablero diagnóstico |
-| `ms_iam` | Sumidero de auditoría (`POST /internal/audit/events`) y proveedor de resolución de identidad interna (`IamUserGateway`) para mapear el `sub` del JWT a un `userId` interno |
+| `ms_iam` | Sumidero de auditoría en ms_audit (`POST /internal/audit/events`) y proveedor de resolución de identidad interna (`IamUserGateway`) para mapear el `sub` del JWT a un `userId` interno |
 | `ms_reporting` (Módulo 9) | Consumidor S2S de `/internal/assessments/**` (bundle de exportación y brechas) vía `X-Internal-Api-Key`, sin pasar por JWT |
 | Keycloak (IdP) | Emisor de los JWT que autentican la API pública (`/assessments/**`) |
 | Equipo DevOps / DBA | Responsable de aplicar `schema.sql` (el microservicio **no** ejecuta DDL automáticamente, ver `03-Diseno.md`/`06-Implementacion-Despliegue.md`) |

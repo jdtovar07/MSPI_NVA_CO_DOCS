@@ -16,7 +16,7 @@
 | **ms_org** (sistema externo) | Provee los datos de la organización a validar al crear una evaluación | `OrganizationGatewayAdapter`, `OrganizationGateway` |
 | **ms_catalog** (sistema externo) | Provee la plantilla activa y todo el contenido evaluable (controles, PHVA, madurez, NIST, presets de áreas, dominios ISO, escala, reglas) | `CatalogGatewayAdapter`, `CatalogGateway` |
 | **ms_evidence** (sistema externo) | Gestiona el levantamiento documental asociado a la evaluación (init/clone) y aporta el contexto de auto-percepción del tablero diagnóstico | `EvidenceGatewayAdapter`, `EvidenceGateway` |
-| **ms_iam** (sistema externo) | Sumidero de auditoría de eventos de negocio y resolutor de identidad interna del usuario autenticado | `IamAuditGatewayAdapter`, `IamUserGatewayAdapter` |
+| **ms_iam** (sistema externo) | Sumidero de auditoría de eventos de negocio y resolutor de identidad interna del usuario autenticado | `AuditGatewayAdapter`, `IamUserGatewayAdapter` |
 | **ms_reporting** (sistema externo, S2S) | Consume la API interna (`/internal/assessments/**`) con `X-Internal-Api-Key` para construir reportes/exportables | `InternalAssessmentReportingApi` |
 
 ## 2. Requerimientos funcionales (verificados en `domain/usecase`)
@@ -25,7 +25,7 @@
 |---|---|---|
 | RF-01 | Crear una evaluación en estado `BORRADOR`, validando organización, resolviendo la plantilla activa (o una explícita) y materializando snapshots de controles, PHVA, madurez, NIST y áreas | `CreateAssessmentUseCase` |
 | RF-02 | Consultar y actualizar metadatos de una evaluación existente | `GetAssessmentUseCase`, `UpdateAssessmentUseCase` |
-| RF-03 | Asignar el tipo de orden territorial (`entityOrderTypeCode`; si `OTRA`, exigir `entityTypeOther`) a la evaluación, con auditoría en `ms_iam` | `AssignEntityOrderTypeUseCase` |
+| RF-03 | Asignar el tipo de orden territorial (`entityOrderTypeCode`; si `OTRA`, exigir `entityTypeOther`) a la evaluación, con auditoría en `ms_audit` | `AssignEntityOrderTypeUseCase` |
 | RF-04 | Publicar una evaluación (`BORRADOR` → `CERRADA`), validando tipo de entidad (y texto libre si `OTRA`) y control de concurrencia optimista (`rowVersion`), con registro de auditoría | `PublishAssessmentUseCase` |
 | RF-05 | Clonar una evaluación **publicada** (`CERRADA`) hacia una nueva evaluación `BORRADOR`, copiando áreas, snapshot de controles/PHVA/madurez/NIST y el levantamiento documental | `CloneAssessmentUseCase` |
 | RF-06 | Listar áreas de la evaluación con sus temas/procesos; cada tema incluye funcionario (`staffName` / alias `funcionario`) obligatorio al guardar | `GetAssessmentAreasUseCase`, `ReplaceAssessmentAreaTopicsUseCase`, `AssessmentAreaTopicRequest` |
@@ -56,7 +56,7 @@
 | RNF-05 | Control de concurrencia optimista en la publicación de evaluaciones vía `rowVersion` | `PublishAssessmentUseCase`, `RowVersionRequest` (DTO de entrada) |
 | RNF-06 | Cobertura mínima de instrucciones del 80% exigida por build (`jacocoTestCoverageVerification`, enlazada a `check`) | `main.gradle` |
 | RNF-07 | El microservicio no debe ejecutar DDL automáticamente en producción (`spring.sql.init.mode: never`, `hibernate.ddl-auto: none`) | `application.yaml` |
-| RNF-08 | Las llamadas de auditoría a `ms_iam` no deben bloquear ni fallar la operación de negocio si el servicio de auditoría no responde (best-effort) | `IamAuditGatewayAdapter` (captura genérica `catch (Exception ex)` con `log.warn`) |
+| RNF-08 | Las llamadas de auditoría a `ms_iam` no deben bloquear ni fallar la operación de negocio si el servicio de auditoría no responde (best-effort) | `AuditGatewayAdapter` (captura genérica `catch (Exception ex)` con `log.warn`) |
 | RNF-09 | CORS restringido a una lista explícita de orígenes configurada por variable de entorno, sin comodín | `CorsConfig` (`CORS_ALLOWED_ORIGINS`) |
 | RNF-10 | Todas las respuestas exitosas siguen un envoltorio uniforme `CorrectResponse{meta,data}` con `traceId` y `timestamp`; los errores siguen `ErrorResponse{meta,error[]}` | `ApiResponseMapper`, `GlobalExceptionHandler` |
 
@@ -146,7 +146,7 @@ Algoritmo documentado en el propio código (`ComputeAssessmentRollupUseCase`), d
 | Caso de uso | Entrada principal | Salida | Efectos secundarios |
 |---|---|---|---|
 | `CreateAssessmentUseCase` | `CreateAssessmentCommand`, `createdBy` | `Assessment` | Inserta assessment + member líder + historial de estado + snapshots (controles, PHVA, madurez, NIST, áreas); llama a `ms_evidence.initLifting` |
-| `PublishAssessmentUseCase` | `assessmentId`, `rowVersion`, `publishedBy` | `Assessment` actualizado | Inserta historial de estado; audita `ASSESSMENT_PUBLISHED` en `ms_iam` (best-effort) |
+| `PublishAssessmentUseCase` | `assessmentId`, `rowVersion`, `publishedBy` | `Assessment` actualizado | Inserta historial de estado; audita `ASSESSMENT_PUBLISHED` en `ms_audit` (best-effort) |
 | `CloneAssessmentUseCase` | `sourceAssessmentId`, `createdBy`, nombre evaluador | `Assessment` nuevo | Clona áreas/controles/PHVA/madurez/NIST; llama a `ms_evidence.cloneLifting` |
 | `PatchControlScoreUseCase` | `assessmentId`, `assessmentControlNodeId`, `PatchControlScoreCommand` | *(void)* | Valida contra escala y reglas del catálogo; persiste respuesta de control |
 | `ComputeAssessmentRollupUseCase` | `assessmentId`, `controlType` opcional | `RollupResult` (árbol) | Ninguno (lectura pura) |
@@ -158,4 +158,4 @@ Algoritmo documentado en el propio código (`ComputeAssessmentRollupUseCase`), d
 
 - No se encontró código de **workflow de aprobación multiusuario genérico** más allá de los flujos ya implementados de ampliación y eliminación lógica (guards `requireExtension*` / `requireDeletion*` en `AssessmentAccessGuard`); `SecurityConfig` sigue exigiendo `authenticated()` y la autorización de negocio vive en esos guards.
 - La **eliminación física** de evaluaciones no existe a propósito: el borrado es lógico (`assessment.deleted_at`) tras aprobación + periodo de gracia (`assessment_deletion_request` + sweeper). El registro permanece para auditoría.
-- No se encontró notificación (correo/webhook) al publicar o calificar; el único efecto colateral observado es la auditoría best-effort hacia `ms_iam`.
+- No se encontró notificación (correo/webhook) al publicar o calificar; el único efecto colateral observado es la auditoría best-effort hacia `ms_audit`.

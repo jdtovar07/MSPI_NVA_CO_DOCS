@@ -19,7 +19,7 @@
 | `archunit` | 1.4.1 | Declarada en `app-service`, **sin clase de prueba asociada** | `app-service` |
 | `object-mapper` (reactivecommons) | 0.1.0 | Declarada en `jpa-repository`, **sin uso confirmado en clases de prueba existentes** | `jpa-repository` |
 
-No hay MockWebServer/OkHttp ni ninguna otra librería de simulación HTTP declarada (a diferencia de `ms_iam`, que la usa para probar `KeycloakAuthAdapter`): **no existe ninguna clase de prueba para los 5 adaptadores de `rest-consumer`** (`CatalogGatewayAdapter`, `OrganizationGatewayAdapter`, `EvidenceGatewayAdapter`, `IamAuditGatewayAdapter`, `IamUserGatewayAdapter`).
+No hay MockWebServer/OkHttp ni ninguna otra librería de simulación HTTP declarada (a diferencia de `ms_iam`, que la usa para probar `KeycloakAuthAdapter`): **no existe ninguna clase de prueba para los 5 adaptadores de `rest-consumer`** (`CatalogGatewayAdapter`, `OrganizationGatewayAdapter`, `EvidenceGatewayAdapter`, `AuditGatewayAdapter`, `IamUserGatewayAdapter`).
 
 ## 2. Estructura de carpetas de test (real, verificada en el repositorio)
 
@@ -62,7 +62,7 @@ En total se identificaron **10 clases de prueba**, todas concentradas en 2 de lo
 
 - **No hay pruebas de los 9 controladores REST del dominio de negocio** (`AssessmentApi`, `AssessmentControlApi`, etc.) ni con `MockMvc` ni con `@SpringBootTest`: a diferencia de `ms_iam` (que sí prueba `AuthApi`/`UsersApi`/`RolesApi` con MockMvc standalone), `ms_assessment` no tiene ninguna prueba de entry point HTTP más allá de la configuración transversal y el manejador de errores.
 - **No hay pruebas de los adaptadores de persistencia** (`AssessmentJpaAdapter`, el único adaptador de `:jpa-repository`, con 39 métodos) ni de configuración JPA (`JpaConfig`), pese a que `ms_iam` sí prueba su adaptador de auditoría (`AuthAuditAdapterTest`) y su configuración de conexión (`JpaConfigTest`).
-- **No hay pruebas de ningún adaptador `rest-consumer`** (`CatalogGatewayAdapter`, `OrganizationGatewayAdapter`, `EvidenceGatewayAdapter`, `IamAuditGatewayAdapter`, `IamUserGatewayAdapter`), ni con MockWebServer ni con ningún otro mecanismo — es la brecha de cobertura más significativa dado que este microservicio depende fuertemente de 4 integraciones HTTP salientes para materializar snapshots.
+- **No hay pruebas de ningún adaptador `rest-consumer`** (`CatalogGatewayAdapter`, `OrganizationGatewayAdapter`, `EvidenceGatewayAdapter`, `AuditGatewayAdapter`, `IamUserGatewayAdapter`), ni con MockWebServer ni con ningún otro mecanismo — es la brecha de cobertura más significativa dado que este microservicio depende fuertemente de 4 integraciones HTTP salientes para materializar snapshots.
 - **No hay pruebas para 21 de los 28 casos de uso**: solo 7 casos de uso tienen clase de test dedicada (`ComputeAssessmentRollupUseCase`, `ComputeDomainEffectivenessUseCase`, `ComputePhvaAdvanceUseCase`, `ListGapsUseCase`, `PatchControlScoreUseCase`, más los 2 resolvers). Casos de uso centrales como `CreateAssessmentUseCase`, `PublishAssessmentUseCase`, `CloneAssessmentUseCase`, `ComputeMaturitySummaryUseCase`, `ComputeNistSummaryUseCase`, `ComputeDiagnosticDashboardUseCase` y `BuildReportExportBundleUseCase` no tienen prueba unitaria propia en el repositorio.
 - **No se encontraron pruebas de integración con `@SpringBootTest`** ni pruebas end-to-end contra PostgreSQL/Testcontainers, igual que en `ms_iam`.
 - **No hay clase de prueba ArchUnit** pese a la dependencia declarada `archunit:1.4.1` en `app-service` — misma discrepancia observada en `ms_iam`.
