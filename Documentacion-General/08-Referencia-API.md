@@ -15,7 +15,7 @@
 | Auth | `POST /auth/login`, `POST /auth/change-password`, `GET /auth/totp/status`, `POST /auth/totp/setup`, `POST /auth/totp/verify` | Público / autenticado |
 | Usuarios | `GET/POST /users`, `GET /users/statuses`, `GET/PUT /users/{userId}`, `PATCH /users/{userId}/status`, `POST /users/{userId}/reset-password`, `POST /users/disable-by-email` | `AdminSistema` |
 | Roles | `GET /roles` | `AdminSistema` |
-| Sistema | `GET/PUT /system/config`, `GET /system/config/history` | `AdminSistema` |
+| Sistema (`ms_admin` :8089) | `GET/PUT /system/config`, `GET /system/config/history` | `AdminSistema` |
 | Auditoría (`ms_audit:8088`) | `GET /audit/events` | `AdminSistema` |
 | Notificaciones | `GET /notifications`, `POST /notifications/{id}/read`, `POST /notifications/read-all` | Autenticado |
 | Interno | `POST /internal/audit/events` (`ms_audit`), `POST /internal/notifications` (`ms_iam`) | `X-Internal-Api-Key` |

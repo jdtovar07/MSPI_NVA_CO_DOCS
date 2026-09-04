@@ -1,10 +1,18 @@
 # ms_admin — Diseño
 
 | Campo | Valor |
-|---|---|
+|---|---
+
+> **ACTUALIZACIÓN 2026-10-11:** `ms_admin` está **implementado** (puerto **8089**, esquema **`admin`**).
+> Posee `admin.system_config` / `admin.system_config_history` (sin FK a `iam.user`).
+> Endpoints: `GET/PUT /system/config`, `GET /system/config/history` (JWT `AdminSistema`) y
+> `GET /internal/system/config` (API-key). Consumidores: `ms_assessment`, `ms_catalog`, `mf_shell` (`msAdminUrl`).
+> El resto de este documento describe el diseño *placeholder* histórico; ante conflicto, prevalece el código en `MSPI_NVA_CO_MR_BACK/ms_admin`.
+
+|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_admin` |
-| Fecha del documento | 2026-08-18 |
-| Alcance | Arquitectura, estructura de paquetes, modelo de datos y diseño de API de `ms_admin` |
+| Fecha del documento | 2026-08-18 (rev. implementación 2026-10-11) |
+| Alcance | Diseño histórico + estado implementado (SystemConfig hexagonal :8089) |
 | Estado del repositorio | Placeholder — **no existe estructura de paquetes real que documentar** |
 
 ---

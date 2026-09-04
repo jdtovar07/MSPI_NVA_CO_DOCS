@@ -68,7 +68,7 @@ flowchart LR
 | **Evaluación (Assessment)** | Ciclo de vida de una evaluación concreta, snapshot congelado del instrumento, calificación y cálculo | `ms_assessment` | Activo |
 | **Evidencia** | Contexto/misión de la entidad, levantamiento documental, archivos adjuntos | `ms_evidence` | Activo |
 | **Reportería** | Generación asíncrona de reportes PDF/Excel, comparativos temporales | `ms_reporting` | Activo |
-| **Administración** | Consola administrativa transversal (previsto: resumen del sistema, configuración global) | `ms_admin` (previsto) | **Placeholder** |
+| **Administración** | Configuración global del sistema (`admin.system_config`) | `ms_admin` (:8089) | **Activo** |
 | **Auditoría** | Auditoría transversal dedicada | `ms_audit` | **Activo** — `audit.audit_log` (puerto 8088) |
 
 ---

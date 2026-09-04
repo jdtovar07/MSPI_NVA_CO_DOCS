@@ -57,7 +57,7 @@ flowchart TB
         MSCAT["ms_catalog :8085<br/>Catálogo del instrumento"]
         MSEVI["ms_evidence :8086<br/>Evidencias y levantamiento"]
         MSREP["ms_reporting :8087<br/>Reportes PDF/Excel async"]
-        MSADM["ms_admin<br/>(placeholder, sin puerto)"]
+        MSADM["ms_admin<br/>:8089"]
         MSAUD["ms_audit<br/>(placeholder, sin puerto)"]
     end
 
@@ -128,7 +128,7 @@ flowchart TB
 | `ms_assessment` | 8084 | **Activo** | Agregado raíz de la evaluación: ciclo de vida, snapshot del instrumento, calificación de controles, rollup jerárquico, PHVA, madurez, NIST, tablero de diagnóstico consolidado | `assessment` |
 | `ms_evidence` | 8086 | **Activo** | Contexto/misión de la entidad, levantamiento de 43 ítems documentales, carga/descarga de archivos multipart | `evidence` |
 | `ms_reporting` | 8087 | **Activo** | Generación asíncrona de reportes (PORTADA PDF/Excel + instrumento completo 11 hojas vía LibreOffice/POI, watermark borrador, oficiales/protegidos), jobs con *polling*, comparativos | `reporting` |
-| `ms_admin` | — (sin asignar) | **Placeholder** — solo `README.md` + `docs/openapi.yaml` (`paths: {}`, `version: 0.0.0`); sin `build.gradle` ni módulos | Consola administrativa transversal objetivo (no implementada) | — |
+| `ms_admin` | 8089 | Hexagonal Gradle (SystemConfig) | Configuración global `admin.system_config` | `admin` |
 | `ms_audit` | — (sin asignar) | **Placeholder** — solo `README.md` + `docs/MIGRATION-NOTES.md` + `docs/openapi.yaml` deprecado que reenvía a `ms_iam`; sin código propio | Auditoría transversal dedicada objetivo (funcionalidad real hoy vive dentro de `ms_iam.iam.audit_log`) | — |
 
 Fuente: `Documentacion-Backend/ms_admin/03-Diseno.md` §1-2 y `Documentacion-Backend/ms_audit/03-Diseno.md` §1; puertos de `docker-compose.apps.yml`; propiedad de esquema confirmada en `DB-MER.txt` (comentario "Microservicios y dueño de schema", líneas 16-22) y `Documento-Investigacion.md` secc. 10.1.
@@ -418,7 +418,7 @@ Implementado mediante el campo `row_version` en `assessment.assessment` (increme
 
 Esta sección documenta con honestidad las brechas encontradas al consolidar los 14 documentos de diseño por componente, citando explícitamente dónde se evidenció cada hallazgo.
 
-1. **`ms_admin` y `ms_audit` son placeholders sin código ejecutable.** `ms_admin` solo contiene `README.md` + `docs/openapi.yaml` (`paths: {}`, `version: 0.0.0`), sin `build.gradle` ni estructura de módulos (`Documentacion-Backend/ms_admin/03-Diseno.md` §1-2). `ms_audit` tiene la misma naturaleza documental; su `openapi.yaml` está 100% marcado `deprecated` y reenvía por `externalDocs` al contrato real de `ms_iam` (`Documentacion-Backend/ms_audit/03-Diseno.md` §1). La funcionalidad de auditoría transversal que `ms_audit` debería proveer **ya existe hoy, pero vive dentro de `ms_iam`** (`iam.audit_log` + endpoint interno `POST /internal/audit/events`), lo cual es una solución funcional pero no la separación de responsabilidades que el diseño original contemplaba.
+1. **`ms_admin` y `ms_audit` están implementados** (8089 / 8088). `ms_admin` solo contiene `README.md` + `docs/openapi.yaml` (`paths: {}`, `version: 0.0.0`), sin `build.gradle` ni estructura de módulos (`Documentacion-Backend/ms_admin/03-Diseno.md` §1-2). `ms_audit` tiene la misma naturaleza documental; su `openapi.yaml` está 100% marcado `deprecated` y reenvía por `externalDocs` al contrato real de `ms_iam` (`Documentacion-Backend/ms_audit/03-Diseno.md` §1). La funcionalidad de auditoría transversal que `ms_audit` debería proveer **ya existe hoy, pero vive dentro de `ms_iam`** (`iam.audit_log` + endpoint interno `POST /internal/audit/events`), lo cual es una solución funcional pero no la separación de responsabilidades que el diseño original contemplaba.
 
 2. **Discrepancia entre Module Federation planificado y la integración real por iframe.** El plan de trabajo del backend (`PLAN_TRABAJO_MSPI_v2.md`, sección 10, citado en `Documento-Investigacion.md` secc. 6.2) especifica una configuración `webpack.config.js` con `remotes` de Module Federation para los 6 microfrontends. La verificación directa del código de los 6 `03-Diseno.md` de frontend confirma que **ninguno** implementa Module Federation: todos usan iframe + `postMessage` + almacenamiento compartido. Implicaciones documentadas: URLs `hardcodeadas` a `localhost:420X` sin `environment.prod.ts` que las parametrice (`Documentacion-Frontend/mf_shell/03-Diseno.md`, "Observación de diseño"), y propagación de sesión "parcial" entre orígenes distintos del navegador.
 

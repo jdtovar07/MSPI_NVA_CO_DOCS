@@ -85,7 +85,7 @@ flowchart TB
 
 La documentación se elaboró leyendo los repositorios reales, no a partir de plantillas. Cuando algo no está implementado, se declara. Detalle y trazabilidad en la [sección de deuda técnica](Documentacion-General/01-Arquitectura-General-del-Sistema.md).
 
-- **`ms_admin` y `ms_audit`** son carpetas placeholder; la auditoría operativa vive en `ms_iam`.
+- **`ms_admin`** (:8089) posee la configuración global; **`ms_audit`** (:8088) posee la bitácora.
 - Los microfrontends se componen con **iframe + `postMessage`**, no con Module Federation (aunque el plan de trabajo lo especificaba).
 - El backend define umbral JaCoCo 80 %, pero el pipeline de CI ejecuta `assemble`, no `test`/`check`. Ningún microfrontend tiene pruebas automatizadas verificadas.
 - El instrumento fuente usa **ISO/IEC 27001:2013**; la versión vigente de la norma es **2022**.
@@ -148,7 +148,7 @@ Ocho microservicios, cada uno con los 7 documentos del ciclo de vida. El enlace 
 | [`ms_assessment`](Documentacion-Backend/ms_assessment/) | Ciclo de vida de evaluaciones y motor de cálculo | 8084 | Activo |
 | [`ms_evidence`](Documentacion-Backend/ms_evidence/) | Contexto organizacional y evidencias documentales | 8086 | Activo |
 | [`ms_reporting`](Documentacion-Backend/ms_reporting/) | Generación asíncrona de reportes PDF/Excel | 8087 | Activo (con limitaciones) |
-| [`ms_admin`](Documentacion-Backend/ms_admin/) | Administración general | — | Placeholder, sin código |
+| [`ms_admin`](Documentacion-Backend/ms_admin/) | Configuración global | 8089 | Activo |
 | [`ms_audit`](Documentacion-Backend/ms_audit/) | Auditoría transversal | — | Placeholder, sin código |
 
 ### Frontend

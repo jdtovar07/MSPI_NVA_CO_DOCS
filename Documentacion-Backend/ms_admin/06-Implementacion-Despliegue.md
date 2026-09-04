@@ -1,5 +1,8 @@
 # ms_admin — Implementación y Despliegue
 
+> **ACTUALIZACIÓN 2026-10-11:** `ms_admin` implementado en :8089 con SystemConfig (esquema `admin`). Ver `MSPI_NVA_CO_MR_BACK/ms_admin/README.md`.
+
+
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_admin` |

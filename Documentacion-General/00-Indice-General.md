@@ -5,7 +5,7 @@
 | **Proyecto** | MSPI: Sistema de Gestión de Seguridad y Privacidad de la Información basado en ISO/IEC 27001 |
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Programa** | Ingeniería de Sistemas |
-| **Fecha** | 2026-08-27 (índice inicial); **última revisión API/código** 2026-10-07; **alineación instrumento MSPI (v2)** 2026-10-08; **TANDA A bugs** / **TANDA B UX** / **TANDA C icon-buttons** 2026-10-11; **ms_audit extract** 2026-10-11 |
+| **Fecha** | 2026-08-27 (índice inicial); **última revisión API/código** 2026-10-07; **alineación instrumento MSPI (v2)** 2026-10-08; **TANDA A bugs** / **TANDA B UX** / **TANDA C icon-buttons** 2026-10-11; **ms_audit extract** 2026-10-11; **ms_admin extract** 2026-10-11 |
 
 Este índice es el punto de entrada único de toda la documentación generada para el proyecto de grado. Está pensado para que el profesor/asesor pueda revisar el trabajo de lo general a lo particular, sin necesidad de explorar el código fuente directamente.
 
@@ -60,7 +60,7 @@ Cada uno de los 8 microservicios backend y los 6 microfrontends tiene **7 docume
 | `ms_assessment` — Ciclo de vida de evaluaciones y motor de cálculo | ✅ Activo | [`Documentacion-Backend/ms_assessment/`](../Documentacion-Backend/ms_assessment/) |
 | `ms_evidence` — Contexto organizacional y evidencias documentales | ✅ Activo | [`Documentacion-Backend/ms_evidence/`](../Documentacion-Backend/ms_evidence/) |
 | `ms_reporting` — Generación asíncrona de reportes PDF/Excel | ✅ Activo (con limitaciones) | [`Documentacion-Backend/ms_reporting/`](../Documentacion-Backend/ms_reporting/) |
-| `ms_admin` — Administración general | ⚠️ Placeholder, sin código | [`Documentacion-Backend/ms_admin/`](../Documentacion-Backend/ms_admin/) |
+| `ms_admin` — Configuración global del sistema | ✅ Activo (puerto 8089) | [`Documentacion-Backend/ms_admin/`](../Documentacion-Backend/ms_admin/) |
 | `ms_audit` — Auditoría transversal | ✅ Activo (puerto 8088) | [`Documentacion-Backend/ms_audit/`](../Documentacion-Backend/ms_audit/) |
 
 ### 4.2 Frontend — `Documentacion-Frontend/` (6 microfrontends × 7 documentos = 42 documentos)
@@ -92,7 +92,7 @@ Cada uno de los 14 componentes tiene la misma estructura interna:
 
 Toda la documentación técnica detallada (sección 4) y la documentación general (sección 3) se construyó **a partir de la lectura directa del código fuente real** de los repositorios `MSPI_NVA_CO_MR_BACK` y `MSPI_NVA_CO_MR_FRONT` — no es contenido genérico ni una plantilla rellenada por adivinanza. Cuando un dato no pudo confirmarse en el código (por ejemplo, cobertura real de pruebas, existencia de CI/CD, o alcance normativo exacto), se declaró explícitamente como ausente o como `[PENDIENTE: a completar por los autores]`, en vez de inventarse. Esto incluye hallazgos honestos y relevantes para la sustentación, entre ellos:
 
-- **`ms_admin`** permanece como placeholder; **`ms_audit`** es microservicio activo (puerto 8088, esquema `audit`).
+- **`ms_admin`** es microservicio activo (puerto 8089, esquema `admin`, SystemConfig); **`ms_audit`** es microservicio activo (puerto 8088, esquema `audit`).
 - **Ningún microfrontend** tiene pruebas automatizadas verificadas (sin `*.spec.ts` ni configuración Karma/Jest).
 - La integración de microfrontends **no usa Module Federation** de Webpack (como sí lo especifica el plan de trabajo v2), sino composición por `iframe` + `postMessage` + almacenamiento compartido — confirmado en los 6 microfrontends.
 - El backend define pruebas y umbrales de cobertura (JaCoCo 80 %) en Gradle, pero el pipeline de CI (`bitbucket-pipelines.yml`) solo ejecuta `assemble`, nunca `test`/`check`.
