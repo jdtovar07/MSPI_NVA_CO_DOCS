@@ -68,3 +68,10 @@ Cualquier cambio en `mf_reports` debe considerar su impacto en:
 ## 7. Resumen
 
 `mf_reports` es, de los siete documentos de esta serie, el que presenta menor superficie de mantenimiento en términos de líneas de código (17 archivos TypeScript) y de dependencias externas, pero concentra su complejidad en la tolerancia a variantes del contrato de `ms_assessment` y en el flujo de *polling*/descarga asíncrona. La ausencia de pruebas automatizadas y de configuración de entorno en tiempo de ejecución son, junto con la falta de una pantalla para reportes comparativos ya soportados a nivel de dominio, los tres puntos de mayor prioridad para la evolución futura del microfrontend.
+
+
+## Changelog operativo (2026-09-04) — UI sin códigos internos
+
+- Etiquetas en español para tipo/estado de reporte y estado de evaluación (`report-ui-labels.ts`).
+- No se muestran Job id, UUIDs ni enums crudos en Exportar reportes; mensajes de error se limpian de UUID.
+- Descarga: si el header trae UUID, se fuerza el nombre con slug de entidad.

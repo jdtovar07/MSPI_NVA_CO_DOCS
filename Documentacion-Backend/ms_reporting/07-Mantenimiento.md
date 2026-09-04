@@ -56,3 +56,9 @@
 - Completar o retirar los tipos `DIAGNOSTIC_WIDGET_PNG`/`DIAGNOSTIC_WIDGET_PDF` del enum `ReportType` según la decisión de producto vigente.
 - Evaluar la integración real de `ms_catalog` (hoja "Escala") si el negocio la retoma, o eliminar `CatalogGateway`/`CatalogGatewayAdapter` si se confirma que quedó fuera de alcance definitivamente.
 - Crear el `bitbucket-pipelines.yml` faltante, alineado con el patrón usado por los demás microservicios del repositorio (`Build App` + `Deploy to Railway` sobre rama `dev`), incorporando al menos la ejecución de `./gradlew test` dado el estado actual de cobertura.
+
+
+## 6. Changelog operativo (2026-09-04) — nombres de descarga legibles
+
+- `DownloadReportJobUseCase` regenera el `Content-Disposition` con slug de entidad (`ReportArtifactDescriptor`) si el nombre almacenado contiene UUID (artefactos antiguos).
+- Los jobs nuevos ya guardan el archivo con slug (sin UUID de evaluación ni jobId).

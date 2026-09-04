@@ -86,3 +86,10 @@ No se encontró un archivo `MIGRATION-NOTES.md` en `ms_assessment/`. El DDL can�
 | Equipo de seguridad | Rotación de `INTERNAL_API_KEY` (compartida con `ms_catalog`/`ms_evidence`/`ms_iam`), revisión de la propagación del JWT del usuario hacia servicios aguas abajo (`jwtBearerForwardingInterceptor`), alineado con `docs/linea_base_seguridad_ISO27001.md` |
 | Equipo de calidad / QA | Cerrar la brecha de pruebas en persistencia, adaptadores REST salientes y casos de uso de ciclo de vida; activar `check` en CI como *gate* real |
 | Equipo de infraestructura | Mantenimiento del pipeline (`bitbucket-pipelines.yml`), gestión de despliegue en Railway, coordinación de arranque con las 4 dependencias externas del compose (`ms-org`, `ms-catalog`, `ms-evidence`, `ms-iam`) |
+
+
+## 7. Changelog operativo (2026-09-04) — score en listados
+
+- `AssessmentResponse.score`: promedio del rollup (`overallAverage`) enriquecido en `ListAssessmentsUseCase`.
+- `MyAssignedAssessment.overallScore`: mismo promedio, calculado junto con `progress` en `ListMyAssignedAssessmentsUseCase` (antes quedaba `null` y la UI mostraba «—»).
+- OpenAPI: propiedad `score` documentada en `AssessmentResponse`.

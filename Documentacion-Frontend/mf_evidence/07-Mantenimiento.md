@@ -83,3 +83,9 @@ No se identificó un **error boundary global** de Angular (`ErrorHandler` person
 - [ ] Retirar o documentar el uso previsto de la variable `apiBaseUrl` no utilizada en `environment.*.ts`.
 - [ ] Definir estrategia de versionado semántico y `CHANGELOG.md`.
 - [ ] Evaluar instrumentación de logs/observabilidad centralizada acorde al contexto ISO 27001 de MSPI, especialmente para operaciones de carga/descarga y cambio de estado de evidencias.
+
+
+## Changelog operativo (2026-09-04) — sin UUID en subtítulos
+
+- Levantamiento documental muestra nombre/entidad (`assessmentLabel`), no el UUID de la evaluación.
+- Autocomplete de evaluación humaniza el estado (Borrador, En diligenciamiento, …).

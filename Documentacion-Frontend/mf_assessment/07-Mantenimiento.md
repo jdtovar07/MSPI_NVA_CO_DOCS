@@ -83,3 +83,9 @@ El proyecto usa Angular 19 con builder `application` (esbuild/Vite internamente)
 7. **Página o flujo explícito de publicación de evaluación** (`publishAssessment`) si actualmente no existe una entrada de UI, o documentación de dónde se invoca si existe fuera del alcance revisado.
 
 Estas mejoras se formulan como recomendaciones derivadas del análisis del código y la documentación existente; ninguna de ellas está implementada en el estado actual del repositorio.
+
+
+## Changelog operativo (2026-09-04) — Score / Calificación en listados
+
+- Lista de Evaluaciones: mapea `score` / `overallScore` / `averageValue` → `a.score` (`mapAssessmentListScore`).
+- Mis evaluaciones asignadas: columna Calificación usa `overallScore` del API (ahora poblado por el backend) formateado como %.
