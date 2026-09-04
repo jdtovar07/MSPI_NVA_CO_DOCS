@@ -5,7 +5,7 @@
 | **Proyecto** | MSPI: Sistema de Gestión de Seguridad y Privacidad de la Información basado en ISO/IEC 27001 |
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Programa** | Ingeniería de Sistemas |
-| **Fecha** | 2026-08-27 (índice inicial); **última revisión API/código** 2026-10-07; **alineación instrumento MSPI (v2)** 2026-10-08; **TANDA A bugs** / **TANDA B UX** / **TANDA C icon-buttons** 2026-10-11; **ms_audit extract** 2026-10-11; **ms_admin extract** 2026-10-11 |
+| **Fecha** | 2026-08-27 (índice inicial); **última revisión API/código** 2026-10-07; **alineación instrumento MSPI (v2)** 2026-10-08; **TANDA A bugs** / **TANDA B UX** / **TANDA C icon-buttons** 2026-10-11; **ms_audit extract** 2026-10-11; **ms_admin extract** 2026-10-11; **reload stack + patches** 2026-10-12 |
 
 Este índice es el punto de entrada único de toda la documentación generada para el proyecto de grado. Está pensado para que el profesor/asesor pueda revisar el trabajo de lo general a lo particular, sin necesidad de explorar el código fuente directamente.
 
