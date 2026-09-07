@@ -73,7 +73,7 @@ No existe un `ROADMAP.md` propio de `ms_assessment`. A partir de las brechas fun
 
 ## 5. Notas de migración
 
-No se encontró un archivo `MIGRATION-NOTES.md` en `ms_assessment/`. El DDL canónico vive en `docker-config/docker/postgres/init/MER-MSPI.sql`. Para volúmenes ya existentes hay patches aditivos idempotentes (p. ej. `patch-assessment-soft-delete.sql` para `deleted_at` + `assessment_deletion_request`; `patch-assessment-request-numbers.sql` para `request_number` / nombres de actor y secuencias `SOL-ELIM`/`SOL-AMPL`). Se recomienda mantener ese patrón (evitar `DROP`/`ALTER` destructivos) al evolucionar el esquema `assessment`.
+No se encontró un archivo `MIGRATION-NOTES.md` en `ms_assessment/`. El DDL canónico vive en `docker-config/docker/postgres/init/MER-MSPI.sql`. Para volúmenes ya existentes hay patches aditivos idempotentes (p. ej. `patch-assessment-soft-delete.sql`; `patch-assessment-request-numbers.sql` para `SOL-ELIM`/`SOL-AMPL`; `patch-catalog-request-numbers.sql` para `SOL-CAT`). Se recomienda mantener ese patrón (evitar `DROP`/`ALTER` destructivos) al evolucionar el esquema.
 
 `maturity_data.sql`, aunque vive en la raíz de `ms_assessment/`, no es una migración del esquema `assessment`: es un script de siembra de datos de **catálogo** (`catalog.*`) para pruebas manuales del módulo de madurez. Debe mantenerse claramente diferenciado de cualquier futuro script de migración real del esquema propio del microservicio, para no confundir a un mantenedor que busque el historial de cambios de `assessment.*`.
 

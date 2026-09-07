@@ -192,7 +192,8 @@ flowchart TB
 
   subgraph AuditMS["ms_audit futuro"]
     Ingest["POST /internal/audit/events"]
-    Query["GET /audit/events"]
+    Query["GET /audit/events\n(+ dateFrom/dateTo/actor/requestNumber)"]
+    Detail["GET /audit/requests/{requestNumber}"]
     Export["GET /audit/export"]
     Ingest --> Store[(audit.audit_log)]
     Query --> Store
@@ -276,7 +277,9 @@ Esquema `AuditEventRequest` copiado en `ms_audit/docs/openapi.yaml` (idéntico e
 | `afterJson` | object | No |
 | `metadataJson` | object | No |
 
-Campos útiles en `metadataJson` (productores de solicitudes): `summary`, `requestNumber`, `actorUserName`, `assessmentName`, `hasAttachment` / `attachmentFileId` (eventos `DELETION_*` / `EXTENSION_*`). El listado público proyecta `summary` desde metadata.
+Campos útiles en `metadataJson` (productores de solicitudes): `summary`, `requestNumber`, `actorUserName`, `subjectName`/`assessmentName`, `hasAttachment` / `attachmentFileId` (eventos `DELETION_*` / `EXTENSION_*` / `CATALOG_DELETION_*`). El listado público proyecta `summary`, `requestNumber` y `hasAttachment` desde metadata y **no** expone UUID crudos (`entityRef` = radicado cuando aplica).
+
+**Ficha por radicado:** `GET /audit/requests/{requestNumber}` compone cabecera viva vía S2S `GET /internal/requests/{requestNumber}` (dueño: evaluación o catálogo según prefijo `SOL-ELIM`/`SOL-AMPL`/`SOL-CAT`) + timeline ASC de eventos locales con ese `requestNumber`.
 
 Seguridad: `internalApiKey` (`apiKey` en header `X-Internal-Api-Key`), igual que en `ms_iam`.
 
@@ -287,7 +290,8 @@ El README describe (sin un `openapi.yaml` objetivo todavía) tres endpoints prev
 | Endpoint | Método | Estado de diseño |
 |---|---|---|
 | `/internal/audit/events` | `POST` | Contrato heredado de `ms_iam`, reutilizable tal cual |
-| `/audit/events` | `GET` | Solo nombrado en diagramas; sin parámetros de query, códigos de respuesta ni esquema de paginación formalizados |
+| `/audit/events` | `GET` | Query: `page`, `size`, `q`, `eventType`, `entityType`, `dateFrom`, `dateTo`, `actor`, `requestNumber`. Orden `occurred_at DESC`. |
+| `/audit/requests/{requestNumber}` | `GET` | Cabecera de solicitud + timeline cronológico ASC correlacionado por radicado. |
 | `/audit/export` | `GET` | Solo nombrado en diagrama de arquitectura objetivo; sin formato de exportación (CSV/JSON/NDJSON), límites ni parámetros definidos |
 
 ## 5. Decisiones técnicas y de diseño
