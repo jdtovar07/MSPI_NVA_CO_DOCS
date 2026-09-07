@@ -276,6 +276,8 @@ Esquema `AuditEventRequest` copiado en `ms_audit/docs/openapi.yaml` (idéntico e
 | `afterJson` | object | No |
 | `metadataJson` | object | No |
 
+Campos útiles en `metadataJson` (productores de solicitudes): `summary`, `requestNumber`, `actorUserName`, `assessmentName`, `hasAttachment` / `attachmentFileId` (eventos `DELETION_*` / `EXTENSION_*`). El listado público proyecta `summary` desde metadata.
+
 Seguridad: `internalApiKey` (`apiKey` en header `X-Internal-Api-Key`), igual que en `ms_iam`.
 
 ### 4.2 API objetivo (planificada, sin OpenAPI formalizado)
