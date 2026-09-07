@@ -93,3 +93,10 @@ No se encontró un archivo `MIGRATION-NOTES.md` en `ms_assessment/`. El DDL can�
 - `AssessmentResponse.score`: promedio del rollup (`overallAverage`) enriquecido en `ListAssessmentsUseCase`.
 - `MyAssignedAssessment.overallScore`: mismo promedio, calculado junto con `progress` en `ListMyAssignedAssessmentsUseCase` (antes quedaba `null` y la UI mostraba «—»).
 - OpenAPI: propiedad `score` documentada en `AssessmentResponse`.
+
+
+## 8. Changelog operativo (2026-09-04) — bloqueo en periodo de gracia
+
+- `AssessmentResponse.pendingDeletion` / `deletionStatus` / `scheduledDeletionAt` enriquecidos en get/list.
+- `AssessmentAccessGuard` rechaza EDIT/REVIEW/workflow si hay eliminación APPROVED con fecha futura.
+- Query `excludePendingDeletion=true` en listado para selectores de evidencias/reportes.

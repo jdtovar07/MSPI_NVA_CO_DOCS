@@ -89,3 +89,8 @@ No se identificó un **error boundary global** de Angular (`ErrorHandler` person
 
 - Levantamiento documental muestra nombre/entidad (`assessmentLabel`), no el UUID de la evaluación.
 - Autocomplete de evaluación humaniza el estado (Borrador, En diligenciamiento, …).
+
+
+## Changelog operativo (2026-09-04) — excluir evaluaciones en eliminación
+
+- El selector de evidencias usa `excludePendingDeletion=true` y filtra `pendingDeletion`.

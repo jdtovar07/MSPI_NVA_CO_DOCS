@@ -89,3 +89,10 @@ Estas mejoras se formulan como recomendaciones derivadas del análisis del códi
 
 - Lista de Evaluaciones: mapea `score` / `overallScore` / `averageValue` → `a.score` (`mapAssessmentListScore`).
 - Mis evaluaciones asignadas: columna Calificación usa `overallScore` del API (ahora poblado por el backend) formateado como %.
+
+
+## Changelog operativo (2026-09-04) — modal de confirmación y recuperación
+
+- Componente compartido `shared/confirm-modal` sustituye `window.confirm` (escala, banco de preguntas, áreas).
+- Botón Recuperar naranja; confirma con días restantes antes de cancelar la eliminación.
+- Evaluaciones con `pendingDeletion`: solo lectura en el wizard; aviso en el tablero.

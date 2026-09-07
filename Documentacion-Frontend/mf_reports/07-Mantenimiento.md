@@ -75,3 +75,8 @@ Cualquier cambio en `mf_reports` debe considerar su impacto en:
 - Etiquetas en español para tipo/estado de reporte y estado de evaluación (`report-ui-labels.ts`).
 - No se muestran Job id, UUIDs ni enums crudos en Exportar reportes; mensajes de error se limpian de UUID.
 - Descarga: si el header trae UUID, se fuerza el nombre con slug de entidad.
+
+
+## Changelog operativo (2026-09-04) — excluir evaluaciones en eliminación
+
+- El selector de reportes usa `excludePendingDeletion=true` y filtra `pendingDeletion`.
