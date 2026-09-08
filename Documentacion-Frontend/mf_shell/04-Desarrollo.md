@@ -137,9 +137,9 @@ Rutas protegidas con `AUDIT_VIEW`:
 
 **Eventos** (`ApiAuditRepository`): `GET /audit/events` con filtros `q`, `eventType`, `entityType`, `dateFrom`, `dateTo`, `actor`, `requestNumber`, paginación. Etiquetas en español vía `AUDIT_EVENT_TYPE_LABELS` / `AUDIT_ENTITY_TYPE_LABELS` (sin enums crudos ni UUID en pantalla). El radicado se enlaza a la ficha cuando coincide con `SOL-ELIM|AMPL|CAT-*`.
 
-**Ficha** (`GetAuditRequestDetailUseCase`): `GET /audit/requests/{requestNumber}` (cabecera + timeline).
+**Ficha** (`AuditRequestDetailPageComponent` + `GetAuditRequestDetailUseCase`): `GET /audit/requests/{requestNumber}`. Secciones: cabecera (radicado, tipo, estado con color, entidad), solicitud (solicitante, fecha, justificación, adjuntos con descarga vía evidencias), decisión (responsable, resultado, motivo, fechas / días / borrado programado) y **línea de tiempo** ascendente (etiqueta legible + actor + fecha). Sin UUID ni enums crudos.
 
-**Bandeja Solicitudes** (`ApiRequestTrayRepository` + `ListUnifiedRequestsUseCase`): fusiona en cliente los listados de eliminación, ampliación y catálogo (por estado), con filtros radicado / tipo / estado / solicitante / rango de fechas. Columnas humanizadas; «Ver detalle» navega por radicado.
+**Bandeja Solicitudes** (`ApiRequestTrayRepository` + `ListUnifiedRequestsUseCase`): fusiona en cliente los listados de eliminación, ampliación y catálogo (por estado), con filtros radicado / tipo / estado / solicitante / rango de fechas. Columnas humanizadas; «Ver detalle» y el radicado en la tabla de eventos abren la ficha.
 
 ## 9. Módulos placeholder
 
