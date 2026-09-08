@@ -37,7 +37,8 @@
 | RF-12 | El sistema debe mostrar la vista de Evidencias/Reportes solo si existe una evaluación activa (`active_assessment_id`); en caso contrario debe mostrar un mensaje de "Sin evaluación activa". | `evidence-redirect.component.ts`, `reports-redirect.component.ts` |
 | RF-13 | El sistema debe cerrar sesión eliminando `auth_session` de `localStorage`/`sessionStorage` y redirigiendo a `/login`. | `shell-layout.component.ts` (`logout`) |
 | RF-14 | El sistema debe validar el origen (`event.origin`) de todo mensaje `postMessage` recibido, aceptando únicamente `localhost`/`127.0.0.1` en los puertos 4201–4205. | `shell-iframe-bridge.ts` (`isShellChildOrigin`), `shell-layout.component.ts` (`onAuthMessage`, lista explícita 4201) |
-| RF-15 | El sistema debe presentar páginas *placeholder* informativas para módulos aún no implementados (Escalas, Banco de preguntas, Auditoría, Salud del sistema, Configuración), indicando una acción alternativa cuando aplica. | `feature-placeholder-page.component.ts`, `app.routes.ts` (bloque `data`) |
+| RF-15 | El sistema debe presentar páginas *placeholder* informativas para módulos aún no implementados (p. ej. Salud del sistema), indicando una acción alternativa cuando aplica. | `feature-placeholder-page.component.ts`, `app.routes.ts` (bloque `data`) |
+| RF-17 | El módulo Auditoría debe listar eventos con filtros (texto, tipo, entidad, fechas, actor, radicado) y una bandeja unificada de solicitudes (eliminación, ampliación, catálogo) con ficha por radicado. | `audit-page.component.ts`, `audit-requests-page.component.ts`, `audit-request-detail-page.component.ts`, `ApiAuditRepository`, `ApiRequestTrayRepository` |
 | RF-16 | El sistema debe adjuntar el header `Authorization: Bearer {token}` a las peticiones HTTP salientes del shell y desenvolver la respuesta `{ data, meta }`. | `api.interceptor.ts` |
 
 ## 3. Requerimientos no funcionales
@@ -59,7 +60,7 @@ No se encontraron requerimientos no funcionales explícitos de rendimiento (tiem
 ### 4.1 Enrutamiento global y control de acceso
 
 1. Toda ruta bajo `ShellLayoutComponent` (todas excepto `/login`) requiere sesión activa (`authGuard`).
-2. Las rutas `/users`, `/organizations`, `/evaluations`, `/evidence`, `/reports`, `/scales`, `/security-baseline`, `/audit` requieren, además, una autoridad específica vía `roleGuard(authority)`.
+2. Las rutas `/users`, `/organizations`, `/evaluations`, `/evidence`, `/reports`, `/scales`, `/security-baseline`, `/audit`, `/audit/requests` y `/audit/requests/:requestNumber` requieren, además, una autoridad específica vía `roleGuard(authority)` (`AUDIT_VIEW` para auditoría).
 3. Las rutas `/system-health` y `/system-settings` requieren el rol `AdminSistema` exclusivamente (`systemAdminGuard`), no una autoridad derivada.
 4. La ruta `/my-organization` no exige autoridad adicional (solo sesión), pero solo se muestra en el menú a usuarios con rol `Lector` que no tengan `ORG_MANAGE`.
 5. Cualquier ruta no reconocida (`**`) redirige a `/dashboard`.

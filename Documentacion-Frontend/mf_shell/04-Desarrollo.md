@@ -125,11 +125,27 @@ El menú **Evaluaciones** (`/evaluations`) siempre carga el listado en el iframe
 
 `SystemSettingsPageComponent` (`/system-settings`) consume `GET/PUT /system/config` de `ms_admin` (`msAdminUrl`). En la pestaña **Evaluaciones** incluye la sección **Plazos de evaluación** (`assessmentDueDays` default 30, `assessmentExtensionDays` default 15, `assessmentDeletionGraceDays` default 5; rango 1–365).
 
-## 8. Módulos placeholder
+## 8. Módulo Auditoría (eventos + bandeja de solicitudes)
 
-`FeaturePlaceholderPageComponent` es un componente genérico y reutilizable, parametrizado vía `ActivatedRoute.snapshot.data` (tipado como `FeaturePlaceholderData`: `title`, `description`, `hint?`, `actionLink?`, `actionLabel?`). Cada ruta placeholder (`/scales`, `/security-baseline`, `/audit`, `/system-health`) define su propio contenido informativo directamente en `app.routes.ts`, evitando crear un componente Angular distinto por cada módulo pendiente. Es un patrón de diseño de UI pragmático para comunicar alcance futuro sin duplicar código.
+Rutas protegidas con `AUDIT_VIEW`:
 
-## 8. Patrones aplicados (resumen)
+| Ruta | Componente | Rol |
+|---|---|---|
+| `/audit` | `AuditPageComponent` | Bitácora de eventos |
+| `/audit/requests` | `AuditRequestsPageComponent` | Bandeja unificada de solicitudes |
+| `/audit/requests/:requestNumber` | `AuditRequestDetailPageComponent` | Ficha por radicado |
+
+**Eventos** (`ApiAuditRepository`): `GET /audit/events` con filtros `q`, `eventType`, `entityType`, `dateFrom`, `dateTo`, `actor`, `requestNumber`, paginación. Etiquetas en español vía `AUDIT_EVENT_TYPE_LABELS` / `AUDIT_ENTITY_TYPE_LABELS` (sin enums crudos ni UUID en pantalla). El radicado se enlaza a la ficha cuando coincide con `SOL-ELIM|AMPL|CAT-*`.
+
+**Ficha** (`GetAuditRequestDetailUseCase`): `GET /audit/requests/{requestNumber}` (cabecera + timeline).
+
+**Bandeja Solicitudes** (`ApiRequestTrayRepository` + `ListUnifiedRequestsUseCase`): fusiona en cliente los listados de eliminación, ampliación y catálogo (por estado), con filtros radicado / tipo / estado / solicitante / rango de fechas. Columnas humanizadas; «Ver detalle» navega por radicado.
+
+## 9. Módulos placeholder
+
+`FeaturePlaceholderPageComponent` es un componente genérico y reutilizable, parametrizado vía `ActivatedRoute.snapshot.data`. Las rutas placeholder restantes (`/system-health` y similares aún no implementados) definen su contenido en `app.routes.ts`. Escalas, banco de preguntas y auditoría ya tienen vistas reales.
+
+## 10. Patrones aplicados (resumen)
 
 | Patrón | Dónde |
 |---|---|
@@ -145,7 +161,7 @@ El menú **Evaluaciones** (`/evaluations`) siempre carga el listado en el iframe
 | Lazy loading por ruta (`loadComponent`) | `app.routes.ts` |
 | Degradación controlada ante fallos de API (`safeCount`) | `DashboardStatsService` |
 
-## 9. Convenciones de código observadas
+## 11. Convenciones de código observadas
 
 - Nomenclatura de archivos en `kebab-case` con sufijo de tipo (`*.component.ts`, `*.guard.ts`, `*.service.ts`, `*.adapter.ts`, `*.use-case.ts`, `*.port.ts`), consistente en toda la capa `presentation`/`infrastructure`/`application`/`domain`.
 - Uso de `@if`/`@for` (sintaxis de control flow nativa de Angular 17+) en vez de `*ngIf`/`*ngFor`, visible en `EvidenceRedirectComponent` y `FeaturePlaceholderPageComponent`.

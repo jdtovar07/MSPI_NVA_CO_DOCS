@@ -54,6 +54,9 @@ src/app/
     ├── layout/shell-layout.component.{ts,html,scss}
     └── pages/
         ├── dashboard-page.component.{ts,html,scss}
+        ├── audit-page.component.ts
+        ├── audit-requests-page.component.ts
+        ├── audit-request-detail-page.component.ts
         ├── *-redirect.component.ts (users, organizations, my-organization, evaluations, evidence, reports)
         ├── feature-placeholder-page.component.ts
         ├── login-placeholder.component.ts
@@ -64,10 +67,10 @@ Esta estructura sí coincide plenamente con el código real (a diferencia de la 
 
 | Capa | Responsabilidad observada |
 |---|---|
-| **Domain** | `DashboardUser` (modelo de usuario para UI), `GetDashboardUserPort` (puerto de lectura de sesión), `authority.ts` (`hasAuthority`, `isSystemAdmin`, `getUserAuthorities`, mapeo rol → autoridades), `AuthSessionService` (lectura reactiva de `auth_session` con `signal`/`computed`). |
-| **Application** | `GetDashboardUserUseCase`: único caso de uso explícito, obtiene el usuario para el layout y el menú a través del puerto de dominio. |
-| **Infrastructure** | `LocalStorageDashboardUserAdapter` (implementa `GetDashboardUserPort` leyendo `auth_session`), `DashboardStatsService` (contadores reales vía HTTP a `ms_org`/`ms_iam`/`ms_evidence`), `api.interceptor.ts` (Bearer + unwrap `data`), `shell-iframe-bridge.ts` (relevo de sesión y navegación hacia/desde iframes). |
-| **Presentation** | `ShellLayoutComponent` (menú + `router-outlet`), `DashboardPageComponent` (tarjetas por rol), componentes `*-redirect` (iframes a los puertos 4201–4205), `auth.guard.ts`, `role.guard.ts`. |
+| **Domain** | `DashboardUser`, puertos de sesión; modelos de auditoría (`audit.types`) y bandeja unificada (`request-tray.types`) con etiquetas en español; `AuditRepository` / `RequestTrayRepository`. |
+| **Application** | `GetDashboardUserUseCase`, `GetAuditPageUseCase`, `GetAuditRequestDetailUseCase`, `ListUnifiedRequestsUseCase`, casos de configuración del sistema. |
+| **Infrastructure** | Adaptadores HTTP (`ApiAuditRepository`, `ApiRequestTrayRepository`, stats, notificaciones), `api.interceptor.ts`, `shell-iframe-bridge.ts`. |
+| **Presentation** | Layout + dashboard + redirects; módulo Auditoría (eventos, bandeja, ficha); guards. |
 
 ## 3. Inyección de dependencias
 
@@ -80,11 +83,14 @@ export const appConfig: ApplicationConfig = {
     provideRouter(appRoutes),
     provideHttpClient(withInterceptors([apiInterceptor])),
     { provide: GetDashboardUserPort, useClass: LocalStorageDashboardUserAdapter },
+    { provide: AuditRepository, useClass: ApiAuditRepository },
+    { provide: RequestTrayRepository, useClass: ApiRequestTrayRepository },
+    // … SystemConfigRepository, NotificationRepository
   ],
 };
 ```
 
-El único puerto de dominio inyectado es `GetDashboardUserPort`, resuelto por `LocalStorageDashboardUserAdapter`. Esto permite, en teoría, sustituir la fuente del usuario (por ejemplo, por una llamada API real al perfil) sin tocar `ShellLayoutComponent`, `DashboardPageComponent` ni los guards, que dependen únicamente de `GetDashboardUserUseCase`.
+Además de `GetDashboardUserPort`, el shell registra repositorios de administración (auditoría, bandeja de solicitudes, configuración) y notificaciones.
 
 ## 4. Diagrama de integración con los 5 microfrontends hijos
 
@@ -177,7 +183,8 @@ Este diagrama consolida y verifica con el código el diagrama presentado en `doc
 | `localStorage` como almacén de sesión primario, reforzado por `postMessage` | El `localStorage` no se comparte automáticamente entre orígenes (puertos) distintos en el navegador; el `postMessage` es el mecanismo que salva esa limitación replicando el valor en cada origen. | `shell-iframe-bridge.ts`, `auth-session.service.ts` |
 | Tabla estática de autoridades por rol en el frontend (`ROLE_AUTHORITIES`) en vez de consumir permisos del backend | Simplifica el cálculo de UI (menú, guards) sin una llamada adicional de "permisos efectivos"; acopla el frontend a la taxonomía de roles del backend `ms_iam`. | `authority.ts` |
 | Interceptor único de HTTP para todas las llamadas propias del shell (no de los iframes) | Centraliza la inyección del Bearer token y el desenvolvimiento de la respuesta paginada `{ data, meta }` para las llamadas de `DashboardStatsService`. | `api.interceptor.ts` |
-| Placeholders explícitos para módulos no implementados, en vez de ocultarlos del menú | Comunica al usuario y a los evaluadores del proyecto qué está planificado pero pendiente (Escalas, Banco de preguntas, Auditoría, Salud, Configuración). | `feature-placeholder-page.component.ts`, `app.routes.ts` (bloque `data`) |
+| Placeholders solo para módulos aún pendientes (p. ej. Salud del sistema) | Escalas, banco, auditoría y configuración ya tienen vistas reales; el placeholder comunica lo restante. | `feature-placeholder-page.component.ts`, `app.routes.ts` |
+| Vista centralizada de auditoría con bandeja única de radicados | Unifica eventos filtrables y solicitudes (eliminación + ampliación + catálogo) sin UUID/enums crudos. | `audit-page.component.ts`, `audit-requests-page.component.ts` |
 
 ## 8. Limitaciones de diseño detectadas
 

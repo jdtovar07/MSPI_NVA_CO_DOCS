@@ -33,13 +33,13 @@ Esta relación está documentada en `MSPI_NVA_CO_MR_FRONT/docs/README.md`, índi
 - **Contenedores iframe** que embeben `mf_auth`, `mf_org`, `mf_assessment`, `mf_evidence` y `mf_reports` dentro del layout del shell, preservando el menú.
 - **Puente de sesión** (`shell-iframe-bridge.ts`): retransmite la sesión JWT (`auth_session`) a los iframes hijos vía `postMessage`, escucha solicitudes de sesión (`MSPI_AUTH_REQUEST`) y eventos de navegación/evaluación activa (`MSPI_SHELL_NAV`, `MSPI_ACTIVE_ASSESSMENT`) emitidos por los hijos.
 - **Interceptor HTTP** (`apiInterceptor`) que añade el header `Authorization: Bearer` y desenvuelve la respuesta `{ data, meta }` de las APIs propias del dashboard.
-- Páginas *placeholder* para funcionalidades aún no integradas (Escalas, Banco de preguntas, Auditoría, Salud del sistema, Configuración del sistema).
+- **Módulo Auditoría** (`/audit`, `/audit/requests`, ficha por radicado): bitácora filtrable y bandeja unificada de solicitudes.
+- Páginas *placeholder* solo para módulos aún pendientes (p. ej. Salud del sistema).
 
 ### 2.2 Fuera del alcance de `mf_shell`
 
-- **Lógica de negocio** de autenticación, organizaciones, evaluaciones, evidencias o reportes — cada una reside en su propio microfrontend; el shell solo enlaza/embebe.
-- **Backend**: el shell consume APIs REST de solo lectura (conteos) para el dashboard; no implementa reglas de negocio de dominio.
-- Módulos declarados como *placeholder* en el código (`FeaturePlaceholderPageComponent`): Escalas, Banco de preguntas, Auditoría, Salud del sistema, Configuración del sistema — pendientes de implementación real, según lo declara explícitamente `app.routes.ts` y `DESCRIPCION.md`.
+- **Lógica de negocio** de autenticación, organizaciones, evaluaciones, evidencias o reportes — cada una reside en su propio microfrontend; el shell solo enlaza/embebe (salvo vistas nativas de administración: auditoría, configuración).
+- **Backend**: el shell consume APIs REST (dashboard, auditoría, configuración, notificaciones); no implementa reglas de negocio de dominio en el servidor.
 
 ## 3. Objetivos
 
@@ -111,7 +111,7 @@ No existe en el repositorio un backlog, roadmap o bitácora de sprints formal pa
 5. **Dashboard con contadores reales**: `DashboardStatsService` consumiendo `ms_org`, `ms_iam`, `ms_evidence` en paralelo con manejo de fallos individuales (`safeCount`).
 6. **Integración iframe de microfrontends**: componentes `*-redirect.component.ts` para `mf_auth`, `mf_org`, `mf_assessment`, `mf_evidence`, `mf_reports`.
 7. **Puente de sesión entre iframes**: `shell-iframe-bridge.ts` con protocolo `postMessage` propio.
-8. **Placeholders de módulos futuros**: `FeaturePlaceholderPageComponent` para Escalas, Banco de preguntas, Auditoría, Salud y Configuración del sistema.
+8. **Módulo Auditoría** en el shell (eventos filtrables + bandeja unificada de solicitudes por radicado); placeholders solo para módulos aún pendientes.
 9. **Empaquetado y despliegue**: Dockerfile propio + Nginx.
 10. **Documentación técnica** (`docs/*.md`), generada como parte del proyecto (con la inconsistencia señalada en la sección 5).
 
