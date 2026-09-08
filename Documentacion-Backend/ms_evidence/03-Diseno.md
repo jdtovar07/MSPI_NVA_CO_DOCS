@@ -160,7 +160,7 @@ Detalles reales del `schema.sql`:
 - `assessment_id` **no tiene llave foránea** hacia `ms_assessment` (esquema separado, sin FK cross-schema) — es un simple `UUID` correlacionado por convención.
 - `lifting_document_delivery` tiene restricción única `(assessment_id, document_item_catalog_id)`, evitando duplicar entregas para el mismo ítem de catálogo en la misma evaluación.
 - Índices: `idx_lifting_delivery_assessment`, `idx_lifting_delivery_status` (compuesto `assessment_id, delivery_status`), `idx_evidence_file_assessment`, `idx_evidence_file_relation` (compuesto `assessment_id, relation_type, relation_id`), `idx_evidence_file_context` (compuesto `assessment_id, relation_type, context_field`).
-- `evidence_file.deleted_at` implementa borrado lógico; todas las consultas de listado/descarga en `EvidenceJpaAdapter` filtran explícitamente `deletedAt == null` o usan métodos de repositorio con sufijo `AndDeletedAtIsNull`.
+- `evidence_file.deleted_at` implementa borrado **solo lógico** (el objeto en storage se conserva). Listados y `findFileById` (descarga) filtran `deletedAt == null` / `…AndDeletedAtIsNull…`.
 - El servicio **no ejecuta DDL** (`spring.sql.init.mode: never`, `hibernate.ddl-auto: none`): `schema.sql` es de referencia/documentación y se aplica externamente (scripts de `docker-config/docker/postgres`).
 
 ## 4. Diagrama de clases (dominio y casos de uso)
@@ -191,7 +191,6 @@ classDiagram
         <<interface>>
         +store(assessmentId, filename, contentType, content) StoredObject
         +open(bucket, objectKey) InputStream
-        +delete(bucket, objectKey)
     }
 
     class UploadEvidenceFileUseCase {
@@ -304,7 +303,7 @@ sequenceDiagram
 | Almacenamiento de archivos en filesystem local (no S3/object storage) | `FileStorageGateway` es el único puerto de abstracción; su única implementación real es `LocalFileStorageAdapter`, que escribe bajo un directorio raíz configurable (`EVIDENCE_STORAGE_DIR`). No hay dependencia de AWS SDK, MinIO ni cliente S3 en ningún `build.gradle` del proyecto. El nombre lógico "bucket" (`EVIDENCE_BUCKET`, por defecto `mspi-evidence`) es solo una etiqueta de metadatos — no corresponde a un bucket real de object storage. |
 | Ruta física organizada por fecha + evaluación | `LocalFileStorageAdapter.store`: `{root}/{yyyy}/{mm}/{dd}/{assessmentId}/{uuid}.{ext}` — favorece distribución de archivos entre directorios y evita colisiones de nombre (nombre físico es siempre un UUID, no el nombre original del usuario). |
 | Verificación de integridad con SHA-256 calculado en streaming | `DigestOutputStream` envuelve la escritura a disco, evitando una segunda pasada de lectura sobre el archivo para calcular el hash. |
-| Prevención de path traversal | `LocalFileStorageAdapter.open`/`.delete` normalizan la ruta resuelta y verifican que siga siendo descendiente de `rootPath` antes de operar; de lo contrario lanzan `DomainException`. |
+| Prevención de path traversal | `LocalFileStorageAdapter.open` normaliza la ruta resuelta y verifica que siga siendo descendiente de `rootPath` antes de leer; de lo contrario lanza `DomainException`. El borrado de evidencias es solo lógico (`deleted_at`); no hay `delete` en storage. |
 | Puerto de almacenamiento vive en `app-service`, no en un módulo `driven-adapters` dedicado | Observación real de estructura: a diferencia de `jpa-repository` (módulo Gradle independiente), `storage/` está bajo `applications/app-service/src/main/java/co/com/mspi/storage`. Esto acopla, en la práctica, el adaptador de archivos al módulo ejecutable en lugar de aislarlo como puerto/adaptador Gradle separado — una discrepancia frente al diagrama aspiracional del `README.md`, que menciona `infrastructure/driven-adapters/filesystem/` sin que ese directorio exista en el repositorio. |
 | Autenticación dual: JWT para usuarios, API key para S2S | `SecurityConfig` combina `InternalApiKeyFilter` (antes del filtro Bearer) con `oauth2ResourceServer` estándar; las rutas `/internal/**` están en `permitAll()` a nivel de Spring Security porque la autorización real ocurre en el filtro custom, no en `authorizeHttpRequests`. |
 | `assessmentId` sin FK cross-schema | Cada microservicio posee su propio esquema PostgreSQL (`evidence`); la integridad referencial hacia `ms_assessment` se confía al llamador (validación en `ms_assessment` o el frontend), no a una constraint de base de datos. |

@@ -35,7 +35,7 @@ Al ser almacenamiento en filesystem local (no object storage gestionado), el man
 - **Backups**: no se encontró script ni configuración de respaldo del volumen `mspi_evidence_data` (ni en `docker-config/`, ni en el propio repositorio). El respaldo de `EVIDENCE_STORAGE_DIR` es responsabilidad externa no automatizada.
 - **Crecimiento sin control de cuota**: no existe límite de almacenamiento total por evaluación u organización (solo límite de tamaño por archivo individual, ver `02-Analisis.md` §3). El crecimiento del volumen debe monitorearse manualmente.
 - **Archivos huérfanos**: como se documenta en `02-Analisis.md` §6, un fallo entre `FileStorageGateway.store` y `EvidencePersistenceGateway.saveFile` puede dejar archivos físicos sin metadato asociado; no existe una tarea de limpieza (*garbage collection*) automatizada que reconcilie el filesystem con la tabla `evidence_file`.
-- **Borrado lógico sin purga física garantizada**: `DeleteEvidenceFileUseCase` intenta el borrado físico, pero si falla solo registra una advertencia — el archivo físico puede persistir indefinidamente aunque el metadato esté marcado como borrado. No hay tarea programada de purga diferida.
+- **Retención por borrado solo lógico**: `DeleteEvidenceFileUseCase` marca `deleted_at` y **conserva** el objeto en storage (regla MSPI). No hay purga física de evidencias; el crecimiento del volumen debe planificarse como retención.
 
 ## 4. Deuda técnica identificada
 
@@ -54,7 +54,7 @@ Al ser almacenamiento en filesystem local (no object storage gestionado), el man
 
 1. **Cobertura de pruebas del dominio**: priorizar pruebas unitarias de los 11 casos de uso (sin dependencias de Spring, dado que `usecase` no depende de framework), siguiendo el patrón ya usado en `ms_iam`.
 2. **Migración incremental de esquema**: introducir Flyway o Liquibase para versionar cambios sobre `evidence.*` en lugar de un único `schema.sql` estático, facilitando auditoría de cambios de modelo de datos.
-3. **Tarea de reconciliación de almacenamiento**: job periódico que compare `evidence_file.object_key` contra el contenido real de `EVIDENCE_STORAGE_DIR`, reportando/purgando archivos huérfanos y archivos lógicamente borrados cuyo borrado físico falló.
+3. **Tarea de reconciliación de almacenamiento**: job periódico que compare `evidence_file.object_key` contra el contenido real de `EVIDENCE_STORAGE_DIR`, reportando archivos huérfanos (sin metadato). No debe purgar objetos de filas con `deleted_at` (retención lógica).
 4. **Métricas Prometheus**: incorporar `micrometer-registry-prometheus` (ya usado en `ms_iam`) para exponer métricas de tamaño de archivos subidos, tasa de rechazo por validación de negocio, y latencia de subida/descarga.
 5. **Extracción del adaptador de almacenamiento a un módulo Gradle propio** (`infrastructure/driven-adapters/filesystem`), habilitando en el futuro una implementación alternativa de `FileStorageGateway` (p. ej. S3/MinIO) sin modificar `app-service`.
 6. **Activar `./gradlew check` en el pipeline** antes de `assemble`/`deploy`, para que la cobertura mínima y las pruebas existentes actúen como *quality gate* real.

@@ -30,7 +30,7 @@ No existe un rol de negocio diferenciado (p. ej. `AdminSistema`, `Evaluador`) de
 | RF-06 | Subir un archivo de evidencia (multipart), asociado a `CONTEXT`, `LIFTING_DOC` o `REPORT_OUTPUT`, con validación de tipo MIME, tamaño y campos requeridos según la relación | `UploadEvidenceFileUseCase`, `EvidenceFileApi.upload` |
 | RF-07 | Listar archivos de evidencia de una evaluación, filtrables por tipo de relación y por relación específica | `ListEvidenceFilesUseCase`, `EvidenceFileApi.list` |
 | RF-08 | Descargar el binario de un archivo de evidencia (Content-Type, Content-Length y Content-Disposition reales del archivo) | `DownloadEvidenceFileUseCase`, `EvidenceFileApi.download` |
-| RF-09 | Eliminar (borrado lógico) un archivo de evidencia, intentando además su borrado físico en el filesystem | `DeleteEvidenceFileUseCase`, `EvidenceFileApi.delete` |
+| RF-09 | Eliminar un archivo de evidencia con borrado **solo lógico** (`deleted_at`); el objeto en storage se conserva | `DeleteEvidenceFileUseCase`, `EvidenceFileApi.delete` |
 | RF-10 | Exponer un canal S2S para que `ms_assessment` inicialice/clone levantamientos y liste evidencias sin JWT de usuario final | `InternalLiftingApi` (`/internal/assessments/**`) |
 | RF-11 | Exponer un canal S2S para que `ms_reporting` suba salidas de reporte (PDF/XLSX) y las descargue internamente | `InternalReportOutputApi`, `InternalFileDownloadApi` |
 | RF-12 | Exponer el contexto de una evaluación por canal interno (sin JWT), para consumo de `ms_assessment` | `InternalAssessmentContextApi` |
@@ -43,7 +43,7 @@ No existe un rol de negocio diferenciado (p. ej. `AdminSistema`, `Evaluador`) de
 | RNF-02 | Autenticación S2S independiente del JWT de usuario, mediante clave compartida en header | `InternalApiKeyFilter` |
 | RNF-03 | Tamaño máximo de payload multipart acotado (20 MB por archivo, 22 MB por request; 50 MB para salidas de reporte) para evitar saturación de disco/memoria | `application.yaml` (`spring.servlet.multipart`), `UploadEvidenceFileUseCase.MAX_FILE_SIZE_BYTES` / `MAX_REPORT_SIZE_BYTES` |
 | RNF-04 | Integridad de archivo verificable mediante hash SHA-256 calculado en la propia escritura a disco (`DigestOutputStream`), sin relectura adicional del archivo | `LocalFileStorageAdapter.store` |
-| RNF-05 | Protección contra *path traversal* al leer o borrar archivos por `objectKey` (normalización + verificación de prefijo contra la raíz configurada) | `LocalFileStorageAdapter.open` / `.delete` |
+| RNF-05 | Protección contra *path traversal* al leer archivos por `objectKey` (normalización + verificación de prefijo contra la raíz configurada) | `LocalFileStorageAdapter.open` |
 | RNF-06 | Trazabilidad de peticiones mediante `X-Trace-Id` propagado o generado y expuesto en errores | `TraceIdFilter`, `GlobalExceptionHandler.getTraceId` |
 | RNF-07 | Observabilidad mínima vía Spring Boot Actuator (`/actuator/health`, `/actuator/info`), sin autenticación | `SecurityConfig`: rutas `permitAll()` |
 | RNF-08 | Cabeceras de seguridad HTTP: `X-Frame-Options: DENY` y HSTS (1 año, incluye subdominios, preload) | `SecurityConfig.securityFilterChain` (`headers { frameOptions... httpStrictTransportSecurity... }`) |
@@ -66,8 +66,8 @@ No existe un rol de negocio diferenciado (p. ej. `AdminSistema`, `Evaluador`) de
 
 ### 4.2 Descarga y borrado de evidencia
 
-- La descarga (`DownloadEvidenceFileUseCase`) exige que el archivo exista y no esté borrado lógicamente; de lo contrario lanza `ResourceNotFoundException` (mapeada a HTTP 404).
-- El borrado (`DeleteEvidenceFileUseCase`) primero intenta eliminar el archivo físico y luego marca `deleted_at` en base de datos; si el borrado físico falla (p. ej. archivo ya inexistente), se registra una advertencia (`log.warn`) pero **no se interrumpe** el borrado lógico.
+- La descarga (`DownloadEvidenceFileUseCase`) exige que el archivo exista y no esté borrado lógicamente (`findFileById` filtra `deleted_at IS NULL`); de lo contrario lanza `ResourceNotFoundException` (HTTP 404).
+- El borrado (`DeleteEvidenceFileUseCase`) **solo** marca `deleted_at` vía `markFileDeleted`. No hay borrado físico del objeto en storage (retención MSPI). Los listados ya usan consultas `…AndDeletedAtIsNull…`.
 
 ### 4.3 Inicialización y clonación de levantamiento
 
