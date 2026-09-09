@@ -139,7 +139,7 @@ Rutas protegidas con `AUDIT_VIEW`:
 
 **Ficha** (`AuditRequestDetailPageComponent` + `GetAuditRequestDetailUseCase`): `GET /audit/requests/{requestNumber}`. Secciones: cabecera (radicado, tipo, estado con color, entidad), solicitud (solicitante, fecha, justificación, adjuntos con descarga vía evidencias), decisión (responsable, resultado, motivo, fechas / días / borrado programado) y **línea de tiempo** ascendente (etiqueta legible + actor + fecha). Sin UUID ni enums crudos.
 
-**Bandeja Solicitudes** (`ApiRequestTrayRepository` + `ListUnifiedRequestsUseCase`): fusiona en cliente los listados de eliminación, ampliación y catálogo (por estado), con filtros radicado / tipo / estado / solicitante / rango de fechas. Columnas humanizadas; «Ver detalle» y el radicado en la tabla de eventos abren la ficha.
+**Bandeja Solicitudes** (`ApiRequestTrayRepository` + `ListUnifiedRequestsUseCase`): fusiona en cliente los listados de eliminación, ampliación, catálogo y reenvío de contraseña (`SOL-PWD-######`, por estado), con filtros radicado / tipo / estado / solicitante / rango de fechas. Columnas humanizadas; pendientes de reenvío permiten Aprobar/Rechazar; «Ver detalle» y el radicado en la tabla de eventos abren la ficha.
 
 ## 9. Módulos placeholder
 

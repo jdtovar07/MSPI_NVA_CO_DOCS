@@ -38,7 +38,7 @@
 | RF-13 | El sistema debe cerrar sesión eliminando `auth_session` de `localStorage`/`sessionStorage` y redirigiendo a `/login`. | `shell-layout.component.ts` (`logout`) |
 | RF-14 | El sistema debe validar el origen (`event.origin`) de todo mensaje `postMessage` recibido, aceptando únicamente `localhost`/`127.0.0.1` en los puertos 4201–4205. | `shell-iframe-bridge.ts` (`isShellChildOrigin`), `shell-layout.component.ts` (`onAuthMessage`, lista explícita 4201) |
 | RF-15 | El sistema debe presentar páginas *placeholder* informativas para módulos aún no implementados (p. ej. Salud del sistema), indicando una acción alternativa cuando aplica. | `feature-placeholder-page.component.ts`, `app.routes.ts` (bloque `data`) |
-| RF-17 | El módulo Auditoría debe listar eventos con filtros (texto, tipo, entidad, fechas, actor, radicado) y una bandeja unificada de solicitudes (eliminación, ampliación, catálogo) con ficha por radicado. | `audit-page.component.ts`, `audit-requests-page.component.ts`, `audit-request-detail-page.component.ts`, `ApiAuditRepository`, `ApiRequestTrayRepository` |
+| RF-17 | El módulo Auditoría debe listar eventos con filtros (texto, tipo, entidad, fechas, actor, radicado) y una bandeja unificada de solicitudes (eliminación, ampliación, catálogo, reenvío de contraseña) con ficha por radicado y decisión Aprobar/Rechazar en reenvíos pendientes. | `audit-page.component.ts`, `audit-requests-page.component.ts`, `audit-request-detail-page.component.ts`, `ApiAuditRepository`, `ApiRequestTrayRepository` |
 | RF-16 | El sistema debe adjuntar el header `Authorization: Bearer {token}` a las peticiones HTTP salientes del shell y desenvolver la respuesta `{ data, meta }`. | `api.interceptor.ts` |
 
 ## 3. Requerimientos no funcionales
