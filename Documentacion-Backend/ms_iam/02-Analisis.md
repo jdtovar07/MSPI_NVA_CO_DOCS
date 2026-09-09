@@ -45,6 +45,9 @@ Extraídos de los controladores REST (`infrastructure/entry-points/api-rest/src/
 | RF-16 | Actualizar nombre, correo y/o roles de un usuario, sincronizando con Keycloak | `PUT /users/{userId}` → `UpdateUserUseCase` → `UserManagementService.updateUser` | AdminSistema |
 | RF-17 | Activar/inactivar usuario, propagando el estado a Keycloak (`setEnabled`) | `PATCH /users/{userId}/status` → `UpdateUserStatusUseCase` | AdminSistema |
 | RF-18 | Restablecer contraseña de un usuario y marcar `must_change_password=true` | `POST /users/{userId}/reset-password` → `ResetPasswordUseCase` | AdminSistema |
+| RF-18b | Solicitar reenvío de contraseña temporal (flujo de aprobación) | `POST /users/{userId}/password-reset-requests` → `RequestPasswordResetUseCase` | AdminSistema |
+| RF-18c | Aprobar reenvío: temporal nueva + correo + reset 2FA | `POST /password-reset-requests/{id}/approve` → `ApprovePasswordResetUseCase` | AdminSistema |
+| RF-18d | Rechazar / cancelar solicitud de reenvío | `POST .../reject` · `POST .../cancel` | AdminSistema |
 | RF-19 | Desactivar usuario por correo (usado por `ms_org` al cambiar el contacto de una organización) | `POST /users/disable-by-email` → `DisableUserByEmailUseCase` | AdminSistema / ms_org |
 | RF-20 | Listar catálogo de roles del realm de Keycloak con etiquetas en español | `GET /roles` → `GetRolesUseCase` / `RolesApi` | Usuario autenticado |
 | RF-21 | Registrar eventos de auditoría de negocio provenientes de otros microservicios | `POST /internal/audit/events` → `InternalAuditApi` → `RecordAuditEventUseCase` | Microservicios (vía API key interna) |
@@ -64,6 +67,7 @@ Extraídos de los controladores REST (`infrastructure/entry-points/api-rest/src/
 10. **Roles con prefijo `ROLE_`**: los roles del JWT (`realm_access.roles`) se traducen a `GrantedAuthority` con prefijo `ROLE_` más un `ROLE_USER` implícito para todo usuario autenticado (`SecurityConfig.jwtAuthenticationConverter`).
 11. **Autorización por rol único administrativo**: solo `AdminSistema` (`hasRole("AdminSistema")`) puede acceder a cualquier ruta bajo `/users/**`; no existen roles intermedios con acceso parcial a esa API.
 12. **2FA opcional y por usuario**: TOTP no es obligatorio; cada usuario decide activar `POST /auth/totp/setup` + `POST /auth/totp/verify`. El secreto vive en `iam.user_totp`, indexado por `keycloak_sub` (no por `user.id`).
+12b. **Reenvío de contraseña con aprobación**: no se ejecuta al solicitar; queda `PENDING` (`SOL-PWD-######`). Al aprobar se genera temporal, se envía correo y se llama `TotpGateway.resetTotp` (borra secreto / deshabilita) para forzar reconfiguración en el próximo acceso. Fallo de correo no revierte el reset (`email_sent=false`, reintentable).
 13. **API interna protegida por clave compartida, no por JWT**: `/internal/**` está `permitAll` a nivel de Spring Security, pero `InternalApiKeyFilter` intercepta antes que el filtro de Bearer Token y exige el header `X-Internal-Api-Key` igual a `INTERNAL_API_KEY`; si la propiedad no está configurada en el servidor, responde 503 (falla segura, no permite pasar sin protección).
 14. **El microservicio no gestiona su propio esquema**: `spring.sql.init.mode: never` y `hibernate.ddl-auto: none` — las tablas deben preexistir (aplicadas por scripts SQL versionados), lo que constituye una regla operativa más que de negocio, pero condiciona el arranque correcto del servicio.
 

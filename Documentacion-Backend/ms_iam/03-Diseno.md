@@ -190,6 +190,8 @@ erDiagram
     "iam.user" ||--o{ "iam.user_role" : tiene
     "iam.role" ||--o{ "iam.user_role" : asignado_a
     "iam.user" ||--o| "iam.user_totp" : configura
+    "iam.user" ||--o{ "iam.password_reset_request" : destino_de
+    "iam.user" ||--o{ "iam.password_reset_request" : solicita
     "iam.user" ||--o{ "iam.audit_log" : actor_de
     "iam.user" ||--o{ "iam.system_config" : actualiza
 
@@ -219,6 +221,16 @@ erDiagram
         varchar secret
         timestamptz enabled_at
     }
+    "iam.password_reset_request" {
+        UUID id PK
+        UUID target_user_id FK
+        varchar request_number UK "SOL-PWD-######"
+        varchar status "PENDING/APPROVED/REJECTED/CANCELLED"
+        UUID requested_by FK
+        UUID decision_by FK
+        timestamptz executed_at
+        boolean email_sent
+    }
     "iam.audit_log" {
         bigserial id PK
         varchar event_type
@@ -246,6 +258,7 @@ erDiagram
 
 - **`iam.user` no almacena contraseñas**: las credenciales viven en Keycloak; el vínculo es `keycloak_sub` (único). Esto es coherente con el objetivo de centralizar autenticación fuera del microservicio.
 - **`iam.user_totp` es una extensión propia de `ms_iam`**, no contemplada en el MER general del proyecto (comentario explícito en el SQL: "extensión ms_iam, no en MER"). Se indexa por `keycloak_sub` en lugar de `user.id`, lo que acopla la funcionalidad TOTP directamente a la identidad de Keycloak.
+- **`iam.password_reset_request`**: solicitudes de reenvío de contraseña temporal con ciclo PENDING→APPROVED/REJECTED/CANCELLED y radicado legible `SOL-PWD-######` (secuencia `iam.seq_password_reset_request_number`). Al aprobar se ejecuta reset de contraseña + `TotpGateway.resetTotp` y se registra `email_sent` / `email_error` sin dejar el estado inconsistente si falla el correo.
 - **`iam.audit_log` es polimórfica**: `entity_type` + `entity_id` (string, no FK tipada) permite registrar eventos sobre cualquier tipo de entidad de cualquier microservicio, incluyendo `assessment_id` como columna dedicada por ser el caso de uso principal de auditoría externa (`ms_assessment`). Tres columnas `JSONB` (`before_json`, `after_json`, `metadata_json`) permiten capturar diffs de negocio sin necesidad de tablas específicas por tipo de evento.
 - **`iam.system_config`** existe en el DDL (clave-valor JSONB versionado) pero no se identificó código de aplicación (adaptador/gateway) que la use activamente en los módulos revisados; aparenta ser una tabla reservada del MER para configuración paramétrica futura.
 - **Índices**: 4 índices sobre `audit_log` optimizan las consultas típicas de auditoría (por `assessment_id`+fecha, por actor+fecha, por tipo de evento+fecha, por entidad). `user.email` y `user.keycloak_sub` tienen índices únicos adicionales explícitos aunque ya son `UNIQUE` a nivel de columna.

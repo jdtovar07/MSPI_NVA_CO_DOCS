@@ -279,7 +279,7 @@ Esquema `AuditEventRequest` copiado en `ms_audit/docs/openapi.yaml` (idéntico e
 
 Campos útiles en `metadataJson` (productores de solicitudes): `summary`, `requestNumber`, `actorUserName`, `subjectName`/`assessmentName`, `hasAttachment` / `attachmentFileId` (eventos `DELETION_*` / `EXTENSION_*` / `CATALOG_DELETION_*`). El listado público proyecta `summary`, `requestNumber` y `hasAttachment` desde metadata y **no** expone UUID crudos (`entityRef` = radicado cuando aplica).
 
-**Ficha por radicado:** `GET /audit/requests/{requestNumber}` compone cabecera viva vía S2S `GET /internal/requests/{requestNumber}` (dueño: evaluación o catálogo según prefijo `SOL-ELIM`/`SOL-AMPL`/`SOL-CAT`) + timeline ASC de eventos locales con ese `requestNumber`.
+**Ficha por radicado:** `GET /audit/requests/{requestNumber}` compone cabecera viva vía S2S `GET /internal/requests/{requestNumber}` (dueño: evaluación, catálogo o identidad según prefijo `SOL-ELIM`/`SOL-AMPL`/`SOL-CAT`/`SOL-PWD`) + timeline ASC de eventos locales con ese `requestNumber`.
 
 Seguridad: `internalApiKey` (`apiKey` en header `X-Internal-Api-Key`), igual que en `ms_iam`.
 

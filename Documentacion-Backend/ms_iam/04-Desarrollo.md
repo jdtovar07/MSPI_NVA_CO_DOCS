@@ -136,4 +136,5 @@ Punto de ensamblaje final. Contiene:
 6. **Productor de auditoría AUTH**: los intentos de login se envían a **ms_audit** (`POST /internal/audit/events`) vía `AuditAuthRestAdapter`; la bitácora ya no reside en ms_iam.
 7. **Catálogo de roles con etiquetas en español** para consumo directo por frontends, sin necesidad de tabla de traducción propia en el cliente.
 8. **Notificación transaccional por correo** (contraseña temporal / reset) vía Brevo, desacoplada mediante gateway opcional.
-9. **Carga de secretos en tiempo de arranque desde Infisical**, con *fallback* transparente a configuración local/H2 cuando no está disponible (facilita desarrollo local sin credenciales de producción).
+9. **Solicitud de reenvío de contraseña temporal con aprobación** (`iam.password_reset_request`, radicado `SOL-PWD-######`): al aprobar se genera temporal, se envía correo y se resetea TOTP (`TotpGateway.resetTotp`) para forzar reconfiguración en el próximo acceso; eventos `PASSWORD_RESET_*` hacia auditoría.
+10. **Carga de secretos en tiempo de arranque desde Infisical**, con *fallback* transparente a configuración local/H2 cuando no está disponible (facilita desarrollo local sin credenciales de producción).
