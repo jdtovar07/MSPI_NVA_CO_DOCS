@@ -40,7 +40,7 @@
 
 ### 3.3 Validaciones de negocio centralizadas en el caso de uso
 
-`UploadEvidenceFileUseCase` concentra: conjunto cerrado de tipos MIME (`Set.of(...)`), tamaños máximos diferenciados por tipo de relación (constantes `MAX_FILE_SIZE_BYTES` = 20 MB, `MAX_REPORT_SIZE_BYTES` = 50 MB), y validación cruzada de `relationType`/`contextField`/`relationId`. Cualquier violación lanza `BusinessRulesOnFieldsException` (mapeada uniformemente a HTTP 400 por `GlobalExceptionHandler`).
+`UploadEvidenceFileUseCase` concentra: conjunto cerrado de tipos MIME (`Set.of(...)`), tamaños máximos diferenciados por tipo de relación (constantes `MAX_FILE_SIZE_BYTES` = 20 MB, `MAX_REPORT_SIZE_BYTES` = 50 MB), validación de *magic numbers* vía `ContentMagicValidator` (coherencia contenido ↔ MIME declarado) y validación cruzada de `relationType`/`contextField`/`relationId`. Cualquier violación lanza `BusinessRulesOnFieldsException` (mapeada uniformemente a HTTP 400 por `GlobalExceptionHandler`).
 
 ### 3.4 Inicialización y clonación de levantamiento documental
 

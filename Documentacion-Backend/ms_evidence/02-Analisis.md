@@ -62,7 +62,8 @@ No existe un rol de negocio diferenciado (p. ej. `AdminSistema`, `Evaluador`) de
 5. `filename` no puede ser nulo ni estar en blanco.
 6. `contentType` debe estar en el conjunto permitido: `application/pdf`, `application/msword`, `application/vnd.openxmlformats-officedocument.wordprocessingml.document` (DOCX), `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet` (XLSX), `image/png`, `image/jpeg`. **No se permite ZIP ni ningún otro tipo**, tal como documenta el `README.md`.
 7. El tamaño debe ser mayor que 0 y no exceder el límite: 20 MB para `CONTEXT`/`LIFTING_DOC`, 50 MB para `REPORT_OUTPUT`.
-8. Solo si todas las validaciones anteriores pasan se invoca `FileStorageGateway.store` (persistencia física) y luego `EvidencePersistenceGateway.saveFile` (metadatos) — el archivo físico se escribe *antes* de confirmar el metadato, por lo que un fallo posterior al guardar el metadato podría dejar un archivo huérfano en disco (no se observó lógica de compensación/rollback transaccional entre ambos pasos).
+8. **Magic numbers (SEG-A)**: además del allowlist MIME, `ContentMagicValidator` comprueba los primeros bytes del contenido (PDF `%PDF`, PNG, JPEG, ZIP/OOXML, OLE) y rechaza si no coinciden con el `contentType` declarado (p. ej. `.exe` renombrado a `.pdf`).
+9. Solo si todas las validaciones anteriores pasan se invoca `FileStorageGateway.store` (persistencia física) y luego `EvidencePersistenceGateway.saveFile` (metadatos) — el archivo físico se escribe *antes* de confirmar el metadato, por lo que un fallo posterior al guardar el metadato podría dejar un archivo huérfano en disco (no se observó lógica de compensación/rollback transaccional entre ambos pasos).
 
 ### 4.2 Descarga y borrado de evidencia
 
