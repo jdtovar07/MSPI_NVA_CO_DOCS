@@ -120,7 +120,7 @@ Punto de ensamblaje final. Contiene:
 | **DTO ↔ Dominio con mapeadores estáticos dedicados** | `AuthApiMapper`, `UsersApiMapper`, `UserInfoMapper` |
 | **Result/Sealed pattern para resultados de negocio** | `LoginResult` (`LoginSuccess`/`LoginFailed`/`LoginInactive`) — evita usar excepciones para flujo de control esperado dentro del adaptador, y las traduce a excepciones solo en la capa de orquestación (`LoginService`) |
 | **Excepciones de dominio tipadas y centralizadas** | `:common/exception` + `GlobalExceptionHandler` (patrón *Controller Advice*) |
-| **Filtros Servlet para cross-cutting concerns de seguridad** | `InternalApiKeyFilter`, `SecurityHeadersFilter`, `TraceIdFilter` (todos `OncePerRequestFilter` o equivalentes) |
+| **Filtros Servlet para cross-cutting concerns de seguridad** | `AuthRateLimitFilter` (20/min → 429 en login/change-password), `InternalApiKeyFilter` (constant-time), `SecurityHeadersFilter` (CSP/HSTS/nosniff/XFO/Referrer-Policy), `TraceIdFilter` |
 | **Dependencia opcional vía `@Autowired(required = false)`** | `UserManagementService.emailGateway` — degrada con gracia si Brevo no está configurado |
 | **BeanFactoryPostProcessor para inyección temprana de configuración** | `InfisicalConfig` — patrón avanzado de Spring para resolver placeholders antes del ciclo normal de beans |
 | **Multi-módulo Gradle como *build-time enforcement*** | `settings.gradle` + reglas de dependencia entre `build.gradle` de cada módulo |

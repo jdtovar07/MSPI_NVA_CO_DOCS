@@ -81,5 +81,5 @@ No se encontró un archivo `MIGRATION-NOTES.md` en `ms_iam/` (a diferencia de `m
 |---|---|
 | Equipo de desarrollo backend | Evolución de casos de uso, mantenimiento de cobertura ≥80%, actualización de `docs/openapi.yaml` ante cualquier cambio de contrato |
 | DBA / DevOps | Aplicación de scripts SQL (`schema-iam-mvp.sql`/`schema-iam-patch.sql`) en cada entorno, dado que el microservicio no ejecuta DDL |
-| Equipo de seguridad | Rotación de `INTERNAL_API_KEY`, `KEYCLOAK_CLIENT_SECRET`, revisión periódica de roles `realm-management` asignados al *service account* `mspi-backend`, alineado con `docs/linea_base_seguridad_ISO27001.md` |
+| Equipo de seguridad | **Rotación periódica** de `INTERNAL_API_KEY` (todos los MS que usan `X-Internal-Api-Key`), `KEYCLOAK_CLIENT_SECRET`; revisión de `AUTH_RATE_LIMIT_PER_MINUTE` si hay abuso de login; roles `realm-management` del *service account* `mspi-backend`, alineado con `docs/linea_base_seguridad_ISO27001.md` |
 | Equipo de infraestructura | Mantenimiento del pipeline (`bitbucket-pipelines.yml`), gestión de despliegue en Railway, actualización de imágenes base (`eclipse-temurin:21-*-alpine`) ante CVEs |

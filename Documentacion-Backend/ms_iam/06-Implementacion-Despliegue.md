@@ -88,7 +88,8 @@ ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -jar /app/app.jar"]
 | `KEYCLOAK_ADMIN_REALM_URL` | Sí (gestión de usuarios) | Base de la Admin REST API de Keycloak | `""` |
 | `JWT_ISSUER_URI` | Sí | *Issuer* esperado en los JWT validados | — |
 | `JWT_JWK_SET_URI` | No | URL alterna del JWK Set (si difiere del *issuer*, p. ej. en Docker donde el *issuer* del token es `localhost` pero el JWKS se resuelve por el hostname interno `keycloak`) | `""` |
-| `INTERNAL_API_KEY` | Sí (prod) | Clave compartida para proteger `/internal/**` | `""` (si vacía, responde 503) |
+| `INTERNAL_API_KEY` | Sí (prod) | Clave compartida para proteger `/internal/**` (comparación constant-time; rotar periódicamente) | `""` (si vacía, responde 503) |
+| `AUTH_RATE_LIMIT_PER_MINUTE` | No | Máximo de POST/min/IP a `/auth/login` y `/auth/change-password` (exceso → 429) | `20` |
 | `MS_ORG_URL` | Recomendada | URL base de `ms_org`, consumida para validar organizaciones | `http://localhost:8083` |
 | `BREVO_API_KEY` | Sí (envío de correo) | Clave de API de Brevo | — |
 | `BREVO_FROM_EMAIL` | Sí (envío de correo) | Remitente de correos transaccionales | — |
