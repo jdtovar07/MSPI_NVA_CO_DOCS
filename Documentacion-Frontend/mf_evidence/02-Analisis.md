@@ -54,8 +54,9 @@ Basados en `docs/RUTAS-Y-PANTALLAS.md`, `docs/FLUJOS.md`, `docs/API-INTEGRACION.
 | RNF-03 | Las respuestas de error de la API deben normalizarse a un formato único consumible por la UI | `ApiError`, función `toApiError()` en `api-evidence.repository.ts` |
 | RNF-04 | Las respuestas exitosas envueltas en `{data, meta}` deben desenvolverse automáticamente antes de llegar al repositorio | `map()` en `apiInterceptor`, verifica `body.data !== undefined && body.meta` |
 | RNF-05 | Ante error 401 de cualquier llamada, debe recargarse el estado de sesión local | `apiInterceptor`: `inject(AuthSessionService).reload()` en `catchError` cuando `err.status === 401` |
-| RNF-06 | La aplicación debe poder ser embebida como `iframe` desde el shell sin ser bloqueada por políticas de seguridad del navegador | `Content-Security-Policy: frame-ancestors 'self' http://localhost:4200 http://127.0.0.1:4200` en `deployment/nginx.conf` |
+| RNF-06 | La aplicación debe poder ser embebida como `iframe` desde el shell sin ser bloqueada por políticas de seguridad del navegador | `Content-Security-Policy: frame-ancestors 'self' http://localhost:4200 http://127.0.0.1:4200` en `deployment/nginx.conf` (sin `X-Frame-Options: DENY`) |
 | RNF-07 | Los activos estáticos deben servirse con cacheo agresivo en producción | Bloque `location ~* \.(js\|css\|png...)$ { expires 7d; ... }` en `nginx.conf` |
+| RNF-12 | Cabeceras de seguridad adicionales (SEG-A): HSTS, `X-Content-Type-Options: nosniff`, `Referrer-Policy: no-referrer`, CSP con `default-src 'self'` | `deployment/nginx.conf` |
 | RNF-08 | El build de producción debe generar hashing de archivos para invalidación de caché | `"outputHashing": "all"` en configuración `production` de `angular.json` |
 | RNF-09 | El código debe compilarse en modo estricto de TypeScript | `"strict": true`, `noImplicitOverride`, `noPropertyAccessFromIndexSignature`, `strictTemplates` en `tsconfig.json`/`angularCompilerOptions` |
 | RNF-10 | El contenedor debe exponer verificación de salud para orquestadores | `HEALTHCHECK` en `deployment/Dockerfile` (`curl` cada 30s) |
