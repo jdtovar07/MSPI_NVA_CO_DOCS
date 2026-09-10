@@ -52,6 +52,7 @@
 | RNF-05 | **Mantenibilidad por capas**: separación en `domain`, `application`, `infrastructure`, `presentation` dentro de `src/app`. | Estructura de `src/app/**`, `docs/ARQUITECTURA.md` |
 | RNF-06 | **Consistencia visual**: el layout (menú, cabecera) del shell se mantiene visible mientras se navega a un microfrontend hijo (no hay salto de dominio ni recarga completa de página). | `docs/FLUJOS.md` ("El usuario no cambia de dominio") |
 | RNF-07 | **Cacheo de assets estáticos** con expiración de 7 días e inmutabilidad en producción. | `deployment/nginx.conf` |
+| RNF-08 | **Cabeceras de seguridad HTTP (SEG-A)**: HSTS, CSP restrictiva (con `frame-src` hacia remotes 4201–4205 y `frame-ancestors 'self'`), `X-Content-Type-Options: nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`. El shell no se embebe; los remotes permiten iframe solo desde el shell. | `deployment/nginx.conf` |
 
 No se encontraron requerimientos no funcionales explícitos de rendimiento (tiempos de respuesta), accesibilidad (WCAG) ni internacionalización en el código o la documentación del repositorio; se declara esta ausencia en vez de asumirlos.
 
