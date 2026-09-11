@@ -146,10 +146,11 @@ pipelines:
 **Etapas reales:**
 
 1. **`Build App`** — imagen base `amazoncorretto:21`; instala herramientas (`unzip git findutils which tar gzip`), da permisos de ejecución a `gradlew`, y ejecuta `./gradlew clean assemble`. Publica como artefactos `build/libs/**`, `build/reports/**` y `applications/**/build/libs/**`. **No ejecuta `test` ni `check`** — es decir, el pipeline actual no corre las 21 clases de prueba ni valida el umbral de cobertura del 80% antes de desplegar (ver observación en `05-Pruebas.md`).
-2. **`Deploy to Railway`** — instala la CLI de Railway (`curl -fsSL https://railway.app/install.sh | sh`), valida que existan las variables de pipeline `RAILWAY_TOKEN` y `RAILWAY_SERVICE` (aborta con mensaje explícito si faltan), y despliega con `railway up --service "$RAILWAY_SERVICE" --ci`.
-3. **Disparo**: la pipeline **solo está definida para la rama `dev`** (`pipelines.branches.dev`); no hay pipeline configurada para `main`/`master` ni para *pull requests* en el archivo revisado, y no hay *caching* de nada salvo el caché estándar de Gradle (`~/.gradle/caches`).
+2. **`OWASP Dependency-Check (SEG-B)`** — ejecuta `./gradlew dependencyCheckAnalyze` y publica `build/reports/dependency-check/**`. Requiere `NVD_API_KEY` (variable de repositorio) para tiempos razonables. Por defecto no falla el build (`DEPENDENCY_CHECK_FAIL_CVSS`, default 11); usar `7` para fallar en alto/crítico. Guía: `MSPI_NVA_CO_MR_BACK/docs/SEG-B-Dependency-Check.md`.
+3. **`Deploy to Railway`** — instala la CLI de Railway (`curl -fsSL https://railway.app/install.sh | sh`), valida que existan las variables de pipeline `RAILWAY_TOKEN` y `RAILWAY_SERVICE` (aborta con mensaje explícito si faltan), y despliega con `railway up --service "$RAILWAY_SERVICE" --ci`.
+4. **Disparo**: la pipeline **solo está definida para la rama `dev`** (`pipelines.branches.dev`); no hay pipeline configurada para `main`/`master` ni para *pull requests* en el archivo revisado, y no hay *caching* de nada salvo el caché estándar de Gradle (`~/.gradle/caches`).
 
-No se encontró evidencia de análisis SonarQube, escaneo de seguridad (SAST/dependencias) ni notificaciones (Slack/Teams) en el pipeline, pese a que el proyecto Gradle sí tiene el plugin de SonarQube preconfigurado (ver `05-Pruebas.md` §4) — es decir, la infraestructura de calidad existe en el build pero no está conectada al pipeline de CI actual.
+**SEG-B (dependencias):** Spring Boot **4.0.8** + pins `tomcat.version=11.0.25`, `jackson-2-bom.version=2.21.7`, `jackson-bom.version=3.1.7` para CVEs altos/críticos. Local: `./gradlew dependencyCheckAnalyze` o Trivy sobre el `bootJar` (ver doc SEG-B).
 
 ## 5. Infraestructura de despliegue local (Docker Compose)
 
