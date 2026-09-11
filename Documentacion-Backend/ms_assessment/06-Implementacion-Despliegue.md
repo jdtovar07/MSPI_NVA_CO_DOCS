@@ -202,3 +202,7 @@ Requiere, además de PostgreSQL/Keycloak levantados, que `ms-org`, `ms-catalog`,
 | Nombre del jar | `MsAssessment.jar` |
 | Esquema de base de datos | `assessment` (PostgreSQL compartido `MSPI`) |
 | Dependencias de arranque (compose) | `ms-iam` (bloqueante), `ms-org`/`ms-catalog`/`ms-evidence` (no bloqueante) |
+
+## SEG-B — Dependency-Check
+
+Plugin OWASP en `build.gradle`. Local: `./gradlew dependencyCheckAnalyze` (ver `MSPI_NVA_CO_MR_BACK/docs/SEG-B-Dependency-Check.md`). Spring Boot **4.0.8** + pins Tomcat/Jackson seguros.
