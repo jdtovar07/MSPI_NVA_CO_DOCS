@@ -193,3 +193,7 @@ Prerrequisitos según `README.md`:
 | Nombre del contenedor | `ms_org` |
 | Nombre del jar | `MsOrg.jar` |
 | Esquema de base de datos | `org` (PostgreSQL, sin fallback H2) |
+
+## SEG-B — Dependency-Check
+
+Plugin OWASP en `build.gradle`. Local: `./gradlew dependencyCheckAnalyze` (ver `MSPI_NVA_CO_MR_BACK/docs/SEG-B-Dependency-Check.md`). Spring Boot **4.0.8** + pins Tomcat/Jackson seguros.
