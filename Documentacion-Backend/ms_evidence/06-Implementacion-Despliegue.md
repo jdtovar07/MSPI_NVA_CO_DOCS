@@ -201,3 +201,7 @@ Requiere PostgreSQL levantado con el esquema `evidence` aplicado (script `apply-
 | Nombre del jar | `MsEvidence.jar` |
 | Volumen de datos | `mspi_evidence_data:/data/evidence` (Docker Compose) |
 | Esquema PostgreSQL | `evidence` |
+
+## SEG-B — Dependency-Check
+
+Plugin OWASP en `build.gradle`. Local: `./gradlew dependencyCheckAnalyze` (ver `MSPI_NVA_CO_MR_BACK/docs/SEG-B-Dependency-Check.md`). Spring Boot **4.0.8** + pins Tomcat/Jackson seguros.
