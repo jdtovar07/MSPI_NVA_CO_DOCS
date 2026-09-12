@@ -1,0 +1,6 @@
+# Wiki MkDocs Material — MSPI_NVA_CO_DOCS
+# Install: python3 -m venv .venv && . .venv/bin/activate && pip install -r requirements.txt
+# Pin MkDocs 1.x (Material no soporta el plugin system de MkDocs 2).
+mkdocs>=1.6,<2
+mkdocs-material>=9.5,<10
+pymdown-extensions>=10.7,<11

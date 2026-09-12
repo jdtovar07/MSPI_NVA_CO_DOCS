@@ -1,0 +1,220 @@
+site_name: MSPI · AUDITCYBER — Wiki del proyecto
+site_description: Documentación técnica y funcional de la plataforma MSPI (Modelo de Seguridad y Privacidad de la Información).
+# Ajustar al publicar en GitHub Pages:
+# site_url: https://<org>.github.io/<repo>/
+# Contenido real vive en la raíz del repo; docs/ solo contiene symlinks (sin duplicar Markdown).
+docs_dir: docs
+site_dir: site
+use_directory_urls: false
+
+theme:
+  name: material
+  language: es
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/weather-night
+        name: Modo oscuro
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: blue
+      toggle:
+        icon: material/weather-sunny
+        name: Modo claro
+  features:
+    - navigation.sections
+    - navigation.top
+    - navigation.indexes
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - toc.follow
+
+plugins:
+  - search:
+      lang: es
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+  - tables
+  - fenced_code
+  - attr_list
+  - md_in_html
+
+# Excluir del build lo que no es documentación navegable
+exclude_docs: |
+  node_modules/
+  graphify-out/
+  site/
+  .venv/
+  CartasVoBo/
+  Propuesta-grado/
+  *.docx
+
+# Informe graphify enlazado desde Grafo-Codigo.md (no necesita entrada propia en nav)
+not_in_nav: |
+  Documentacion-General/assets/graphify/GRAPH_REPORT.md
+
+# Enlaces a carpetas / .docx / artefactos fuera del site no deben abortar el build
+validation:
+  links:
+    absolute_links: ignore
+    unrecognized_links: ignore
+    not_found: warn
+
+nav:
+  - Inicio: wiki/Inicio.md
+  - Cómo usar la wiki: WIKI.md
+  - README del repo: README.md
+  - Enlaces del proyecto: MSPI-Enlaces.md
+  - General:
+      - Índice general: Documentacion-General/00-Indice-General.md
+      - Arquitectura general: Documentacion-General/01-Arquitectura-General-del-Sistema.md
+      - Grafo de código: Documentacion-General/Grafo-Codigo.md
+      - Modelo de datos (MER): Documentacion-General/Modelo-Datos-MER.md
+      - Modelo de dominio: Documentacion-General/02-Modelo-de-Dominio.md
+      - Objetivos del proyecto: Documentacion-General/03-Objetivos-del-Proyecto.md
+      - Decisiones técnicas: Documentacion-General/04-Decisiones-Tecnicas-Complementarias.md
+      - Manual de despliegue: Documentacion-General/05-Manual-Despliegue.md
+      - Guía de pruebas funcionales: Documentacion-General/06-Guia-Pruebas-Funcionales.md
+      - Manual de usuario: Documentacion-General/07-Manual-Usuario.md
+      - Referencia de API: Documentacion-General/08-Referencia-API.md
+      - Alineación Autodiagnóstico MSPI: Documentacion-General/09-Alineacion-AutodiagnosticoMSPI.md
+      - Auditoría de catálogos: Documentacion-General/10-Auditoria-Catalogos.md
+      - Validación end-to-end: Documentacion-General/11-Validacion-End-to-End.md
+      - Tipos de entidad y eliminación de catálogo: Documentacion-General/12-Tipos-Entidad-MSPI-y-Eliminacion-Catalogo.md
+      - Notificaciones y roles: Documentacion-General/13-Notificaciones-y-Roles.md
+  - Backend (microservicios):
+      - ms_iam:
+          - Planificación: Documentacion-Backend/ms_iam/01-Planificacion.md
+          - Análisis: Documentacion-Backend/ms_iam/02-Analisis.md
+          - Diseño: Documentacion-Backend/ms_iam/03-Diseno.md
+          - Desarrollo: Documentacion-Backend/ms_iam/04-Desarrollo.md
+          - Pruebas: Documentacion-Backend/ms_iam/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Backend/ms_iam/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Backend/ms_iam/07-Mantenimiento.md
+      - ms_org:
+          - Planificación: Documentacion-Backend/ms_org/01-Planificacion.md
+          - Análisis: Documentacion-Backend/ms_org/02-Analisis.md
+          - Diseño: Documentacion-Backend/ms_org/03-Diseno.md
+          - Desarrollo: Documentacion-Backend/ms_org/04-Desarrollo.md
+          - Pruebas: Documentacion-Backend/ms_org/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Backend/ms_org/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Backend/ms_org/07-Mantenimiento.md
+      - ms_assessment:
+          - Planificación: Documentacion-Backend/ms_assessment/01-Planificacion.md
+          - Análisis: Documentacion-Backend/ms_assessment/02-Analisis.md
+          - Diseño: Documentacion-Backend/ms_assessment/03-Diseno.md
+          - Desarrollo: Documentacion-Backend/ms_assessment/04-Desarrollo.md
+          - Pruebas: Documentacion-Backend/ms_assessment/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Backend/ms_assessment/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Backend/ms_assessment/07-Mantenimiento.md
+      - ms_catalog:
+          - Planificación: Documentacion-Backend/ms_catalog/01-Planificacion.md
+          - Análisis: Documentacion-Backend/ms_catalog/02-Analisis.md
+          - Diseño: Documentacion-Backend/ms_catalog/03-Diseno.md
+          - Desarrollo: Documentacion-Backend/ms_catalog/04-Desarrollo.md
+          - Pruebas: Documentacion-Backend/ms_catalog/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Backend/ms_catalog/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Backend/ms_catalog/07-Mantenimiento.md
+      - ms_evidence:
+          - Planificación: Documentacion-Backend/ms_evidence/01-Planificacion.md
+          - Análisis: Documentacion-Backend/ms_evidence/02-Analisis.md
+          - Diseño: Documentacion-Backend/ms_evidence/03-Diseno.md
+          - Desarrollo: Documentacion-Backend/ms_evidence/04-Desarrollo.md
+          - Pruebas: Documentacion-Backend/ms_evidence/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Backend/ms_evidence/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Backend/ms_evidence/07-Mantenimiento.md
+      - ms_reporting:
+          - Planificación: Documentacion-Backend/ms_reporting/01-Planificacion.md
+          - Análisis: Documentacion-Backend/ms_reporting/02-Analisis.md
+          - Diseño: Documentacion-Backend/ms_reporting/03-Diseno.md
+          - Desarrollo: Documentacion-Backend/ms_reporting/04-Desarrollo.md
+          - Pruebas: Documentacion-Backend/ms_reporting/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Backend/ms_reporting/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Backend/ms_reporting/07-Mantenimiento.md
+      - ms_audit:
+          - Planificación: Documentacion-Backend/ms_audit/01-Planificacion.md
+          - Análisis: Documentacion-Backend/ms_audit/02-Analisis.md
+          - Diseño: Documentacion-Backend/ms_audit/03-Diseno.md
+          - Desarrollo: Documentacion-Backend/ms_audit/04-Desarrollo.md
+          - Pruebas: Documentacion-Backend/ms_audit/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Backend/ms_audit/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Backend/ms_audit/07-Mantenimiento.md
+      - ms_admin:
+          - Planificación: Documentacion-Backend/ms_admin/01-Planificacion.md
+          - Análisis: Documentacion-Backend/ms_admin/02-Analisis.md
+          - Diseño: Documentacion-Backend/ms_admin/03-Diseno.md
+          - Desarrollo: Documentacion-Backend/ms_admin/04-Desarrollo.md
+          - Pruebas: Documentacion-Backend/ms_admin/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Backend/ms_admin/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Backend/ms_admin/07-Mantenimiento.md
+  - Frontend (microfrontends):
+      - mf_shell:
+          - Planificación: Documentacion-Frontend/mf_shell/01-Planificacion.md
+          - Análisis: Documentacion-Frontend/mf_shell/02-Analisis.md
+          - Diseño: Documentacion-Frontend/mf_shell/03-Diseno.md
+          - Desarrollo: Documentacion-Frontend/mf_shell/04-Desarrollo.md
+          - Pruebas: Documentacion-Frontend/mf_shell/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Frontend/mf_shell/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Frontend/mf_shell/07-Mantenimiento.md
+      - mf_auth:
+          - Planificación: Documentacion-Frontend/mf_auth/01-Planificacion.md
+          - Análisis: Documentacion-Frontend/mf_auth/02-Analisis.md
+          - Diseño: Documentacion-Frontend/mf_auth/03-Diseno.md
+          - Desarrollo: Documentacion-Frontend/mf_auth/04-Desarrollo.md
+          - Pruebas: Documentacion-Frontend/mf_auth/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Frontend/mf_auth/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Frontend/mf_auth/07-Mantenimiento.md
+      - mf_org:
+          - Planificación: Documentacion-Frontend/mf_org/01-Planificacion.md
+          - Análisis: Documentacion-Frontend/mf_org/02-Analisis.md
+          - Diseño: Documentacion-Frontend/mf_org/03-Diseno.md
+          - Desarrollo: Documentacion-Frontend/mf_org/04-Desarrollo.md
+          - Pruebas: Documentacion-Frontend/mf_org/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Frontend/mf_org/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Frontend/mf_org/07-Mantenimiento.md
+      - mf_assessment:
+          - Planificación: Documentacion-Frontend/mf_assessment/01-Planificacion.md
+          - Análisis: Documentacion-Frontend/mf_assessment/02-Analisis.md
+          - Diseño: Documentacion-Frontend/mf_assessment/03-Diseno.md
+          - Desarrollo: Documentacion-Frontend/mf_assessment/04-Desarrollo.md
+          - Pruebas: Documentacion-Frontend/mf_assessment/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Frontend/mf_assessment/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Frontend/mf_assessment/07-Mantenimiento.md
+      - mf_evidence:
+          - Planificación: Documentacion-Frontend/mf_evidence/01-Planificacion.md
+          - Análisis: Documentacion-Frontend/mf_evidence/02-Analisis.md
+          - Diseño: Documentacion-Frontend/mf_evidence/03-Diseno.md
+          - Desarrollo: Documentacion-Frontend/mf_evidence/04-Desarrollo.md
+          - Pruebas: Documentacion-Frontend/mf_evidence/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Frontend/mf_evidence/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Frontend/mf_evidence/07-Mantenimiento.md
+      - mf_reports:
+          - Planificación: Documentacion-Frontend/mf_reports/01-Planificacion.md
+          - Análisis: Documentacion-Frontend/mf_reports/02-Analisis.md
+          - Diseño: Documentacion-Frontend/mf_reports/03-Diseno.md
+          - Desarrollo: Documentacion-Frontend/mf_reports/04-Desarrollo.md
+          - Pruebas: Documentacion-Frontend/mf_reports/05-Pruebas.md
+          - Implementación y despliegue: Documentacion-Frontend/mf_reports/06-Implementacion-Despliegue.md
+          - Mantenimiento: Documentacion-Frontend/mf_reports/07-Mantenimiento.md
+  - Investigación:
+      - Documento de investigación: Documentacion-investigacion/Documento-Investigacion.md
+  - Seguridad:
+      - Postura y hardening: wiki/Seguridad.md
+  - Legal:
+      - Política de privacidad: legal/POLITICA-PRIVACIDAD-MSPI.md

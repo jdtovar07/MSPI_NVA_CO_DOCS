@@ -1,6 +1,11 @@
 # Graphify (local knowledge graph — do not commit)
 graphify-out/
 
+# MkDocs
+site/
+.venv/
+venv/
+
 # macOS
 .DS_Store
 

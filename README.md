@@ -109,6 +109,12 @@ La documentación se elaboró leyendo los repositorios reales, no a partir de pl
 
 ```
 MSPI_NVA_CO_DOCS/
+├── mkdocs.yml                      # Wiki MkDocs Material
+├── requirements.txt                # Dependencias de la wiki
+├── WIKI.md                         # Cómo servir / publicar la wiki
+├── docs/                           # Symlinks al contenido (docs_dir de MkDocs)
+├── wiki/                           # Landing e índice de seguridad
+├── legal/                          # Política de privacidad
 ├── Documentacion-General/          # Arquitectura, dominio y objetivos
 ├── Documentacion-Backend/          # 8 microservicios × 7 fases SDLC
 ├── Documentacion-Frontend/         # 6 microfrontends × 7 fases SDLC
@@ -203,3 +209,17 @@ Cuando un dato no pudo confirmarse en el código, se declara como ausente o `[PE
 7. [`Documento-Investigacion.md`](Documentacion-investigacion/Documento-Investigacion.md) — referencia académica ampliada.
 
 El índice completo está en [`Documentacion-General/00-Indice-General.md`](Documentacion-General/00-Indice-General.md).
+
+---
+
+## Wiki (MkDocs Material)
+
+Documentación navegable y buscable generada desde estos Markdown:
+
+```bash
+python3 -m venv .venv && source .venv/bin/activate
+pip install -r requirements.txt
+mkdocs serve    # http://127.0.0.1:8000
+```
+
+Guía completa (build, `gh-deploy`, estructura): [`WIKI.md`](WIKI.md).
