@@ -121,7 +121,16 @@ export const environment = {
 
 Es el **único** archivo de entorno del proyecto (no existe `environment.prod.ts`); las URLs de los microservicios backend están fijas a `localhost` incluso en el build de producción, ya que `angular.json` no declara `fileReplacements` para la configuración `production`. Esto implica que, tal como está el repositorio, **el build de producción apunta a los mismos hosts que el de desarrollo**, una limitación relevante para cualquier despliegue fuera de la máquina de desarrollo local (documentada también en `07-Mantenimiento.md`).
 
-## 7. Resumen de puertos y despliegue
+## 7. SEG-B — npm audit (dependencias)
+
+```bash
+cd mf_shell && npm run audit:high
+# o: npm audit --audit-level=high
+```
+
+Overrides en `package.json` mitigan transitivas alto/crítico (`ws`, `vite`, `proxy-addr`, etc.). Angular permanece en **19.2.x** (cerrar avisos del framework exige major 21/22, fuera de alcance SEG-B). Guía: `MSPI_NVA_CO_MR_FRONT/docs/SEG-B-npm-audit.md`.
+
+## 8. Resumen de puertos y despliegue
 
 | Elemento | Valor |
 |---|---|
