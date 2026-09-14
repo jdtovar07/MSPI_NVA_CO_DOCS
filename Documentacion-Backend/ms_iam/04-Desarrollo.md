@@ -4,6 +4,7 @@
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_iam` |
 | Fecha del documento | 2026-08-18 |
+| Última revisión cruzada con código | **2026-10-19** |
 | Alcance | Descripción de la implementación real: tecnologías, estructura de código por capa, patrones aplicados y funcionalidades desarrolladas |
 
 ---

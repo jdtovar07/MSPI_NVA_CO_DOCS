@@ -6,7 +6,9 @@ Documentación técnica y funcional del **Modelo de Seguridad y Privacidad de la
 |---|---|
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Stack** | Java 21 · Spring Boot · Angular 19 · Keycloak · PostgreSQL · Docker |
-| **Repos** | [README del repositorio](../README.md) · [Arquitectura general](../Documentacion-General/01-Arquitectura-General-del-Sistema.md) |
+| **Backend** | **8** microservicios activos (8082–8089) |
+| **Última revisión** | 2026-10-19 |
+| **Repos** | [README](../README.md) · [Arquitectura](../Documentacion-General/01-Arquitectura-General-del-Sistema.md) · [Flujos SOL-*](../Documentacion-General/14-Flujos-Solicitudes-Auditoria-y-Seguridad.md) |
 
 ---
 
