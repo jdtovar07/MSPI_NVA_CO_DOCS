@@ -3,43 +3,58 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_admin` |
-| Fecha del documento | 2026-08-18 |
-| Alcance | Frameworks de prueba, estructura y cobertura de `ms_admin` |
-| Estado del repositorio | **Sin pruebas — no existe código que probar** |
+| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
+| Estado | Activo |
+| Alcance | Pruebas unitarias existentes y huecos en `src/test` |
 
 ---
 
-## 1. Declaración explícita
+## 1. Frameworks
 
-No existe carpeta `src/test` en `ms_admin`, ni en ninguna otra ubicación del repositorio. No hay ningún archivo de prueba (`*Test.java`, `*Spec.*`, `*.test.*`, etc.). Esto es consistente con el hecho, ya documentado en `01-Planificacion.md` y `04-Desarrollo.md`, de que **no existe código de aplicación**: no puede haber pruebas unitarias, de integración, de arquitectura ni de contrato sobre un sistema que no ha sido implementado.
+Plantilla Gradle MSPI: JUnit 5, `spring-boot-starter-test` (Mockito), JaCoCo enlazado a `check` cuando hay tests en el módulo.
 
-## 2. Frameworks de prueba
+## 2. Estructura real de tests (verificada)
 
-No hay ningún framework de pruebas configurado, porque no hay `build.gradle` (ni equivalente Node) que declare dependencias de tipo `test`. No se puede afirmar que se usarán JUnit, Mockito, ArchUnit u otra herramienta, aunque —a modo de referencia de lo que usan los microservicios hermanos ya implementados del mismo ecosistema (`ms_iam`)— sería razonable esperar continuidad tecnológica si `ms_admin` se implementa en Java/Spring: JUnit 5, Mockito, MockWebServer y ArchUnit. Esto se deja explícito como **expectativa no confirmada**, no como hecho documentado de `ms_admin`.
+```
+domain/usecase/src/test/java/co/com/mspi/usecase/systemconfig/
+├── GetSystemConfigUseCaseTest.java
+├── UpdateSystemConfigUseCaseTest.java
+└── GetSystemConfigHistoryUseCaseTest.java
 
-## 3. Estructura de pruebas
+infrastructure/entry-points/api-rest/src/test/java/co/com/mspi/api/
+├── config/CorsConfigTest.java
+├── config/TraceIdFilterTest.java
+└── exception/GlobalExceptionHandlerTest.java
+```
 
-No aplica. No hay estructura que describir.
+**Total: 6 clases de prueba** bajo `ms_admin/**/src/test/**`.
 
-## 4. Tipos de pruebas evidenciadas
+## 3. Cobertura por área
 
-| Tipo de prueba | Evidencia en `ms_admin` |
-|---|---|
-| Unitarias | Ninguna |
-| Integración | Ninguna |
-| Arquitectura (ArchUnit o similar) | Ninguna |
-| Contrato de API | Ninguna — el propio `docs/openapi.yaml` es un stub sin `paths`, por lo que no hay contrato que validar |
-| Extremo a extremo | Ninguna |
-| Carga/rendimiento | Ninguna |
+| Área | Estado | Detalle |
+|---|---|---|
+| `GetSystemConfigUseCase` | Presente | Defaults 30/15/5/5 y merge con valores existentes |
+| `UpdateSystemConfigUseCase` | Presente | Incluye rechazo de días fuera de rango (p. ej. 0) |
+| `GetSystemConfigHistoryUseCase` | Presente | `GetSystemConfigHistoryUseCaseTest` |
+| `SystemAdminApi` / `InternalSystemConfigApi` | **No encontrado** | Sin MockMvc de controladores |
+| `InternalApiKeyFilter` | **No encontrado** | TODO / verificar si se añade |
+| Adaptador JPA `SystemConfig*` | **No encontrado** | Sin `src/test` en `jpa-repository` |
+| CORS / TraceId / GlobalExceptionHandler | Presente | 3 tests transversales |
+| Integración `@SpringBootTest` | **No encontrado** | |
 
-## 5. Cobertura de código
+## 4. Qué ejercitan los tests de dominio
 
-No hay configuración de cobertura (no existe configuración de JaCoCo, Istanbul, ni ninguna otra herramienta), porque no hay código fuente sobre el cual calcular cobertura. No es posible reportar un porcentaje de cobertura.
+- Aplicación de defaults cuando no hay fila o faltan claves.
+- Persistencia mockeada en update con valores válidos.
+- Validación de negocio: días fuera de **1–365** lanzan `BusinessRulesOnFieldsException`.
+- Lectura de historial con gateway mockeado.
 
-## 6. Análisis estático / calidad
+## 5. Recomendaciones
 
-No hay configuración de SonarQube, Pitest, ni ningún otro análisis de calidad o mutación en el repositorio.
+1. MockMvc de `PUT /system/config` (401/403 sin rol, 400 por validación, 200 feliz).
+2. Test del filtro interno (clave válida/ inválida).
+3. Mantener tests de usecase como quality gate mínimo en CI (`./gradlew test` / `check`).
 
-## 7. Recomendación
-
-Siguiendo la gobernanza que el propio `ROADMAP.md` establece para el desarrollo de `ms_admin` (Fase 2 — "Estructura Clean Architecture (alineada con `ms_iam` / `ms_org`)"), se recomienda que, cuando se inicie la implementación, la estrategia de pruebas replique la ya verificada en `ms_iam` (documentada en su propio `05-Pruebas.md`): pruebas unitarias de `domain/usecase` con mocks de los gateways, pruebas de arquitectura con ArchUnit para blindar la regla de dependencia hexagonal, y pruebas de integración de los adaptadores HTTP salientes hacia `ms_iam`/`ms_org` (previsiblemente con `MockWebServer`, dado que ese es el patrón ya usado en el ecosistema para simular servicios externos). Esta es una recomendación prospectiva, no una descripción de algo existente.
+```bash
+./gradlew test
+```

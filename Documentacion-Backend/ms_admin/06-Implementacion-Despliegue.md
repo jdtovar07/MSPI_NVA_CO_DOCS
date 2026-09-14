@@ -1,85 +1,81 @@
 # ms_admin — Implementación y Despliegue
 
-> **ACTUALIZACIÓN 2026-10-11:** `ms_admin` implementado en :8089 con SystemConfig (esquema `admin`). Ver `MSPI_NVA_CO_MR_BACK/ms_admin/README.md`.
-
-
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_admin` |
-| Fecha del documento | 2026-08-18 |
-| Alcance | Build, contenedor, variables de entorno y CI/CD real de `ms_admin` |
-| Estado del repositorio | **No desplegable — no existe artefacto de build, imagen ni pipeline** |
+| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
+| Estado | Activo |
+| Alcance | Build, Docker, variables de entorno, Compose y esquema PostgreSQL de `ms_admin` |
 
 ---
 
-## 1. Declaración explícita
+## 1. Build local
 
-`ms_admin` no tiene ningún mecanismo de build, empaquetado ni despliegue. Verificaciones realizadas sobre el repositorio y sobre la configuración de orquestación del monorepo:
+Desde `MSPI_NVA_CO_MR_BACK/ms_admin/`:
 
-- No existe `deployment/Dockerfile` ni ningún otro `Dockerfile` en el repositorio.
-- No existe `bitbucket-pipelines.yml` en `ms_admin`.
-- No existe ningún archivo `.env` ni `application.yaml`/`application.properties` con variables de entorno.
-- **`ms_admin` no aparece en `docker-config/docker/docker-compose.apps.yml`.** Se inspeccionó el archivo completo y sus servicios declarados son únicamente: `ms-iam`, `ms-org`, `ms-catalog`, `ms-evidence`, `ms-assessment` y `ms-reporting`. No hay entrada `ms-admin`.
-- No hay ninguna imagen Docker publicada bajo el namespace `mspi/ms-admin` (los demás servicios usan el patrón `mspi/<servicio>:dev`, p. ej. `mspi/ms-iam:dev`).
+```bash
+./gradlew :app-service:compileJava
+./gradlew test
+./gradlew :app-service:bootJar -x test --no-daemon
+./gradlew :app-service:bootRun
+```
 
-El propio `README.md` de `ms_admin` lo resume en su tabla de estado: *"Despliegue: No aplica"*.
+Root project: `MsAdmin` (`settings.gradle`).
 
-## 2. Build
+## 2. Dockerfile
 
-No hay comando de build aplicable. No existe `gradlew`, `build.gradle` ni `package.json`; por lo tanto no hay tareas como `./gradlew build`, `./gradlew bootJar` ni `npm run build` que ejecutar sobre este repositorio.
+Archivo: `ms_admin/deployment/Dockerfile`
 
-## 3. Contenedor (Docker)
+- Multi-stage Temurin 21 Alpine (JDK build → JRE runtime).
+- `./gradlew :app-service:bootJar -x test --no-daemon`.
+- Usuario `mspi` + `su-exec`; `EXPOSE 8089`; `SERVER_PORT=8089`.
+- `HEALTHCHECK` contra `/actuator/health` (30s / start-period 90s).
+- Imagen Compose: `mspi/ms-admin:dev`.
 
-No hay `Dockerfile`. Como referencia de lo que usan los microservicios Java/Spring ya implementados en el mismo monorepo (`ms_iam`), y dejando explícito que **no aplica a `ms_admin` hasta que se implemente**, el patrón del ecosistema es:
+## 3. Docker Compose
 
-- Imagen de build: `eclipse-temurin:21-jdk-alpine`.
-- Imagen de runtime: `eclipse-temurin:21-jre-alpine`.
-- Publicación bajo el namespace `mspi/<servicio>:dev` mediante el script `docker-config/docker/build-ms-images.ps1`.
+Archivo: `docker-config/docker/docker-compose.apps.yml`
 
-Si `ms_admin` se implementara como BFF en otro stack (Node, según la opción abierta en el README), este patrón de imagen no aplicaría directamente y debería definirse uno nuevo.
+| Campo | Valor |
+|---|---|
+| Servicio | `ms-admin` |
+| `container_name` | `ms_admin` |
+| Imagen | `mspi/ms-admin:dev` |
+| Context | `../../ms_admin` |
+| Dockerfile | `deployment/Dockerfile` |
+| Puertos | `8089:8089` |
+| `SERVER_PORT` | `"8089"` |
+
+En red Docker: `MS_ADMIN_URL=http://ms-admin:8089` (`docker-config/docker/env-mspi-docker.env`).
 
 ## 4. Variables de entorno
 
-No hay variables de entorno declaradas para `ms_admin` en ningún archivo del repositorio ni en `docker-config/docker/env-mspi-docker.env.example`, que es el archivo de ejemplo de variables de entorno compartidas del monorepo y que no contiene ninguna entrada relacionada con `ms_admin` o `ms-admin`.
+| Variable | Obligatoria | Descripción | Default / nota |
+|---|---|---|---|
+| `SERVER_PORT` | No | Puerto HTTP | `8089` |
+| `INTERNAL_API_KEY` | Sí (S2S) | Header `X-Internal-Api-Key` | Compartida con assessment/catalog |
+| `CORS_ALLOWED_ORIGINS` | Sí (frontend) | Orígenes CORS | Sin default en YAML |
+| `JWT_ISSUER_URI` | Sí (prod) | Issuer Keycloak `iam` | Default Railway en YAML |
+| `JWT_JWK_SET_URI` | No | JWK Set | `""` |
+| `DB_CREDENTIAL` | **Sí** | JSON conexión PostgreSQL (Infisical) | Sin fallback H2 |
+| Infisical (`INFISICAL_*`) | Prod | Carga de secretos | `InfisicalConfig` |
 
-## 5. Orquestación local (Docker Compose)
+Consumidores:
 
-`docker-config/docker/docker-compose.apps.yml` es el compose real que orquesta los microservicios de dominio del sistema MSPI en entorno local/desarrollo. Sus servicios reales, con dependencias de arranque (`depends_on: condition: service_healthy`), son:
+- `MS_ADMIN_URL` (local `http://localhost:8089`, Docker `http://ms-admin:8089`).
+- Frontend: `msAdminUrl` en `mf_shell`.
 
-```mermaid
-flowchart LR
-    IAM["ms-iam"]
-    ORG["ms-org"]
-    CAT["ms-catalog"]
-    EVI["ms-evidence"]
-    ASM["ms-assessment"]
-    REP["ms-reporting"]
-    ADM["ms-admin\n(NO EXISTE EN COMPOSE)"]
+## 5. Base de datos
 
-    ORG -->|depends_on healthy| IAM
-    ASM -->|depends_on healthy| IAM
-    ASM -->|depends_on healthy| ORG
-    ASM -->|depends_on healthy| CAT
-    ASM -->|depends_on healthy| EVI
+- Esquemas/tablas: `admin.system_config`, `admin.system_config_history`.
+- Migración: `docker-config/docker/postgres/init/patch-admin-schema.sql` (idempotente; migra desde `iam.*` si aplica).
+- App sin DDL automático.
 
-    style ADM fill:#742a2a,stroke:#e53e3e,color:#fff,stroke-dasharray: 5 5
-```
+## 6. Checklist de despliegue
 
-`ms_admin` se representa en el diagrama únicamente para dejar explícito, por contraste, que **no forma parte de la orquestación real** del entorno local del proyecto. No hay puerto asignado, no hay red Docker asociada, no hay volumen ni healthcheck definido para él.
-
-## 6. CI/CD
-
-No existe `bitbucket-pipelines.yml` en `ms_admin`, por lo que no hay pipeline de integración continua ni de despliegue continuo configurado para este repositorio. No se puede documentar ninguna etapa de build, test, análisis estático o despliegue automatizado porque ninguna de ellas existe.
-
-## 7. Qué se necesitaría para desplegar `ms_admin`
-
-Siguiendo la Fase 2 del `ROADMAP.md` ("Implementación inicial" — incluye "Integración con Infisical y despliegue"), los pasos pendientes para que `ms_admin` sea desplegable son, en orden lógico:
-
-1. Definir y confirmar el stack de implementación (Java/Spring o Node), resolviendo la pregunta abierta del `README.md`.
-2. Crear el build del proyecto (Gradle multi-módulo si sigue el patrón `ms_iam`/`ms_org`, o el equivalente en el stack elegido).
-3. Escribir un `Dockerfile` siguiendo el patrón de imagen del resto del ecosistema (`eclipse-temurin:21-jdk-alpine` / `-jre-alpine`), si se opta por Java.
-4. Agregar el servicio `ms-admin` a `docker-config/docker/docker-compose.apps.yml`, con sus variables de entorno, healthcheck y dependencias (`ms-iam`, `ms-org`, y potencialmente `ms-assessment`).
-5. Integrar la gestión de secretos con Infisical.
-6. Crear un `bitbucket-pipelines.yml` para el repositorio, replicando las etapas de build/test/despliegue ya usadas por los microservicios hermanos.
-
-Ninguno de estos pasos se ha ejecutado a la fecha de este documento.
+1. Aplicar `patch-admin-schema.sql`.
+2. Definir `DB_CREDENTIAL`, `INTERNAL_API_KEY`, `JWT_ISSUER_URI`, `CORS_ALLOWED_ORIGINS`.
+3. Alinear API key con `ms_assessment` y `ms_catalog`.
+4. Configurar `MS_ADMIN_URL` / `msAdminUrl`.
+5. Levantar servicio `ms-admin` y verificar `/actuator/health`.
+6. Probar `GET/PUT /system/config` (AdminSistema) y `GET /internal/system/config` (API key).

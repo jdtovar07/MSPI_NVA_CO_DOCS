@@ -3,68 +3,62 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_admin` |
-| Fecha del documento | 2026-08-18 |
-| Alcance | Mantenimiento correctivo, preventivo y evolutivo de `ms_admin`; gestión de versiones; monitoreo; mejoras futuras |
-| Estado del repositorio | **Sin sistema en producción — el mantenimiento aplica al repositorio y su documentación, no a un servicio en ejecución** |
+| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
+| Estado | Activo |
+| Alcance | Operación, historial, monitoreo y deuda técnica de `ms_admin` |
 
 ---
 
-## 1. Naturaleza del mantenimiento en el estado actual
+## 1. Modelo operativo de datos
 
-Dado que `ms_admin` no tiene código desplegado (ver `01`–`06`), no existe un sistema en ejecución sobre el cual practicar mantenimiento correctivo o preventivo en el sentido tradicional (parches de bugs, monitoreo de incidentes, actualización de dependencias vulnerables). El "mantenimiento" aplicable hoy es de tipo **documental y de gobernanza de alcance**, tal como lo define el propio `docs/ROADMAP.md` del repositorio.
+### 1.1 Configuración vigente (`admin.system_config`)
 
-## 2. Mantenimiento correctivo
+- Una fila canónica por clave; la clave de producto es `mspi.system.config`.
+- Las actualizaciones **sobrescriben** `value_json` / `version` / `updated_at` de la fila vigente.
+- Soft-delete de la config vigente: **no aplica** al diseño actual (no hay `deleted_at`); la fila se mantiene y se actualiza in-place.
 
-No aplica. No hay defectos que corregir porque no hay funcionalidad implementada. No hay incidentes, tickets de bug ni hotfixes registrados en el repositorio.
+### 1.2 Historial (`admin.system_config_history`) — append
 
-## 3. Mantenimiento preventivo
+- Cada cambio genera una **nueva fila** de historial (append-only).
+- No hay borrado lógico/físico de historial en el código de aplicación.
+- El crecimiento del historial es monótono: si `limit` del panel es insuficiente para auditoría forense, consultar la tabla directamente o ampliar el parámetro `limit` en la API.
+- Soft-delete: **N/A** para history (retención por inserción; purga solo sería operación DBA explícita fuera del MS).
 
-En el estado actual, el único mantenimiento preventivo relevante es **documental**: mantener `README.md`, `docs/ROADMAP.md` y `docs/openapi.yaml` sincronizados con las decisiones reales del equipo de arquitectura, para evitar que el repositorio quede con documentación desactualizada respecto al MER u otros microservicios del ecosistema. La regla de gobernanza explícita del `ROADMAP.md` — *"Cualquier cambio de alcance debe reflejarse en el MER del proyecto y en los contratos OpenAPI de los MS afectados antes de implementar código en este repositorio"* — funciona, en la práctica, como una medida preventiva contra decisiones de arquitectura no documentadas.
+## 2. Operación cotidiana
 
-Cuando exista una implementación real, el mantenimiento preventivo esperable (por analogía con `ms_iam`, ya en producción, y sin que esto sea una afirmación sobre `ms_admin`) incluiría: actualización de versiones de Spring Boot/Gradle, renovación de dependencias con vulnerabilidades conocidas, y revisión periódica de la configuración de Infisical/secretos.
+1. Verificar salud del servicio Compose/`ms-admin` en **8089**.
+2. Confirmar que `ms_assessment` y `ms_catalog` resuelven `MS_ADMIN_URL` y comparten `INTERNAL_API_KEY`.
+3. Tras cambiar plazos (días), validar impacto en flujos de evaluación/eliminación/catálogo (consumidores leen en caliente vía S2S).
+4. Rotar `INTERNAL_API_KEY` de forma coordinada (env/Infisical).
+5. Mantener rol Keycloak `AdminSistema` alineado con `SecurityConfig`.
 
-## 4. Mantenimiento evolutivo
+## 3. Esquema y migraciones
 
-El mantenimiento evolutivo de `ms_admin` está, en efecto, planificado como las Fases 1 a 3 de `docs/ROADMAP.md`:
+- DDL: `patch-admin-schema.sql`.
+- Tras migración desde `iam.system_config*`, no reintroducir escritura dual en IAM.
+- Nuevos parámetros JSON: preferir extensión del mapa `value_json` + defaults en `GetSystemConfigUseCase` + validación en `UpdateSystemConfigUseCase` (si aplica rango).
 
-```mermaid
-flowchart TD
-    A["Fase 0 — Reserva de nombre\n(completada)"] --> B["Fase 1 — Definición de alcance\nMS vs BFF · autenticación · OpenAPI v1"]
-    B --> C["Fase 2 — Implementación inicial\nClean Architecture · Infisical\nprimeros endpoints"]
-    C --> D["Fase 3 — Consola administrativa completa\nUI admin · métricas ·\nauditoría (ms_audit futuro)"]
-    D --> E["Mantenimiento evolutivo continuo\n(post-MVP, no planificado aún)"]
-```
+## 4. Observabilidad
 
-Cada fase del ROADMAP es, en sí misma, una unidad de evolución del producto: pasar de "repositorio reservado" a "alcance decidido", de ahí a "primeros endpoints", y finalmente a "consola administrativa completa" con posible integración a un `ms_audit` que hoy no existe en el ecosistema.
+| Mecanismo | Estado |
+|---|---|
+| `/actuator/health`, `/actuator/info` | Implementado; HEALTHCHECK Docker |
+| `X-Trace-Id` | Filtro + handler de excepciones |
+| Métricas Prometheus | No evidenciadas en este MS en la revisión |
 
-## 5. Gestión de versiones
+## 5. Deuda técnica / mejoras
 
-- El contrato de API (`docs/openapi.yaml`) está en `version: 0.0.0`, consistente con "no lanzado". No hay historial de versiones de API que documentar.
-- No hay tags ni releases de código, porque no hay código.
-- La convención de versionado que se adoptaría (SemVer para el contrato OpenAPI, versión de imagen `mspi/ms-admin:<tag>` para el contenedor) se infiere por analogía con el resto del ecosistema (`mspi/ms-iam:dev` como patrón observado en `docker-compose.apps.yml`), no está confirmada para `ms_admin`.
+| Ítem | Notas |
+|---|---|
+| `updated_by` UUID a menudo null | Limitación documentada en `SystemAdminApi`; el label humano mitiga en summary |
+| Tests de API / filtro internos ausentes | Ver `05-Pruebas.md` |
+| Historial sin retención automatizada | Operación DBA si el volumen crece |
+| Nuevos campos de config | Requiere contrato con consumidores (assessment/catalog/shell) |
 
-## 6. Monitoreo y logs
+## 6. Checklist de mantenimiento
 
-No aplica. No hay servicio en ejecución, por lo que no hay logs que recolectar ni métricas que exponer. No hay configuración de Micrometer, Prometheus, ni ningún endpoint `/actuator` en este repositorio (a diferencia de `ms_iam`, que sí expone `/actuator/health` e `/actuator/info` como parte de sus requerimientos iniciales).
-
-Cuando `ms_admin` se implemente, el propio ecosistema ya fija un patrón de referencia: los servicios en `docker-compose.apps.yml` declaran `depends_on: condition: service_healthy`, lo que implica que un futuro `ms-admin` necesitaría, como mínimo, un endpoint de salud compatible con ese mecanismo si otros servicios llegaran a depender de él.
-
-## 7. Mejoras futuras (según ROADMAP.md)
-
-Listadas en orden de la hoja de ruta oficial del repositorio, todas pendientes de ejecución:
-
-1. **Decisión de arquitectura** — microservicio independiente vs. BFF sin persistencia propia.
-2. **Inventario de operaciones administrativas** a centralizar (panel admin, reportes, configuración global).
-3. **Definición de autenticación** — JWT del rol `AdminSistema` emitido por Keycloak/`ms_iam`.
-4. **Publicación de `docs/openapi.yaml` v1** con al menos un endpoint de salud o agregación.
-5. **Estructura Clean Architecture** alineada con `ms_iam`/`ms_org`.
-6. **Integración con Infisical** y su cadena de despliegue.
-7. **Primeros endpoints de agregación o proxy** hacia microservicios de dominio (`ms_iam`, `ms_org`, `ms_assessment`).
-8. **UI administrativa** (si aplica) consumiendo `ms_admin`.
-9. **Métricas y auditoría de lectura**, con posible integración a un futuro `ms_audit` — hoy la auditoría del sistema vive únicamente en `ms_iam` (`iam.audit_log`).
-
-## 8. Riesgos de mantenimiento identificados
-
-- **Deuda de alcance no resuelta**: mientras la Fase 1 no se complete, cualquier trabajo de implementación corre el riesgo de construirse sobre supuestos no validados (por ejemplo, implementar como MS con base de datos propia si finalmente se decide que será un BFF sin persistencia).
-- **Dependencia de un servicio inexistente (`ms_audit`)**: parte del alcance de la Fase 3 depende de un microservicio que, a la fecha, no está ni siquiera reservado como carpeta en el monorepo ni referenciado en `docker-compose.apps.yml`.
-- **Desalineación documental**: si el equipo decide el alcance de `ms_admin` sin actualizar `docs/proyecto/DB-MER.txt` ni `docs/proyecto/Historias_Usuario_MSPI_v2.md` del monorepo general (donde hoy no hay ninguna mención a `ms_admin`), se rompería la trazabilidad exigida por la propia gobernanza del `ROADMAP.md`.
+1. Health `ms-admin:8089`.
+2. `GET /internal/system/config` responde 200 con defaults o valores persistidos.
+3. Un `PUT` de prueba en entorno no productivo deja rastro en `system_config_history`.
+4. Front `mf_shell` apunta a `msAdminUrl` correcto.
+5. Documentar cualquier nuevo campo de `value_json` en OpenAPI/`README` del microservicio.

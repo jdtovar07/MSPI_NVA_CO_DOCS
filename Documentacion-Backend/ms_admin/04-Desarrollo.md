@@ -1,70 +1,69 @@
 # ms_admin — Desarrollo
 
-> **ACTUALIZACIÓN 2026-10-11:** `ms_admin` implementado en :8089 con SystemConfig (esquema `admin`). Ver `MSPI_NVA_CO_MR_BACK/ms_admin/README.md`.
-
-
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_admin` |
-| Fecha del documento | 2026-08-18 |
-| Alcance | Implementación real, librerías, patrones y funcionalidades concretas de `ms_admin` |
-| Estado del repositorio | **Sin desarrollo iniciado** |
+| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
+| Estado | Activo |
+| Alcance | Implementación, patrones e integraciones de `ms_admin` |
 
 ---
 
-## 1. Declaración explícita de alcance de este documento
+## 1. Convenciones
 
-Este documento normalmente describiría, para un microservicio ya implementado, las librerías declaradas en `build.gradle`, los patrones de diseño aplicados en el código y las funcionalidades concretas entregadas. **Ninguno de esos elementos existe en `ms_admin`.**
+- Paquete `co.com.mspi`, Lombok, casos de uso sin Spring en `:usecase`.
+- DTOs de API en `api-rest` (`SystemConfigResponse`, `UpdateSystemConfigRequest`, `SystemConfigHistoryResponse`).
+- Envelope `CorrectResponse` / `ApiResponseMapper`.
+- Documentación auxiliar en repo: `ms_admin/README.md`, `ms_admin/docs/MIGRATION-NOTES.md`, `ms_admin/docs/ROADMAP.md`.
 
-Verificación realizada:
+## 2. Patrones
 
-- No existe `build.gradle` en ningún nivel del repositorio (raíz ni subcarpetas).
-- No existe `main.gradle`, `settings.gradle` ni `gradlew`.
-- No existe ni un solo archivo `.java`, `.kt` ni de ningún otro lenguaje de aplicación.
-- No existe `src/` en ninguna forma.
-- No existe `application.yaml`/`application.properties`.
-- No existe carpeta `deployment/`.
-
-Por lo tanto, las secciones siguientes documentan **por qué no hay nada que reportar** en cada categoría, en lugar de simular contenido inexistente.
-
-## 2. Librerías y dependencias
-
-No hay archivo de dependencias (`build.gradle`) del cual extraer versiones de librerías. No se puede afirmar qué framework web, ORM, cliente HTTP, librería de seguridad o utilitario usaría `ms_admin`, porque ninguna de esas decisiones se ha materializado en configuración.
-
-La única pista documental sobre el ecosistema tecnológico es la pregunta abierta del `README.md`: *"¿`ms_admin` será un BFF (Node/Spring) o un MS con persistencia propia?"*, que deja sin resolver incluso el lenguaje de implementación.
-
-## 3. Patrones de diseño aplicados
-
-No hay patrones de diseño aplicados en código, porque no hay código. Los patrones que aparecen en el `README.md` (Ports & Adapters / arquitectura hexagonal, con `Gateways` como puertos salientes hacia otros microservicios) son **patrones propuestos en un diagrama**, no patrones verificables en una implementación. Se documentan como intención en `03-Diseno.md`, no aquí, para no mezclar diseño propuesto con desarrollo real.
-
-## 4. Funcionalidades concretas implementadas
-
-Ninguna. El propio `README.md` lo resume en una tabla de estado:
-
-| Aspecto | Estado |
+| Patrón | Dónde |
 |---|---|
-| Código fuente | No implementado |
-| API REST | No disponible |
-| Despliegue | No aplica |
+| Puerto / adaptador | `SystemConfigGateway` + implementación JPA |
+| Merge de defaults | `GetSystemConfigUseCase.execute` con `putIfAbsent` |
+| Validación de dominio | `UpdateSystemConfigUseCase.validateDays` → `BusinessRulesOnFieldsException` |
+| Dual auth | JWT en `/system/**`, API key en `/internal/**` |
+| Historial append | Persistencia de snapshot en `system_config_history` al actualizar |
 
-No hay ningún endpoint HTTP que responda, ni siquiera un health check. No hay lógica de negocio, validaciones, manejo de excepciones, mapeo de DTOs, ni integración real con `ms_iam`, `ms_org` o `ms_assessment` — todas esas integraciones existen únicamente como flechas en los diagramas Mermaid del README (ver `03-Diseno.md`, §3).
+## 3. Funcionalidades implementadas
 
-## 5. Convenciones de código
+### 3.1 Lectura de configuración
 
-No aplican: no hay código sobre el cual establecer o verificar convenciones (nomenclatura de paquetes, formateo, linters, `checkstyle`, etc.). No hay ningún archivo de configuración de estilo (`.editorconfig`, `checkstyle.xml`, `.eslintrc`, etc.) en el repositorio.
+`GetSystemConfigUseCase` busca `mspi.system.config`; si no existe, sintetiza config vacía `version=0` y aplica defaults 30/15/5/5. Usada tanto por panel como por canal interno.
 
-## 6. Control de versiones y estado del repositorio
+### 3.2 Actualización
 
-El único control de versiones verificable es el `.gitignore` del repositorio, que existe pero cuyo contenido no fue solicitado como parte de este análisis funcional (no aporta información de desarrollo). No hay historial de commits analizado en este documento (no se tuvo acceso a `git log`, ya que el entorno de análisis no expone metadatos de Git para esta carpeta).
+`SystemAdminApi.updateConfig`:
 
-## 7. Qué se necesitaría para iniciar desarrollo real
+- Recibe mapa `config` y opcional `changedBy`.
+- Label de actor: `changedBy` o `jwt.name` / `preferred_username`.
+- UUID interno `updated_by` se pasa como `null` desde el controlador (limitación de mapeo subject Keycloak ↔ `iam.user.id` documentada en código).
+- `UpdateSystemConfigUseCase` valida rangos y persiste config + historial.
 
-A partir de lo que sí está documentado (`ROADMAP.md`, Fase 2 — "Implementación inicial"), el desarrollo de `ms_admin` requeriría, en orden:
+### 3.3 Historial
 
-1. Cerrar la decisión de arquitectura (MS propio vs. BFF) — Fase 1 del ROADMAP, aún pendiente.
-2. Publicar una versión no-stub de `docs/openapi.yaml` con al menos un endpoint, como exige la gobernanza del propio ROADMAP.
-3. Crear la estructura de build (multi-módulo Gradle, si se sigue el patrón de `ms_iam`/`ms_org`, o un proyecto Node si se opta por BFF en ese stack).
-4. Integrar con Infisical para gestión de secretos, como en los demás microservicios del ecosistema.
-5. Implementar los primeros casos de uso de agregación/proxy hacia `ms_iam` y `ms_org`.
+`GetSystemConfigHistoryUseCase.execute(limit)` proyecta filas a respuesta con id, version, changedBy, changedAt, summary.
 
-Ninguno de estos pasos se ha ejecutado a la fecha de este documento.
+### 3.4 Canal interno
+
+`InternalSystemConfigApi` reutiliza `GetSystemConfigUseCase` — una sola fuente de verdad de lectura para S2S.
+
+## 4. Integraciones consumidoras
+
+| Consumidor | Evidencia |
+|---|---|
+| `ms_assessment` | `SystemConfigGatewayAdapter` + `MS_ADMIN_URL` |
+| `ms_catalog` | `SystemConfigGatewayAdapter`; YAML `url: ${MS_ADMIN_URL:http://localhost:8089}` |
+| `mf_shell` | `msAdminUrl` (local tip. `http://localhost:8089`) — Configuración y dashboard |
+
+## 5. Configuración de aplicación
+
+`ms_admin/applications/app-service/src/main/resources/application.yaml`:
+
+- `server.port`: `${SERVER_PORT:8089}`
+- `cors.allowed-origins`: `${CORS_ALLOWED_ORIGINS}`
+- `app.internal-api-key`: `${INTERNAL_API_KEY:}`
+- JWT: `JWT_ISSUER_URI`, `JWT_JWK_SET_URI`
+- JPA: `ddl-auto: none`, `sql.init.mode: never`
+- `spring.application.name: admin`
