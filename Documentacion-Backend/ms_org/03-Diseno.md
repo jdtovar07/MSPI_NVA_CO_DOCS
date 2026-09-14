@@ -9,7 +9,7 @@
 
 ## 1. Arquitectura general
 
-`ms_org` implementa **arquitectura hexagonal (Clean Architecture)** por convención de estructura de carpetas/módulos Gradle, sin usar un plugin de generación de arquetipo (no hay evidencia de `co.com.bancolombia.cleanArchitecture` en `build.gradle`, igual que en `ms_iam`). El dominio (`domain/model`, `domain/usecase`) no importa Spring, JPA ni clases de `infrastructure/*`; toda la orquestación de beans se realiza en `applications/app-service` (`UseCaseConfig`).
+`ms_org` implementa **arquitectura hexagonal / Clean Architecture (puertos y adaptadores) por convención de carpetas**/módulos Gradle (igual que `ms_iam`). El dominio (`domain/model`, `domain/usecase`) no importa Spring, JPA ni clases de `infrastructure/*`; toda la orquestación de beans se realiza en `applications/app-service` (`UseCaseConfig`).
 
 ```mermaid
 flowchart TB

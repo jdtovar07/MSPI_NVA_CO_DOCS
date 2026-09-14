@@ -64,7 +64,6 @@ A partir del código y la documentación (`docs/README.md`, `docs/openapi.yaml`)
 | Base de datos desarrollo | H2 en memoria | `application.yaml`: `jdbc:h2:mem:iam` |
 | Base de datos producción | PostgreSQL | `runtimeOnly 'org.postgresql:postgresql'` en `app-service/build.gradle` |
 | Gestión de secretos | Infisical SDK 3.0.2 | `com.infisical:sdk:3.0.2` |
-| Secrets alternos | AWS Secrets Manager Sync (Bancolombia) 4.4.33 | `com.github.bancolombia:aws-secrets-manager-sync:4.4.33` |
 | Resiliencia | Resilience4j Spring Boot 3, versión 2.3.0 | `rest-consumer/build.gradle` |
 | Observabilidad | Micrometer + Prometheus registry | `micrometer-registry-prometheus` en `api-rest/build.gradle` |
 | TOTP (2FA) | java-otp 0.4.0 + commons-codec 1.16.0 | `jpa-repository/build.gradle` |
@@ -78,7 +77,7 @@ A partir del código y la documentación (`docs/README.md`, `docs/openapi.yaml`)
 
 ## 6. Estructura del proyecto (multi-módulo Gradle)
 
-`settings.gradle` define 8 módulos siguiendo arquitectura hexagonal (Clean Architecture, sin el plugin `co.com.bancolombia.cleanArchitecture` que aparece comentado en `build.gradle`, es decir, la estructura hexagonal se aplica manualmente vía convención de carpetas):
+`settings.gradle` define 8 módulos siguiendo **arquitectura hexagonal / Clean Architecture (puertos y adaptadores) por convención de carpetas**:
 
 ```
 MsIam (rootProject)

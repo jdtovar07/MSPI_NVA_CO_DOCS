@@ -366,7 +366,7 @@ domain/usecase             → depende de domain/model
 domain/model                sin dependencias (POJOs + Lombok + java.time/util)
 ```
 
-El plugin oficial de Clean Architecture de Bancolombia (`co.com.bancolombia.cleanArchitecture`) aparece **referenciado pero comentado** en el `build.gradle` raíz; la estructura multi-módulo sigue esa convención manualmente (`Documentacion-Backend/ms_iam/03-Diseno.md` §1). Los ocho microservicios activos (`ms_iam`, `ms_org`, `ms_catalog`, `ms_evidence`, `ms_assessment`, `ms_reporting`, `ms_audit`, `ms_admin`) reproducen el mismo layout hexagonal Gradle.
+La estructura multi-módulo Gradle aplica **arquitectura hexagonal / Clean Architecture (puertos y adaptadores) por convención de carpetas** (`domain/model`, `domain/usecase`, `infrastructure/*`, `applications/app-service`) — `Documentacion-Backend/ms_iam/03-Diseno.md` §1. Los ocho microservicios activos (`ms_iam`, `ms_org`, `ms_catalog`, `ms_evidence`, `ms_assessment`, `ms_reporting`, `ms_audit`, `ms_admin`) reproducen el mismo layout.
 
 ### 7.2 Separación catálogo vs. ejecución (patrón de snapshot)
 
@@ -390,7 +390,7 @@ Implementado mediante el campo `row_version` en `assessment.assessment` (increme
 | Persistencia | Spring Data JPA + Hibernate; H2 en memoria (dev), PostgreSQL 16-alpine (producción/docker) | Cada microservicio mapea entidades JPA solo sobre su propio esquema (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`, `audit`, `admin`), aunque la instancia física de PostgreSQL es compartida |
 | Base de datos | PostgreSQL, esquema `MSPI` particionado por microservicio | Permite claves foráneas físicas entre esquemas (integridad referencial cruzada) mientras conserva la propiedad lógica de cada tabla por microservicio; documentado como decisión reversible hacia *database-per-service* si se requiere en el futuro (`DB-MER.txt` línea 198: *"can be relaxed if DB-per-service later"*) |
 | 2FA/TOTP | java-otp 0.4.0 + commons-codec | Módulo `jpa-repository` de `ms_iam`; secretos Base32 en `iam.user_totp`, desacoplados de Keycloak (Keycloak no almacena este secreto) |
-| Gestión de secretos | Infisical SDK 3.0.2 (alterno: AWS Secrets Manager Sync) | `InfisicalConfig` en `applications/app-service` de `ms_iam`; evita credenciales de BD en texto plano en el repositorio |
+| Gestión de secretos | Infisical SDK 3.0.2 | `InfisicalConfig` en `applications/app-service` de `ms_iam`; evita credenciales de BD en texto plano en el repositorio |
 | Resiliencia | Resilience4j Spring Boot 3 (2.3.0) | Aplicado en el módulo `rest-consumer` de `ms_iam` para llamadas salientes a Keycloak y a `ms_org` |
 | Observabilidad backend | Micrometer + Prometheus registry | Expuesto en `api-rest` de cada microservicio activo |
 | Contenerización backend | Docker Compose (`mspi-apps`), red externa `mspi-net` | Orquesta los 8 microservicios activos con `depends_on`/`healthcheck` declarados |

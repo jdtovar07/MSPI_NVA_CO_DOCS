@@ -27,7 +27,6 @@
 | TOTP | `com.eatthepath:java-otp` | 0.4.0 | `jpa-repository` |
 | Codificación Base32 | `commons-codec:commons-codec` | 1.16.0 | `jpa-repository` |
 | Secretos | `com.infisical:sdk` | 3.0.2 | `app-service` |
-| Secretos (alterno) | `com.github.bancolombia:aws-secrets-manager-sync` | 4.4.33 | `app-service` |
 | Boilerplate | `org.projectlombok:lombok` | 1.18.42 | todos (`compileOnly`/`annotationProcessor`) |
 | Logging | `org.slf4j:slf4j-api` | gestionada por BOM | `service`, `brevo-sender` |
 | Pruebas | `spring-boot-starter-test`, `spring-boot-starter-webmvc-test:4.0.2`, `spring-security-test` | — | ver `05-Pruebas.md` |

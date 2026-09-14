@@ -11,7 +11,7 @@
 
 `ms_iam` implementa **arquitectura hexagonal (puertos y adaptadores) / Clean Architecture**, materializada como un **build multi-módulo de Gradle** (no solo como convención de paquetes dentro de un único módulo): cada capa es un subproyecto Gradle independiente con su propio `build.gradle` y sus propias dependencias declaradas, lo cual impone físicamente la regla de dependencia (el dominio no puede depender de infraestructura porque ni siquiera tiene esa dependencia en el classpath de compilación).
 
-Aunque el `build.gradle` raíz referencia (comentado) el plugin `co.com.bancolombia.cleanArchitecture`, la estructura de módulos sigue manualmente esa misma convención (`domain/model`, `domain/usecase`, `infrastructure/driven-adapters/*`, `infrastructure/entry-points/*`, `applications/app-service`), típica de los arquetipos de Bancolombia para microservicios Java/Spring.
+La estructura de módulos sigue la convención hexagonal (`domain/model`, `domain/usecase`, `infrastructure/driven-adapters/*`, `infrastructure/entry-points/*`, `applications/app-service`) aplicada por carpetas y subproyectos Gradle, sin generadores de arquetipo.
 
 **Regla de dependencia observada:**
 
