@@ -1,7 +1,6 @@
 # mf_evidence — Mantenimiento
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_evidence`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Lineamientos de mantenimiento correctivo, preventivo y evolutivo, gestión de versiones, monitoreo, manejo de errores en frontend y mejoras futuras evidenciadas para el microfrontend `mf_evidence`.
 
 ---
@@ -84,13 +83,11 @@ No se identificó un **error boundary global** de Angular (`ErrorHandler` person
 - [ ] Definir estrategia de versionado semántico y `CHANGELOG.md`.
 - [ ] Evaluar instrumentación de logs/observabilidad centralizada acorde al contexto ISO 27001 de MSPI, especialmente para operaciones de carga/descarga y cambio de estado de evidencias.
 
-
-## Changelog operativo (2026-09-04) — sin UUID en subtítulos
+## Changelog operativo — sin UUID en subtítulos
 
 - Levantamiento documental muestra nombre/entidad (`assessmentLabel`), no el UUID de la evaluación.
 - Autocomplete de evaluación humaniza el estado (Borrador, En diligenciamiento, …).
 
-
-## Changelog operativo (2026-09-04) — excluir evaluaciones en eliminación
+## Changelog operativo — excluir evaluaciones en eliminación
 
 - El selector de evidencias usa `excludePendingDeletion=true` y filtra `pendingDeletion`.

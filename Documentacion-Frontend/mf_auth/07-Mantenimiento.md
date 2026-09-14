@@ -1,7 +1,6 @@
 # mf_auth — Mantenimiento
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_auth`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Lineamientos de mantenimiento correctivo, preventivo y evolutivo, gestión de versiones, monitoreo, manejo de errores en frontend y mejoras futuras evidenciadas para el microfrontend `mf_auth`.
 
 ---

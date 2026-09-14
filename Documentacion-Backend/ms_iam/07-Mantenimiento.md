@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_iam` |
-| Fecha del documento | 2026-08-18 |
 | Alcance | Lineamientos de mantenimiento correctivo, preventivo y evolutivo del microservicio `ms_iam`, basados en lo observado en el código, la configuración y la documentación del repositorio |
 
 ---

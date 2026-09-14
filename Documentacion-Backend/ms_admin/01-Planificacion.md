@@ -4,7 +4,6 @@
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_admin` |
 | Sistema | MSPI (Modelo de Seguridad y Privacidad de la Información — ISO/IEC 27001) |
-| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
 | Estado | Activo |
 | Alcance | Fase de planificación del microservicio `ms_admin` (configuración global, puerto **8089**, esquema PostgreSQL `admin`) |
 

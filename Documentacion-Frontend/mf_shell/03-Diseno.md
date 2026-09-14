@@ -1,7 +1,6 @@
 # mf_shell — Diseño
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_shell`
-**Fecha del documento:** 2026-08-18
 **Fuente:** código fuente (`src/app/**`), `angular.json`, `package.json`, `docs/ARQUITECTURA.md`, `docs/DIAGRAMAS.md`, `docs/INTEGRACION-SHELL.md`.
 
 ---

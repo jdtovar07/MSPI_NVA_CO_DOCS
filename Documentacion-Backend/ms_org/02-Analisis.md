@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_org` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Requerimientos funcionales y no funcionales, reglas de negocio, actores y casos de uso reales del microservicio `ms_org`, extraídos del código (`domain/usecase`, `domain/model`, adaptadores) y de `docs/openapi.yaml` / `docs/MVP-MSPI-CONTRATOS-Y-MER.md` |
 
 ---

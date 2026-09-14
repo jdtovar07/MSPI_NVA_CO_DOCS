@@ -1,7 +1,6 @@
 # mf_assessment — Mantenimiento
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_assessment`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Consideraciones de mantenimiento, control de versiones, monitoreo y mejoras futuras del microfrontend de evaluaciones de madurez (`mf_assessment`), basadas en evidencia real del repositorio.
 
 ---
@@ -84,14 +83,12 @@ El proyecto usa Angular 19 con builder `application` (esbuild/Vite internamente)
 
 Estas mejoras se formulan como recomendaciones derivadas del análisis del código y la documentación existente; ninguna de ellas está implementada en el estado actual del repositorio.
 
-
-## Changelog operativo (2026-09-04) — Score / Calificación en listados
+## Changelog operativo — Score / Calificación en listados
 
 - Lista de Evaluaciones: mapea `score` / `overallScore` / `averageValue` → `a.score` (`mapAssessmentListScore`).
 - Mis evaluaciones asignadas: columna Calificación usa `overallScore` del API (ahora poblado por el backend) formateado como %.
 
-
-## Changelog operativo (2026-09-04) — modal de confirmación y recuperación
+## Changelog operativo — modal de confirmación y recuperación
 
 - Componente compartido `shared/confirm-modal` sustituye `window.confirm` (escala, banco de preguntas, áreas).
 - Botón Recuperar naranja; confirma con días restantes antes de cancelar la eliminación.

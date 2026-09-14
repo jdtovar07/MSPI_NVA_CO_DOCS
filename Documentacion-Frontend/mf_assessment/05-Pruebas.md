@@ -1,7 +1,6 @@
 # mf_assessment — Pruebas
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_assessment`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Estado real de pruebas automatizadas del microfrontend de evaluaciones de madurez (`mf_assessment`), verificado sobre el repositorio.
 
 ---

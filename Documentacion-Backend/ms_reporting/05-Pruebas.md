@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_reporting` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Frameworks de prueba, cobertura real y estado de la suite de pruebas del microservicio `ms_reporting` |
 
 ---

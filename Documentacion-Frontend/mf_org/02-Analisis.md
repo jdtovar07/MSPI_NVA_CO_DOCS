@@ -1,7 +1,6 @@
 # mf_org — Análisis
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_org`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Requerimientos funcionales y no funcionales, reglas de negocio, actores, casos de uso y flujos de usuario del microfrontend de gestión organizacional, derivados de `docs/RUTAS-Y-PANTALLAS.md`, `docs/FLUJOS.md` y del código fuente real en `src/app`.
 
 ---

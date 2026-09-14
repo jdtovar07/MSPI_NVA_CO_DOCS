@@ -4,7 +4,6 @@
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_catalog` |
 | Sistema | MSPI (Modelo de Seguridad y Privacidad de la Información — ISO/IEC 27001) |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Fase de planificación del microservicio `ms_catalog` dentro de la arquitectura de microservicios MSPI |
 
 ---

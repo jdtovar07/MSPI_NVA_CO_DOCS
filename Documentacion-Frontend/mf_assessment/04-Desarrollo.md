@@ -1,7 +1,6 @@
 # mf_assessment — Desarrollo
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_assessment`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Fase de desarrollo/implementación del microfrontend de evaluaciones de madurez (`mf_assessment`), con evidencia directa de código fuente real (`src/app/**`).
 
 ---

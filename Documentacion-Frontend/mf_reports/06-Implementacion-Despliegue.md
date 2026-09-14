@@ -1,7 +1,6 @@
 # mf_reports — Implementación y Despliegue
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_reports`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Proceso de *build*, contenerización, configuración de Nginx, variables de entorno y puesta en marcha real del microfrontend, verificados en `package.json`, `angular.json`, `deployment/Dockerfile` y `deployment/nginx.conf`.
 
 ---

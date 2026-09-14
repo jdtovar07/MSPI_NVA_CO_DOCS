@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_audit` |
-| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
 | Estado | Activo |
 | Alcance | Requerimientos funcionales/no funcionales, reglas de negocio y casos de uso de `ms_audit` |
 

@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_evidence` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Mantenimiento, versionamiento, monitoreo y mejoras futuras del microservicio `ms_evidence` |
 
 ---

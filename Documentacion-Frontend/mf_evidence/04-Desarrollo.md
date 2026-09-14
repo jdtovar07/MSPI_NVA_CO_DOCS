@@ -1,7 +1,6 @@
 # mf_evidence — Desarrollo
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_evidence`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Implementación real del microfrontend: manejo de estado, servicios, componentes, patrones aplicados e integración con la API backend (`ms_evidence`), basado en `docs/API-INTEGRACION.md` y en el código fuente de `src/app`.
 
 ---

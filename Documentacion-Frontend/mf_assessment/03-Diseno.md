@@ -1,7 +1,6 @@
 # mf_assessment — Diseño
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_assessment`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Fase de diseño arquitectónico del microfrontend de evaluaciones de madurez (`mf_assessment`), basada en la estructura real de `src/app/**` y en `docs/ARQUITECTURA.md` / `docs/DIAGRAMAS.md`.
 
 ---

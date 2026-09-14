@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_reporting` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Mantenimiento, gestión de versiones, observabilidad y mejoras futuras del microservicio `ms_reporting` |
 
 ---
@@ -57,8 +56,7 @@
 - Evaluar la integración real de `ms_catalog` (hoja "Escala") si el negocio la retoma, o eliminar `CatalogGateway`/`CatalogGatewayAdapter` si se confirma que quedó fuera de alcance definitivamente.
 - Crear el `bitbucket-pipelines.yml` faltante, alineado con el patrón usado por los demás microservicios del repositorio (`Build App` + `Deploy to Railway` sobre rama `dev`), incorporando al menos la ejecución de `./gradlew test` dado el estado actual de cobertura.
 
-
-## 6. Changelog operativo (2026-09-04) — nombres de descarga legibles
+## 6. Changelog operativo — nombres de descarga legibles
 
 - `DownloadReportJobUseCase` regenera el `Content-Disposition` con slug de entidad (`ReportArtifactDescriptor`) si el nombre almacenado contiene UUID (artefactos antiguos).
 - Los jobs nuevos ya guardan el archivo con slug (sin UUID de evaluación ni jobId).

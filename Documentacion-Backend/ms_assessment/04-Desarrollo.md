@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_assessment` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Descripción de la implementación real: tecnologías, estructura de código por capa, patrones aplicados y funcionalidades desarrolladas |
 
 ---

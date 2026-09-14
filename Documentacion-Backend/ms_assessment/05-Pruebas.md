@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_assessment` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Estrategia de pruebas real del microservicio `ms_assessment`: frameworks, estructura, tipos de prueba evidenciados y configuración de cobertura |
 
 ---

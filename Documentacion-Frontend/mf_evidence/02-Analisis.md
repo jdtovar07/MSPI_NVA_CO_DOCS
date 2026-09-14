@@ -1,7 +1,6 @@
 # mf_evidence — Análisis
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_evidence`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Requerimientos funcionales y no funcionales, reglas de negocio, actores, casos de uso y flujos de usuario del microfrontend de evidencias documentales, derivados de `docs/RUTAS-Y-PANTALLAS.md`, `docs/FLUJOS.md`, `docs/API-INTEGRACION.md` y del código fuente real en `src/app`.
 
 ---

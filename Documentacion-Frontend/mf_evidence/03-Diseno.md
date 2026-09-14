@@ -1,7 +1,6 @@
 # mf_evidence — Diseño
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_evidence`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Arquitectura de software, estructura real de carpetas, componentes principales, integración con `mf_shell` y decisiones técnicas del microfrontend `mf_evidence`, contrastando la documentación preexistente (`docs/ARQUITECTURA.md`, `docs/DIAGRAMAS.md`, `docs/INTEGRACION-SHELL.md`) con la evidencia directa del código fuente.
 
 ---

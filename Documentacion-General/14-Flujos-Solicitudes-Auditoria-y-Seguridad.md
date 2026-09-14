@@ -2,7 +2,6 @@
 
 | Campo | Valor |
 |---|---|
-| Última revisión cruzada con código | **2026-10-19** |
 | Fuentes | `MSPI_NVA_CO_MR_BACK/ms_iam`, `ms_assessment`, `ms_catalog`, `ms_audit`, `ms_admin`; `Documentacion-Backend/*`; `legal/POLITICA-PRIVACIDAD-MSPI.md`; `wiki/Seguridad.md` |
 
 > Cada afirmación cita el artefacto verificado. Donde falte evidencia aparece **TODO**.

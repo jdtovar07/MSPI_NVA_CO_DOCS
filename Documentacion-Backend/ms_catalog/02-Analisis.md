@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_catalog` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Requerimientos funcionales/no funcionales, reglas de negocio y actores del microservicio `ms_catalog`, derivados del código real (`domain/usecase`, `CatalogApi`, `schema.sql`, `docs/openapi.yaml`) |
 
 ---

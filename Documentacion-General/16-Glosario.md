@@ -2,7 +2,6 @@
 
 | Campo | Valor |
 |---|---|
-| Última revisión | **2026-10-19** |
 | Fuentes | `02-Modelo-de-Dominio.md`, `14-Flujos-…`, SDLC backend/frontend, código verificado |
 
 Términos usados de forma consistente en la documentación. No sustituye normas ISO/NIST; solo el uso **en este proyecto**.

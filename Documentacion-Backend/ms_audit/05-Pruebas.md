@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_audit` |
-| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
 | Estado | Activo |
 | Alcance | Pruebas unitarias existentes y huecos verificados en el árbol `src/test` |
 

@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_iam` |
-| Fecha del documento | 2026-08-18 |
 | Alcance | Requerimientos funcionales/no funcionales, reglas de negocio, actores y casos de uso del microservicio `ms_iam`, inferidos directamente del código fuente y `docs/openapi.yaml` |
 
 ---

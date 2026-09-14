@@ -1,7 +1,6 @@
 # mf_reports — Desarrollo
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_reports`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Implementación real del microfrontend: manejo de estado, servicios, componentes, integración con APIs backend y funcionalidades desarrolladas, con referencias directas a archivos y fragmentos de código fuente.
 
 ---

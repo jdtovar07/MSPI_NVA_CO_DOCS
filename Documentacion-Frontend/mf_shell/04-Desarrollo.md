@@ -1,7 +1,6 @@
 # mf_shell — Desarrollo
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_shell`
-**Fecha del documento:** 2026-08-18
 **Fuente:** código fuente real (`src/app/**`).
 
 ---
@@ -135,7 +134,7 @@ Rutas protegidas con `AUDIT_VIEW`:
 | `/audit/requests` | `AuditRequestsPageComponent` | Bandeja unificada de solicitudes |
 | `/audit/requests/:requestNumber` | `AuditRequestDetailPageComponent` | Ficha por radicado |
 
-**Eventos** (`ApiAuditRepository` → `msAuditUrl` :8088): `GET /audit/events` con filtros `q`, `eventType`, `entityType`, `dateFrom`, `dateTo`, `actor`, `requestNumber`, paginación. Etiquetas en español vía `AUDIT_EVENT_TYPE_LABELS` / `AUDIT_ENTITY_TYPE_LABELS` (sin enums crudos ni UUID en pantalla). El radicado se enlaza a la ficha cuando coincide con `SOL-ELIM|AMPL|CAT|PWD-*`. Última revisión cruzada: **2026-10-19**.
+**Eventos** (`ApiAuditRepository` → `msAuditUrl` :8088): `GET /audit/events` con filtros `q`, `eventType`, `entityType`, `dateFrom`, `dateTo`, `actor`, `requestNumber`, paginación. Etiquetas en español vía `AUDIT_EVENT_TYPE_LABELS` / `AUDIT_ENTITY_TYPE_LABELS` (sin enums crudos ni UUID en pantalla). El radicado se enlaza a la ficha cuando coincide con `SOL-ELIM|AMPL|CAT|PWD-*`. 
 
 **Ficha** (`AuditRequestDetailPageComponent` + `GetAuditRequestDetailUseCase`): `GET /audit/requests/{requestNumber}`. Secciones: cabecera (radicado, tipo, estado con color, entidad), solicitud (solicitante, fecha, justificación, adjuntos con descarga vía evidencias), decisión (responsable, resultado, motivo, fechas / días / borrado programado) y **línea de tiempo** ascendente (etiqueta legible + actor + fecha). Sin UUID ni enums crudos.
 

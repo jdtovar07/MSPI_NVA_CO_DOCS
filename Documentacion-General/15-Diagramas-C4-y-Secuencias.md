@@ -2,7 +2,6 @@
 
 | Campo | Valor |
 |---|---|
-| Última revisión cruzada con código | **2026-10-19** |
 | Fuentes | `01-Arquitectura-General-del-Sistema.md`, `14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`, `MER-MSPI.sql`, código en `MSPI_NVA_CO_MR_BACK` / `MSPI_NVA_CO_MR_FRONT` |
 
 > Diagramas en **Mermaid** (renderizan en GitHub y en la wiki MkDocs). No inventan componentes: solo lo verificado en código/docs.

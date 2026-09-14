@@ -14,7 +14,6 @@ Este repositorio **no contiene código fuente**. Agrupa la propuesta de grado, e
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Programa** | Ingeniería de Sistemas |
 | **Institución** | CORHUILA |
-| **Última revisión documental** | 2026-10-19 (DOCS-1 / DOCS-2) |
 
 ---
 

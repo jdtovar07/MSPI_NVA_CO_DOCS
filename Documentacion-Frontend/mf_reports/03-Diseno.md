@@ -1,7 +1,6 @@
 # mf_reports — Diseño
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_reports`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Arquitectura real del microfrontend, estructura de carpetas, componentes principales, diagramas y decisiones técnicas, verificadas directamente en el código fuente de `src/app`.
 
 ---

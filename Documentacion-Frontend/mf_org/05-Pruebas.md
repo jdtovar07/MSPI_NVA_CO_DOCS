@@ -1,7 +1,6 @@
 # mf_org — Pruebas
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_org`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Estrategia de pruebas del microfrontend `mf_org`: frameworks configurados, archivos de prueba existentes, tipos de prueba evidenciados y validación de requerimientos.
 
 ---

@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_org` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Arquitectura hexagonal real, estructura de paquetes, modelo de datos, diagramas y decisiones técnicas del microservicio `ms_org` |
 
 ---

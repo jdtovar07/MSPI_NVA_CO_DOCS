@@ -1,7 +1,6 @@
 # mf_shell — Implementación y Despliegue
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_shell`
-**Fecha del documento:** 2026-08-18
 **Fuente:** `package.json`, `angular.json`, `deployment/Dockerfile`, `deployment/nginx.conf`, `.env.example`, `.dockerignore`, `docs/README.md`, y equivalentes genéricos en `MSPI_NVA_CO_MR_FRONT/deployment/`.
 
 ---

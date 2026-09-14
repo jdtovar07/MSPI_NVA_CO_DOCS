@@ -4,7 +4,6 @@
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_audit` |
 | Sistema | MSPI (Modelo de Seguridad y Privacidad de la Información — ISO/IEC 27001) |
-| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
 | Estado | Activo |
 | Alcance | Fase de planificación del microservicio `ms_audit` (bitácora central, puerto **8088**, esquema PostgreSQL `audit`) |
 

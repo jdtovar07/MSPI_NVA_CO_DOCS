@@ -6,7 +6,6 @@
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Programa** | Ingeniería de Sistemas |
 | **Documento** | Objetivos general y específicos, versión de referencia rápida para el asesor/profesor |
-| **Fecha** | 2026-08-27 |
 
 > Este documento es un extracto de referencia rápida de los objetivos del proyecto. La versión formal, integrada con planteamiento del problema, justificación y marco referencial completo, está en [`Propuesta-grado/Propuesta_de_Grado_MSPI.docx`](../Propuesta-grado/Propuesta_de_Grado_MSPI.docx) (plantilla institucional CORHUILA). El sustento de evidencia detallado de cada objetivo está en [`Documentacion-investigacion/Documento-Investigacion.md`](../Documentacion-investigacion/Documento-Investigacion.md), secciones 5 y 10.
 
@@ -40,8 +39,8 @@
 
 Para que el profesor tenga claridad de frontera de alcance, se declara explícitamente qué **no** se implementó dentro del perímetro funcional actual, aunque la arquitectura lo contempla:
 
-- **Administración general del sistema** — microservicio `ms_admin` (:8089): configuración global `admin.system_config` (+ historial), consumida por `ms_assessment`/`ms_catalog` vía `/internal/system/config` (`Documentacion-Backend/ms_admin/`, revisión 2026-10-19).
-- **Auditoría transversal consolidada** — microservicio `ms_audit` (:8088): bitácora `audit.audit_log`, ingesta S2S y consulta admin con timeline por radicado (`Documentacion-Backend/ms_audit/`, revisión 2026-10-19).
+- **Administración general del sistema** — microservicio `ms_admin` (:8089): configuración global `admin.system_config` (+ historial), consumida por `ms_assessment`/`ms_catalog` vía `/internal/system/config` (`Documentacion-Backend/ms_admin/`).
+- **Auditoría transversal consolidada** — microservicio `ms_audit` (:8088): bitácora `audit.audit_log`, ingesta S2S y consulta admin con timeline por radicado (`Documentacion-Backend/ms_audit/`).
 
 Ambos se documentan en detalle en `Documentacion-Backend/ms_admin/` y `Documentacion-Backend/ms_audit/`.
 

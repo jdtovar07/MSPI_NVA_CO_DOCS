@@ -5,7 +5,6 @@
 | **Proyecto** | MSPI: Sistema de Gestión de Seguridad y Privacidad de la Información basado en ISO/IEC 27001 |
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Programa** | Ingeniería de Sistemas |
-| **Fecha** | 2026-08-27 (índice inicial); extract `ms_audit`/`ms_admin` 2026-10-11; **DOCS-1/DOCS-2** 2026-10-19 (8 MS, diagramas, glosario, changelog, wiki) |
 
 Este índice es el punto de entrada único de toda la documentación generada para el proyecto de grado. Está pensado para que el profesor/asesor pueda revisar el trabajo de lo general a lo particular, sin necesidad de explorar el código fuente directamente.
 
@@ -37,7 +36,7 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`05-Manual-Despliegue.md`](05-Manual-Despliegue.md) | Cómo levantar el stack completo en Docker paso a paso |
 | [`06-Guia-Pruebas-Funcionales.md`](06-Guia-Pruebas-Funcionales.md) | Secuencia de flujos funcionales end-to-end para demostrar el sistema |
 | [`07-Manual-Usuario.md`](07-Manual-Usuario.md) | Qué puede hacer cada rol, en lenguaje de usuario final |
-| [`08-Referencia-API.md`](08-Referencia-API.md) | Índice consolidado de la API de los 8 microservicios (rutas verificadas contra `*Api.java`, 2026-10-19) |
+| [`08-Referencia-API.md`](08-Referencia-API.md) | Índice consolidado de la API de los 8 microservicios (rutas verificadas contra `*Api.java`) |
 | [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md) | Radicados SOL-*, auditoría central, reenvío de contraseña, soft-delete, postura de seguridad y privacidad |
 | [`15-Diagramas-C4-y-Secuencias.md`](15-Diagramas-C4-y-Secuencias.md) | C4 contexto/contenedores (8 MS + 6 MF), ER conceptual, secuencias evaluación / SOL-* / reporte / login+2FA (Mermaid) |
 | [`16-Glosario.md`](16-Glosario.md) | Vocabulario de dominio (PHVA, radicado, borrado lógico, gracia, sweeper, iframe bridge, …) |

@@ -1,7 +1,6 @@
 # mf_reports — Mantenimiento
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_reports`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Consideraciones de mantenimiento, control de versiones, monitoreo y mejoras futuras del microfrontend `mf_reports`, basadas en el estado real observado del repositorio.
 
 ---
@@ -69,14 +68,12 @@ Cualquier cambio en `mf_reports` debe considerar su impacto en:
 
 `mf_reports` es, de los siete documentos de esta serie, el que presenta menor superficie de mantenimiento en términos de líneas de código (17 archivos TypeScript) y de dependencias externas, pero concentra su complejidad en la tolerancia a variantes del contrato de `ms_assessment` y en el flujo de *polling*/descarga asíncrona. La ausencia de pruebas automatizadas y de configuración de entorno en tiempo de ejecución son, junto con la falta de una pantalla para reportes comparativos ya soportados a nivel de dominio, los tres puntos de mayor prioridad para la evolución futura del microfrontend.
 
-
-## Changelog operativo (2026-09-04) — UI sin códigos internos
+## Changelog operativo — UI sin códigos internos
 
 - Etiquetas en español para tipo/estado de reporte y estado de evaluación (`report-ui-labels.ts`).
 - No se muestran Job id, UUIDs ni enums crudos en Exportar reportes; mensajes de error se limpian de UUID.
 - Descarga: si el header trae UUID, se fuerza el nombre con slug de entidad.
 
-
-## Changelog operativo (2026-09-04) — excluir evaluaciones en eliminación
+## Changelog operativo — excluir evaluaciones en eliminación
 
 - El selector de reportes usa `excludePendingDeletion=true` y filtra `pendingDeletion`.

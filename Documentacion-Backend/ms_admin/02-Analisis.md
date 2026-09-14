@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_admin` |
-| Fecha del documento / Última revisión cruzada con código | **2026-10-19** |
 | Estado | Activo |
 | Alcance | Requerimientos, reglas de negocio y casos de uso de `ms_admin` |
 

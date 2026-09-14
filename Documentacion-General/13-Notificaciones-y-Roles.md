@@ -2,7 +2,6 @@
 
 | Campo | Valor |
 |---|---|
-| Fecha | 2026-10-11 |
 | Alcance | Campanita mf_shell + `POST /internal/notifications`; normalización de roles sin crear roles nuevos |
 
 ---

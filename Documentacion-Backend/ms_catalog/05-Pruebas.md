@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_catalog` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Estrategia de pruebas real del microservicio `ms_catalog`: frameworks, estructura, tipos de prueba evidenciados y configuración de cobertura |
 
 ---

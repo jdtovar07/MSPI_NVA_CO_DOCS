@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_evidence` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Build, Dockerfile, variables de entorno, CI/CD, infraestructura y configuración de almacenamiento de `ms_evidence` |
 
 ---

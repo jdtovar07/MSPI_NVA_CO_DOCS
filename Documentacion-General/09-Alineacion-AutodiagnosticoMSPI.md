@@ -5,7 +5,6 @@
 | **Proyecto** | MSPI: Sistema de Gestión de Seguridad y Privacidad de la Información |
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Documento** | Trazabilidad instrumento ↔ implementación, brechas detectadas, cambios aplicados y validación |
-| **Fecha** | 2026-10-08 |
 
 > Este documento consolida el análisis de alineación entre el **Instrumento de Identificación de la Línea Base de Seguridad MSPI** (archivo `AutodiagnosticoMSPI.xlsx`, tipo MinTIC, basado en ISO/IEC 27001:2022 + NIST CSF) y la plataforma implementada. Registra las brechas encontradas, las decisiones tomadas, los cambios aplicados (versión de catálogo **v2**) y la validación realizada.
 

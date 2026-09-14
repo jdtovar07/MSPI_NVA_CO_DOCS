@@ -1,6 +1,5 @@
 # Componente Investigativo — Proyecto de Grado MSPI
 
-**Fecha de elaboración del documento:** 2026-08-18
 **Autor:** [PENDIENTE: a completar por el autor]
 **Universidad / Programa académico:** [PENDIENTE: a completar por el autor]
 **Asesor / Director de trabajo de grado:** [PENDIENTE: a completar por el autor]
@@ -110,7 +109,7 @@ Derivados directamente de los ocho módulos funcionales documentados en `Histori
 
 ### 6.2 Fundamentos de arquitectura de software aplicados
 
-- **Arquitectura de microservicios:** estilo arquitectónico que descompone un sistema en servicios autónomos, desplegables de forma independiente y organizados alrededor de capacidades de negocio. El backend aplica este estilo con **ocho microservicios activos** (`ms_iam` 8082, `ms_org` 8083, `ms_assessment` 8084, `ms_catalog` 8085, `ms_evidence` 8086, `ms_reporting` 8087, `ms_audit` 8088, `ms_admin` 8089), cada uno con esquema PostgreSQL propio (`iam`…`admin`). La auditoría y la configuración global se extrajeron de `ms_iam` hacia `ms_audit`/`ms_admin` (migración documentada en `patch-audit-schema.sql` / `patch-admin-schema.sql`; revisión cruzada 2026-10-19).
+- **Arquitectura de microservicios:** estilo arquitectónico que descompone un sistema en servicios autónomos, desplegables de forma independiente y organizados alrededor de capacidades de negocio. El backend aplica este estilo con **ocho microservicios activos** (`ms_iam` 8082, `ms_org` 8083, `ms_assessment` 8084, `ms_catalog` 8085, `ms_evidence` 8086, `ms_reporting` 8087, `ms_audit` 8088, `ms_admin` 8089), cada uno con esquema PostgreSQL propio (`iam`…`admin`). La auditoría y la configuración global se extrajeron de `ms_iam` hacia `ms_audit`/`ms_admin` (migración documentada en `patch-audit-schema.sql` / `patch-admin-schema.sql`).
 - **Arquitectura hexagonal / Clean Architecture:** patrón que aísla el dominio de negocio de los detalles de infraestructura (framework web, ORM, proveedores externos) mediante puertos y adaptadores. Confirmado en el código real de `ms_iam`, cuyo `settings.gradle` define ocho módulos Gradle separando `domain/model`, `domain/usecase`, adaptadores de persistencia (`jpa-repository`), adaptadores REST salientes (`rest-consumer`), orquestación de casos de uso (`service`), adaptador de correo (`brevo-sender`), entrada REST (`api-rest`) y el módulo ejecutable (`app-service`) — aplicada "manualmente vía convención de carpetas" sin el plugin de Clean Architecture de Bancolombia (comentado en `build.gradle`), según documenta `Documentacion-Backend/ms_iam/01-Planificacion.md`, sección 6.
 - **Microfrontends:** extensión del principio de microservicios a la capa de presentación. El frontend define **seis** microfrontends (`mf_shell`, `mf_auth`, `mf_org`, `mf_assessment`, `mf_evidence`, `mf_reports`) en puertos 4200–4205. La composición **actual** es **iframe + `postMessage`** (`shell-iframe-bridge.ts` en `mf_shell`), verificada en los seis MF. Module Federation (mencionado en planes tempranos) se documenta solo como **evolución futura** (`docs/INTEGRACION-SHELL.md`; `Documentacion-General/15-Diagramas-C4-y-Secuencias.md`).
 - **Snapshot / versionado de catálogo vs. ejecución:** patrón de diseño de datos (documentado en `DBvsExcel.md`) que separa la definición versionable de un instrumento de evaluación (`catalog.*`) de la instancia congelada de una evaluación concreta (`assessment.*`), garantizando que actualizaciones futuras del instrumento no alteren evaluaciones históricas ya publicadas.
@@ -135,7 +134,7 @@ Derivados directamente de los ocho módulos funcionales documentados en `Histori
 | Observabilidad backend | Micrometer + Prometheus registry | `api-rest/build.gradle` |
 | Contenerización backend | `eclipse-temurin:21-jdk-alpine` (build) → `-jre-alpine` (runtime); `ms_reporting` usa `-jre-jammy` + LibreOffice | `deployment/Dockerfile`, `docker-config/` |
 | Framework frontend | Angular ^19.0.0 (standalone components), TypeScript ~5.6.0 (modo `strict`) | `Documentacion-Frontend/mf_auth/01-Planificacion.md`, `package.json` |
-| Composición de microfrontends | iframe + `postMessage` (`shell-iframe-bridge`); Module Federation = evolución futura | `INTEGRACION-SHELL.md`; `Documentacion-Frontend/mf_shell/03-Diseno.md`; DOCS-2 2026-10-19 |
+| Composición de microfrontends | iframe + `postMessage` (`shell-iframe-bridge`); Module Federation = evolución futura | `INTEGRACION-SHELL.md`; `Documentacion-Frontend/mf_shell/03-Diseno.md` |
 | UI / diseño | Angular Material + CDK, Tailwind CSS, `@ng-icons/lucide`, `ng2-charts`/Chart.js (gráficos NIST/PHVA) | `PLAN_TRABAJO_MSPI_v2.md` secciones 3.1, 5.1 |
 | Gestión de estado frontend | Angular Signals (`signal`, `computed`) para `AuthStore` y `AssessmentStateService` | `PLAN_TRABAJO_MSPI_v2.md` secciones 2.3, 5.6 |
 | Contenerización frontend | Node 22-alpine (build) + Nginx 1.27-alpine (runtime) | `Documentacion-Frontend/mf_auth/01-Planificacion.md` |
@@ -200,7 +199,7 @@ Con base en la estructura real del repositorio, el sistema construido comprende:
 
 ### 10.1 Backend — 8 microservicios activos
 
-| Microservicio | Puerto | Estado según evidencia (revisión 2026-10-19) |
+| Microservicio | Puerto | Estado según evidencia |
 |---|---|---|
 | `ms_iam` | 8082 | Activo — autenticación, 2FA/TOTP, usuarios/roles, solicitudes `SOL-PWD`, correo Brevo. |
 | `ms_org` | 8083 | Activo — CRUD de organizaciones, geografía, áreas base. |
@@ -230,7 +229,7 @@ La carpeta `MSPI_NVA_CO_MR_FRONT/Mspijdbs` documenta un **prototipo funcional ad
 1. **Cumplimiento funcional del objetivo central.** La evidencia documental (historias de usuario con fórmulas, pseudocódigo y ejemplos numéricos verificables) demuestra que el sistema fue diseñado para reproducir con fidelidad matemática exacta las reglas de cálculo del instrumento MSPI de MinTIC, incluyendo casos borde no triviales (exclusión de N/A sin distorsionar promedios, herencia directa en objetivos de un solo hijo, progresión acumulativa estricta del nivel de madurez, topes de ponderación PHVA).
 2. **Arquitectura coherente con el dominio.** La separación por microservicios sigue líneas de responsabilidad de negocio claras (identidad, organización, catálogo, evaluación, evidencia, reportes), y la arquitectura hexagonal verificada en `ms_iam` aísla el algoritmo de cálculo de los detalles de infraestructura, lo cual favorece la mantenibilidad y la prueba unitaria del motor de reglas.
 3. **Limitación técnica relevante — cobertura de pruebas automatizadas heterogénea.** El análisis piloto de `ms_iam` documenta uso de JUnit 5, Mockito, ArchUnit, JaCoCo y Pitest, sugiriendo disciplina de pruebas en el backend; en contraste, el análisis piloto de `mf_auth` documenta **ausencia total de pruebas automatizadas** (sin archivos `*.spec.ts` ni configuración Karma/Jest). Esta asimetría entre backend y frontend es una limitación técnica que debe discutirse en el documento final como riesgo de regresión no mitigado en la capa de presentación.
-4. **Alcance de auditoría y administración — implementado.** `ms_audit` y `ms_admin` están activos (8088/8089) tras la extracción desde `ms_iam`; la documentación SDLC se actualizó el 2026-10-19. Residual: enriquecer pruebas de API (MockMvc) y mantener SCR sincronizado con NVD/npm audit.
+4. **Alcance de auditoría y administración — implementado.** `ms_audit` y `ms_admin` están activos (8088/8089) tras la extracción desde `ms_iam`; la documentación SDLC refleja el código actual. Residual: enriquecer pruebas de API (MockMvc) y mantener SCR sincronizado con NVD/npm audit.
 5. **Composición de microfrontends — estándar actual.** Los 6 MF usan iframe + `postMessage` (`shell-iframe-bridge`). Module Federation permanece como evolución futura. Implicaciones vigentes: URLs de desarrollo y allowlist de orígenes locales (ver `mf_shell/03-Diseno.md`).
 6. **Discrepancia de versión normativa.** El instrumento fuente referencia ISO/IEC 27001:**2013**, mientras que la versión vigente de la norma es **2022**; esta decisión (mantener fidelidad al instrumento MinTIC de 2013 vs. actualizar a 2022) debe justificarse explícitamente como alcance académico del proyecto.
 7. **Código residual y artefactos de plantilla.** Se identificó, en la fase piloto de `mf_auth`, la convivencia de artefactos de una plantilla previa (React + Vite, *shadcn/ui*) que no forman parte del build de Angular real — riesgo de confusión documental que conviene depurar antes de una entrega académica final.

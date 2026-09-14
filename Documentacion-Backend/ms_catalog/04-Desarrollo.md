@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_catalog` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Implementación real del microservicio: librerías, patrones y funcionalidades concretas verificadas en el código |
 
 ---

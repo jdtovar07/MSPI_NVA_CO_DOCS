@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_catalog` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Arquitectura, estructura de paquetes, modelo de datos y diseño de API del microservicio `ms_catalog` |
 
 ---

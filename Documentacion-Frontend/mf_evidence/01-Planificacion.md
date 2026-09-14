@@ -1,7 +1,6 @@
 # mf_evidence — Planificación
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_evidence`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Fase de planificación del microfrontend de gestión de evidencias documentales (`mf_evidence`), componente del ecosistema **MSPI** (sistema de gestión de seguridad de la información alineado a ISO 27001), construido bajo una arquitectura de microfrontends Angular.
 
 ---

@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_iam` |
-| Fecha del documento | 2026-08-18 |
 | Alcance | Arquitectura, estructura de paquetes, modelo de datos y diseño de API del microservicio `ms_iam`, tal como está implementado en el código |
 
 ---

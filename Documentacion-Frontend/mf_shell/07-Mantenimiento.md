@@ -1,7 +1,6 @@
 # mf_shell — Mantenimiento
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_shell`
-**Fecha del documento:** 2026-08-18
 
 ---
 

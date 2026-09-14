@@ -2,7 +2,6 @@
 
 | Campo | Valor |
 |---|---|
-| Fecha | 2026-10-11 |
 | Alcance | Categorías territoriales oficiales del instrumento + soft-delete de escalas/bancos |
 
 ---

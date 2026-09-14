@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_org` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Implementación real: librerías, patrones de código y funcionalidades concretas verificadas en `ms_org` |
 
 ---

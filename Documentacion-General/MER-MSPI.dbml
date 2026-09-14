@@ -909,5 +909,4 @@ Table reporting.analytics_cache {
 // SCHEMA: audit (ms_audit :8088) — migrado desde iam.audit_log vía patch-audit-schema.sql
 // SCHEMA: admin (ms_admin :8089) — migrado desde iam.system_config(_history) vía patch-admin-schema.sql
 // assessment_id / actor_user_id / updated_by / changed_by: UUID sin FK (desacople)
-// Última revisión cruzada con código: 2026-10-19
 // ============================

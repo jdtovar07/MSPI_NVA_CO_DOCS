@@ -8,8 +8,6 @@
 | Estudiantes | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | Programa académico | Ingeniería de Sistemas |
 | Dirigido a | Profesor/asesor de trabajo de grado |
-| Fecha de elaboración | 2026-08-27 |
-| Última revisión cruzada con código | **2026-10-19** (DOCS-1: 8 MS; DOCS-2: diagramas, glosario, changelog, composición iframe) |
 | Fuentes primarias | `Documentacion-investigacion/Documento-Investigacion.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; los 6 `03-Diseno.md` de `Documentacion-Frontend/`; [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI); `Documentacion-General/MER-MSPI.sql`; `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` y `DBvsExcel.md`; `docker-compose.apps.yml` / `docker-compose.front.yml` / `docker-compose.yml` (postgres, keycloak) |
 
 > **Nota de trazabilidad.** Cada afirmación técnica de este documento cita, entre paréntesis, el archivo del repositorio en el que se verificó. Cuando un dato no pudo confirmarse en ningún documento fuente, se declara explícitamente como no verificado en lugar de asumirse.
@@ -139,7 +137,7 @@ flowchart TB
 | `ms_audit` | 8088 | **Activo** | Bitácora central `audit.audit_log`; consulta admin + ingesta S2S; timeline por `requestNumber` | `audit` |
 | `ms_admin` | 8089 | **Activo** | Configuración global `admin.system_config` (+ historial); plazos/gracia consumidos por assessment/catalog | `admin` |
 
-Fuente: `Documentacion-Backend/ms_admin/` y `Documentacion-Backend/ms_audit/` (SDLC 2026-10-19); `ms_audit/.../application.yaml` (`SERVER_PORT:8088`); `ms_admin/.../application.yaml` (`SERVER_PORT:8089`); migraciones `patch-audit-schema.sql` / `patch-admin-schema.sql`.
+Fuente: `Documentacion-Backend/ms_admin/` y `Documentacion-Backend/ms_audit/`; `ms_audit/.../application.yaml` (`SERVER_PORT:8088`); `ms_admin/.../application.yaml` (`SERVER_PORT:8089`); migraciones `patch-audit-schema.sql` / `patch-admin-schema.sql`.
 
 ### 3.1 Dependencias de arranque entre microservicios (Docker Compose)
 
@@ -429,7 +427,7 @@ Implementado mediante el campo `row_version` en `assessment.assessment` (increme
 
 Esta sección documenta con honestidad las brechas encontradas al consolidar los 14 documentos de diseño por componente, citando explícitamente dónde se evidenció cada hallazgo.
 
-1. **Extracción de auditoría y configuración desde `ms_iam` (cerrada en código).** `ms_audit` (:8088, esquema `audit`) y `ms_admin` (:8089, esquema `admin`) son microservicios hexagonales activos; la bitácora y el system config ya no viven en `iam.*` (migraciones `patch-audit-schema.sql` / `patch-admin-schema.sql`). Residual documental histórico en borradores antiguos — fuente actual: SDLC 2026-10-19 de ambos MS y [`14-Flujos-…`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md).
+1. **Extracción de auditoría y configuración desde `ms_iam` (cerrada en código).** `ms_audit` (:8088, esquema `audit`) y `ms_admin` (:8089, esquema `admin`) son microservicios hexagonales activos; la bitácora y el system config ya no viven en `iam.*` (migraciones `patch-audit-schema.sql` / `patch-admin-schema.sql`). Residual documental histórico en borradores antiguos — fuente actual: de ambos MS y [`14-Flujos-…`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md).
 
 2. **Composición por iframe (estándar actual) vs. Module Federation (evolución futura).** Los 6 MF usan iframe + `postMessage` (`shell-iframe-bridge`). El plan v2 mencionaba Module Federation; el código y `INTEGRACION-SHELL.md` fijan iframe como modelo vigente. Residual: URLs de desarrollo a `localhost:420X` y allowlist de orígenes local (`mf_shell/03-Diseno.md`).
 

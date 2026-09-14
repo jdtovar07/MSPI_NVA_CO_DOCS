@@ -1,7 +1,6 @@
 # mf_assessment — Planificación
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_assessment`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Fase de planificación del microfrontend de evaluaciones de madurez (`mf_assessment`), componente del ecosistema **MSPI** (sistema de gestión de seguridad de la información alineado a ISO 27001), construido bajo una arquitectura de microfrontends Angular.
 
 ---

@@ -1,7 +1,6 @@
 # mf_reports — Análisis
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_reports`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Requerimientos funcionales y no funcionales, reglas de negocio, actores, casos de uso y flujos del microfrontend `mf_reports`, derivados de la lectura directa del código fuente y de la documentación técnica preexistente en `docs/`.
 
 ---

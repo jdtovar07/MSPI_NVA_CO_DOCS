@@ -1,7 +1,6 @@
 # mf_auth — Implementación y Despliegue
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_auth`
-**Fecha del documento:** 2026-08-18
 **Alcance:** Proceso de build, contenerización, configuración de Nginx, variables de entorno y puesta en marcha local vs. en contenedor del microfrontend `mf_auth`.
 
 ---

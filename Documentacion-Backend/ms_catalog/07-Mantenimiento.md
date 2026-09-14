@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_catalog` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Mantenimiento, versionado, monitoreo y mejoras futuras del microservicio `ms_catalog`, basado en evidencia real del repositorio |
 
 ---

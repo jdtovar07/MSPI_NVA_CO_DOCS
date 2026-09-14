@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_iam` |
-| Fecha del documento | 2026-08-18 |
 | Alcance | Build, Dockerfile, variables de entorno, CI/CD y puesta en marcha local del microservicio `ms_iam` |
 
 ---

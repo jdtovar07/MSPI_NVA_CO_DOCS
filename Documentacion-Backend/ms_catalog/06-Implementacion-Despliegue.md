@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_catalog` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Build, contenerización, variables de entorno, CI/CD e infraestructura real del microservicio `ms_catalog` |
 
 ---

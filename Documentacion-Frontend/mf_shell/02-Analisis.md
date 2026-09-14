@@ -1,7 +1,6 @@
 # mf_shell — Análisis
 
 **Repositorio:** `MSPI_NVA_CO_MR_FRONT/mf_shell`
-**Fecha del documento:** 2026-08-18
 **Fuente:** código fuente (`src/app/**`) y documentación técnica en `docs/` (excluido `ARQUITECTURA-CLEAN-ARCHITECTURE.md`, descartado por inconsistente — ver `01-Planificacion.md`, sección 5).
 
 ---

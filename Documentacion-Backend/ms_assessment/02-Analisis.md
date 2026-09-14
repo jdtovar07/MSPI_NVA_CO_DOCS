@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_assessment` |
-| Fecha del documento | 2026-08-18 |
 | Alcance | Requerimientos funcionales/no funcionales, reglas de negocio y casos de uso implementados en `domain/usecase`, tal como están en el código |
 
 ---

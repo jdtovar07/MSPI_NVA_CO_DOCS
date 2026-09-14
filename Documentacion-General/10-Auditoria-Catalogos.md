@@ -5,7 +5,6 @@
 | **Proyecto** | MSPI: Sistema de Gestión de Seguridad y Privacidad de la Información |
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Documento** | Clasificación de los datos de referencia del sistema: qué ya es catálogo, qué está fuera por diseño y qué debería serlo |
-| **Fecha** | 2026-10-09 |
 
 > Barrido completo de los datos de referencia (lookup/paramétricos) que usa la plataforma, para responder a la observación de revisión sobre tener los catálogos en tablas y no reutilizar APIs externas.
 

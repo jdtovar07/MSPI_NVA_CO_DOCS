@@ -3,7 +3,6 @@
 | Campo | Valor |
 |---|---|
 | Repositorio | `MSPI_NVA_CO_MR_BACK/ms_assessment` |
-| Fecha del documento | 2026-08-19 |
 | Alcance | Lineamientos de mantenimiento correctivo, preventivo y evolutivo del microservicio `ms_assessment`, basados en lo observado en el código, la configuración y la documentación del repositorio |
 
 ---
@@ -87,15 +86,13 @@ No se encontró un archivo `MIGRATION-NOTES.md` en `ms_assessment/`. El DDL can�
 | Equipo de calidad / QA | Cerrar la brecha de pruebas en persistencia, adaptadores REST salientes y casos de uso de ciclo de vida; activar `check` en CI como *gate* real |
 | Equipo de infraestructura | Mantenimiento del pipeline (`bitbucket-pipelines.yml`), gestión de despliegue en Railway, coordinación de arranque con las 4 dependencias externas del compose (`ms-org`, `ms-catalog`, `ms-evidence`, `ms-iam`) |
 
-
-## 7. Changelog operativo (2026-09-04) — score en listados
+## 7. Changelog operativo — score en listados
 
 - `AssessmentResponse.score`: promedio del rollup (`overallAverage`) enriquecido en `ListAssessmentsUseCase`.
 - `MyAssignedAssessment.overallScore`: mismo promedio, calculado junto con `progress` en `ListMyAssignedAssessmentsUseCase` (antes quedaba `null` y la UI mostraba «—»).
 - OpenAPI: propiedad `score` documentada en `AssessmentResponse`.
 
-
-## 8. Changelog operativo (2026-09-04) — bloqueo en periodo de gracia
+## 8. Changelog operativo — bloqueo en periodo de gracia
 
 - `AssessmentResponse.pendingDeletion` / `deletionStatus` / `scheduledDeletionAt` enriquecidos en get/list.
 - `AssessmentAccessGuard` rechaza EDIT/REVIEW/workflow si hay eliminación APPROVED con fecha futura.
