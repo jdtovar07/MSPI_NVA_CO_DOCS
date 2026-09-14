@@ -9,15 +9,16 @@
 | Programa académico | Ingeniería de Sistemas |
 | Dirigido a | Profesor/asesor de trabajo de grado |
 | Fecha de elaboración | 2026-08-27 |
-| Fuentes primarias | [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI); [`MER-MSPI.sql`](MER-MSPI.sql); `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` (DBML v2.9); `DBvsExcel.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; `Historias_Usuario_MSPI_v2.md`; `Documentacion-investigacion/Documento-Investigacion.md` |
+| Última revisión cruzada con código | **2026-10-19** |
+| Fuentes primarias | [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI); [`MER-MSPI.sql`](MER-MSPI.sql); `patch-audit-schema.sql` / `patch-admin-schema.sql`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; `Documentacion-investigacion/Documento-Investigacion.md` |
 
 > **Nota de trazabilidad y alcance.** El MER interactivo está publicado en [dbdocs.io/jdtovar-2021a/MER-MSPI](https://dbdocs.io/jdtovar-2021a/MER-MSPI). La fuente SQL local es [`MER-MSPI.sql`](MER-MSPI.sql) (exportación del mismo modelo) y el diagrama está también en [`MER-MSPI.pdf`](MER-MSPI.pdf). Las entidades, atributos y relaciones citadas en este documento coinciden con ese MER y con `DB-MER.txt` / los `03-Diseno.md` de cada microservicio. Donde una relación cruza dos esquemas sin clave foránea física (lo habitual entre `assessment`/`evidence`/`reporting` hacia `org`/`catalog`), se indica explícitamente como "referencia lógica, sin FK física" — dato confirmado en los reportes de diseño de `ms_org`, `ms_assessment` y `ms_reporting`. Ninguna entidad de este documento fue inventada; donde la evidencia era insuficiente se declara así.
 
 ---
 
-## 1. Visión general: siete contextos delimitados (bounded contexts)
+## 1. Visión general: ocho contextos delimitados (bounded contexts)
 
-El sistema MSPI se organiza en **siete bounded contexts** con propietario claro de esquema de base de datos, más dos contextos previstos que hoy son placeholders:
+El sistema MSPI se organiza en **ocho bounded contexts** activos, cada uno con esquema PostgreSQL propio:
 
 ```mermaid
 flowchart LR
@@ -45,13 +46,21 @@ flowchart LR
         direction TB
         R1[ms_reporting :8087]
     end
-    subgraph Placeholders["Contextos previstos, no implementados"]
+    subgraph Auditoria["AUDITORÍA (audit)"]
         direction TB
-        P1[ms_admin]
-        P2[ms_audit]
+        U1[ms_audit :8088]
+    end
+    subgraph Administracion["ADMINISTRACIÓN (admin)"]
+        direction TB
+        D1[ms_admin :8089]
     end
 
     Identidad -.autentica/autoriza a todos.-> Evaluacion
+    Identidad -->|POST /internal/audit/events| Auditoria
+    Evaluacion -->|POST /internal/audit/events| Auditoria
+    Catalogo -->|POST /internal/audit/events| Auditoria
+    Evaluacion -->|GET /internal/system/config| Administracion
+    Catalogo -->|GET /internal/system/config| Administracion
     Organizacion -->|organization_id<br/>ref. lógica| Evaluacion
     Catalogo -->|template_version_id<br/>ref. lógica, snapshot| Evaluacion
     Evaluacion -->|assessment_id<br/>ref. lógica| Evidencia
@@ -62,20 +71,20 @@ flowchart LR
 
 | Contexto | Propósito de negocio | Microservicio(s) | Estado |
 |---|---|---|---|
-| **Identidad (IAM)** | Autenticación federada, perfil local de usuario, 2FA, roles | `ms_iam` | Activo |
+| **Identidad (IAM)** | Autenticación federada, perfil local, 2FA, roles, `SOL-PWD` | `ms_iam` | Activo |
 | **Organización** | Maestro de entidades públicas evaluadas y sus contactos | `ms_org` | Activo |
-| **Catálogo** | Definición versionable del instrumento MSPI (la "plantilla vacía") | `ms_catalog` | Activo |
-| **Evaluación (Assessment)** | Ciclo de vida de una evaluación concreta, snapshot congelado del instrumento, calificación y cálculo | `ms_assessment` | Activo |
-| **Evidencia** | Contexto/misión de la entidad, levantamiento documental, archivos adjuntos | `ms_evidence` | Activo |
-| **Reportería** | Generación asíncrona de reportes PDF/Excel, comparativos temporales | `ms_reporting` | Activo |
-| **Administración** | Configuración global del sistema (`admin.system_config`) | `ms_admin` (:8089) | **Activo** |
-| **Auditoría** | Auditoría transversal dedicada | `ms_audit` | **Activo** — `audit.audit_log` (puerto 8088) |
+| **Catálogo** | Definición versionable del instrumento MSPI; `SOL-CAT` | `ms_catalog` | Activo |
+| **Evaluación (Assessment)** | Ciclo de vida, snapshot, cálculo; `SOL-ELIM` / `SOL-AMPL` | `ms_assessment` | Activo |
+| **Evidencia** | Contexto/misión, levantamiento, archivos (soft-delete) | `ms_evidence` | Activo |
+| **Reportería** | Generación asíncrona de reportes PDF/Excel | `ms_reporting` | Activo |
+| **Auditoría** | Bitácora central y timeline por radicado | `ms_audit` | Activo (:8088, `audit`) |
+| **Administración** | Configuración global (plazos, gracia de borrado) | `ms_admin` | Activo (:8089, `admin`) |
 
 ---
 
 ## 2. Contexto: Identidad (esquema `iam`)
 
-**Propósito de negocio:** autenticar usuarios (delegando a Keycloak), mantener un perfil local vinculado al `sub` del JWT, gestionar roles de negocio y segundo factor (2FA/TOTP), y centralizar la auditoría de eventos de todo el ecosistema.
+**Propósito de negocio:** autenticar usuarios (delegando a Keycloak), mantener un perfil local vinculado al `sub` del JWT, gestionar roles de negocio y segundo factor (2FA/TOTP), y orquestar solicitudes de reenvío de contraseña (`SOL-PWD`). La bitácora central vive en `ms_audit` (`audit.audit_log`); la configuración global en `ms_admin`.
 
 **Microservicio:** `ms_iam` (puerto 8082).
 
@@ -256,12 +265,24 @@ Públicos (JWT): `GET/PATCH /assessments/{id}/context`, `GET/PATCH .../process-s
 
 ---
 
-## 8. Contextos previstos no implementados: Administración y Auditoría
+## 8. Contextos Administración y Auditoría (activos)
 
-| Contexto | Esquema previsto | Estado real |
+### 8.1 Auditoría (`ms_audit` :8088, esquema `audit`)
+
+| Entidad | Atributos clave | Notas |
 |---|---|---|
-| **Administración** (`ms_admin`) | Ninguno (no hay modelo de datos) | Placeholder puro: `README.md` + `docs/ROADMAP.md` + `docs/openapi.yaml` con `paths: {}`. Arquitectura objetivo descrita (`AdminDashboardApi`, `SystemConfigApi`, gateways agregadores `IamAdminGateway`/`OrgAdminGateway`/`AssessmentReadGateway`) pero **sin una sola clase de código** |
-| **Auditoría** (`ms_audit`) | `audit.audit_log` | Microservicio activo en `:8088`; MER + `patch-audit-schema.sql`; sin FK cross-dominio |
+| `audit.audit_log` | `id`, `event_type`, `entity_type`, `entity_id`, `assessment_id` (UUID sin FK), `actor_user_id` (UUID sin FK), `occurred_at`, `ip`, `user_agent`, `before_json`, `after_json`, `metadata_json` | Append-only. Correlación de radicados en `metadata_json.requestNumber`. Fuente: `AuditLogEntity.java`, `patch-audit-schema.sql`. |
+
+API: `GET /audit/events`, `GET /audit/requests/{requestNumber}`, `POST /internal/audit/events` — ver `Documentacion-Backend/ms_audit/`.
+
+### 8.2 Administración (`ms_admin` :8089, esquema `admin`)
+
+| Entidad | Atributos clave | Notas |
+|---|---|---|
+| `admin.system_config` | `key` (PK), `value_json`, `version`, `updated_by` (UUID sin FK), `updated_at` | Clave `mspi.system.config` con plazos/gracia. |
+| `admin.system_config_history` | `id`, `key`, `version`, `value_json`, `changed_by`, `changed_at`, `summary` | Historial append. Fuente: `patch-admin-schema.sql`. |
+
+API: `GET/PUT /system/config`, `GET /system/config/history`, `GET /internal/system/config` — ver `Documentacion-Backend/ms_admin/`.
 
 ---
 

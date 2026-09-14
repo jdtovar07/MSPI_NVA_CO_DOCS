@@ -24,7 +24,7 @@ cp docker\env-mspi-docker.env.example docker\env-mspi-docker.env
 `-Rebuild` construye la imagen de cada microservicio (`gradle build`) y de cada microfrontend (`ng build`) dentro de un contenedor. Internamente:
 
 1. Levanta infraestructura (Postgres + Keycloak, red `mspi-net`).
-2. Levanta los 6 microservicios, puertos **8082-8087**.
+2. Levanta los 8 microservicios, puertos **8082–8089** (incluye `ms_audit` 8088 y `ms_admin` 8089).
 3. Levanta los 6 microfrontends, puertos **4200-4205**.
 
 ## 3. Arranques posteriores

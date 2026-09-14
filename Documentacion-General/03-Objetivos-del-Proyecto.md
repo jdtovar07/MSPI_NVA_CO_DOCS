@@ -40,8 +40,8 @@
 
 Para que el profesor tenga claridad de frontera de alcance, se declara explícitamente qué **no** se implementó dentro del perímetro funcional actual, aunque la arquitectura lo contempla:
 
-- **Administración general del sistema** — microservicio `ms_admin`: existe como carpeta *placeholder* (solo `README.md`, `docs/ROADMAP.md` y un stub de OpenAPI vacío), sin código ni API funcional.
-- **Auditoría transversal consolidada** — microservicio `ms_audit`: también *placeholder*; la auditoría que sí opera en producción vive dentro de `ms_iam` (tabla `iam.audit_log`) y es consumida puntualmente por `ms_assessment`, no como un servicio independiente de auditoría transversal.
+- **Administración general del sistema** — microservicio `ms_admin` (:8089): configuración global `admin.system_config` (+ historial), consumida por `ms_assessment`/`ms_catalog` vía `/internal/system/config` (`Documentacion-Backend/ms_admin/`, revisión 2026-10-19).
+- **Auditoría transversal consolidada** — microservicio `ms_audit` (:8088): bitácora `audit.audit_log`, ingesta S2S y consulta admin con timeline por radicado (`Documentacion-Backend/ms_audit/`, revisión 2026-10-19).
 
 Ambos se documentan en detalle en `Documentacion-Backend/ms_admin/` y `Documentacion-Backend/ms_audit/`.
 

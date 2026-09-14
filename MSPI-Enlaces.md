@@ -26,4 +26,4 @@
 |---|---|
 | [MSPI_NVA_CO_DOCS](https://github.com/jdtovar07/MSPI_NVA_CO_DOCS) (este repo) | Propuesta de grado, investigación y documentación SDLC |
 | [MSPI_NVA_CO_MR_FRONT](https://github.com/jdtovar07/MSPI_NVA_CO_MR_FRONT.git) | 6 microfrontends Angular 19 |
-| [MSPI_NVA_CO_MR_BACK](https://github.com/jdtovar07/MSPI_NVA_CO_MR_BACK.git) | 8 microservicios Spring Boot (6 activos) |
+| [MSPI_NVA_CO_MR_BACK](https://github.com/jdtovar07/MSPI_NVA_CO_MR_BACK.git) | 8 microservicios Spring Boot activos (8082–8089) |

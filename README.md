@@ -4,7 +4,7 @@ Repositorio de documentación del **Sistema de Gestión de Seguridad y Privacida
 
 Este repositorio **no contiene código fuente**. Agrupa la propuesta de grado, el componente investigativo y la documentación técnica del ciclo de vida de cada microservicio y microfrontend.
 
-**6** microservicios activos · **2** placeholders · **6** microfrontends · **98** documentos SDLC
+**8** microservicios activos · **6** microfrontends · **98** documentos SDLC
 
 `Java 21` · `Spring Boot` · `Arquitectura hexagonal` · `Angular 19` · `Keycloak` · `PostgreSQL` · `Docker`
 
@@ -60,6 +60,8 @@ flowchart TB
         CAT["ms_catalog :8085"]
         EVI["ms_evidence :8086"]
         RPT["ms_reporting :8087"]
+        AUD["ms_audit :8088"]
+        ADM["ms_admin :8089"]
     end
 
     Auth --> IAM
@@ -69,14 +71,23 @@ flowchart TB
     Evid --> EVI
     Rep --> RPT
     Rep --> ASM
+    Shell --> AUD
+    Shell --> ADM
+    IAM --> AUD
+    ASM --> AUD
+    CAT --> AUD
+    ASM --> ADM
+    CAT --> ADM
 
     IAM --> KC["Keycloak :8080"]
-    IAM --> PG[("PostgreSQL — esquemas iam · org · catalog · assessment · evidence · reporting")]
+    IAM --> PG[("PostgreSQL — iam · org · catalog · assessment · evidence · reporting · audit · admin")]
     MSORG --> PG
     ASM --> PG
     CAT --> PG
     EVI --> PG
     RPT --> PG
+    AUD --> PG
+    ADM --> PG
 ```
 
 ---
@@ -154,8 +165,8 @@ Ocho microservicios, cada uno con los 7 documentos del ciclo de vida. El enlace 
 | [`ms_assessment`](Documentacion-Backend/ms_assessment/) | Ciclo de vida de evaluaciones y motor de cálculo | 8084 | Activo |
 | [`ms_evidence`](Documentacion-Backend/ms_evidence/) | Contexto organizacional y evidencias documentales | 8086 | Activo |
 | [`ms_reporting`](Documentacion-Backend/ms_reporting/) | Generación asíncrona de reportes PDF/Excel | 8087 | Activo (con limitaciones) |
-| [`ms_admin`](Documentacion-Backend/ms_admin/) | Configuración global | 8089 | Activo |
-| [`ms_audit`](Documentacion-Backend/ms_audit/) | Auditoría transversal | — | Placeholder, sin código |
+| [`ms_admin`](Documentacion-Backend/ms_admin/) | Configuración global (`admin.system_config`) | 8089 | Activo |
+| [`ms_audit`](Documentacion-Backend/ms_audit/) | Auditoría central (`audit.audit_log`) | 8088 | Activo |
 
 ### Frontend
 

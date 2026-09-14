@@ -9,7 +9,7 @@
 | Programa académico | Ingeniería de Sistemas |
 | Dirigido a | Profesor/asesor de trabajo de grado |
 | Fecha de elaboración | 2026-08-27 |
-| Última revisión cruzada con código | 2026-10-07 (`08-Referencia-API.md` alineada a controladores reales) |
+| Última revisión cruzada con código | **2026-10-19** (8 MS activos; extracción `ms_audit`/`ms_admin`; radicados SOL-*) |
 | Fuentes primarias | `Documentacion-investigacion/Documento-Investigacion.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; los 6 `03-Diseno.md` de `Documentacion-Frontend/`; [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI); `Documentacion-General/MER-MSPI.sql`; `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` y `DBvsExcel.md`; `docker-compose.apps.yml` / `docker-compose.front.yml` / `docker-compose.yml` (postgres, keycloak) |
 
 > **Nota de trazabilidad.** Cada afirmación técnica de este documento cita, entre paréntesis, el archivo del repositorio en el que se verificó. Cuando un dato no pudo confirmarse en ningún documento fuente, se declara explícitamente como no verificado en lugar de asumirse.
@@ -22,10 +22,10 @@ MSPI es una plataforma web que automatiza el **Instrumento de Identificación de
 
 El sistema se construyó bajo dos estilos arquitectónicos combinados:
 
-- **Backend de microservicios** (Java 21 / Spring Boot, arquitectura hexagonal): 8 carpetas de microservicio, de las cuales **6 están activas** con lógica de negocio real y **2 son placeholders documentales** (`ms_admin`, `ms_audit`) — verificado directamente en `Documentacion-Backend/ms_admin/03-Diseno.md` y `Documentacion-Backend/ms_audit/03-Diseno.md`.
+- **Backend de microservicios** (Java 21 / Spring Boot, arquitectura hexagonal): **8 microservicios activos** con puerto y esquema propios — `ms_iam` 8082, `ms_org` 8083, `ms_assessment` 8084, `ms_catalog` 8085, `ms_evidence` 8086, `ms_reporting` 8087, `ms_audit` 8088, `ms_admin` 8089 — verificados en `MSPI_NVA_CO_MR_BACK/ms_*/applications/app-service/.../application.yaml` y `docker-compose.apps.yml`.
 - **Frontend de microfrontends** (Angular 19): 6 aplicaciones independientes compuestas por un *shell* host. La composición real **no usa Module Federation de Webpack** (mecanismo estándar de la industria para microfrontends), sino **iframes embebidos + `window.postMessage` + almacenamiento compartido (`localStorage`/cookie)** — hallazgo verificado explícitamente en el propio código y documentado en `Documentacion-Frontend/mf_shell/03-Diseno.md` y `Documentacion-Frontend/mf_auth/03-Diseno.md` (ver secc. 4 y 9 de este documento).
 
-La base de datos es una única instancia PostgreSQL particionada en **seis esquemas** (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`), cada uno propiedad de un microservicio, con claves foráneas físicas entre esquemas (`DB-MER.txt`, líneas 13-22, 194-209). El MER interactivo está en [dbdocs.io/jdtovar-2021a/MER-MSPI](https://dbdocs.io/jdtovar-2021a/MER-MSPI); la fuente SQL local es [`MER-MSPI.sql`](MER-MSPI.sql). La identidad se delega a **Keycloak** como IdP externo (realm `iam`), y el sistema aplica sobre sí mismo controles de seguridad equivalentes a los que audita (2FA/TOTP, auditoría centralizada) — coherencia señalada en `Documento-Investigacion.md`, secc. 4.
+La base de datos es una única instancia PostgreSQL particionada en **ocho esquemas** (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`, `audit`, `admin`), cada uno propiedad de un microservicio. Las tablas `audit.audit_log` y `admin.system_config(_history)` se migraron desde `iam.*` vía `patch-audit-schema.sql` / `patch-admin-schema.sql` (UUID sin FK cross-dominio). El MER interactivo está en [dbdocs.io/jdtovar-2021a/MER-MSPI](https://dbdocs.io/jdtovar-2021a/MER-MSPI); la fuente SQL local es [`MER-MSPI.sql`](MER-MSPI.sql). La identidad se delega a **Keycloak** como IdP externo (realm `iam`), y el sistema aplica sobre sí mismo controles de seguridad equivalentes a los que audita (2FA/TOTP, auditoría centralizada) — coherencia señalada en `Documento-Investigacion.md`, secc. 4. Flujos de radicado/auditoría: [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md).
 
 ---
 
@@ -51,18 +51,18 @@ flowchart TB
     end
 
     subgraph Backend["Backend — Microservicios Spring Boot"]
-        MSIAM["ms_iam :8082<br/>Identidad · 2FA · Auditoría"]
+        MSIAM["ms_iam :8082<br/>Identidad · 2FA · SOL-PWD"]
         MSORG["ms_org :8083<br/>Organizaciones"]
         MSASM["ms_assessment :8084<br/>Motor de evaluación y cálculo"]
         MSCAT["ms_catalog :8085<br/>Catálogo del instrumento"]
         MSEVI["ms_evidence :8086<br/>Evidencias y levantamiento"]
         MSREP["ms_reporting :8087<br/>Reportes PDF/Excel async"]
-        MSADM["ms_admin<br/>:8089"]
-        MSAUD["ms_audit<br/>(placeholder, sin puerto)"]
+        MSAUD["ms_audit :8088<br/>Bitácora central"]
+        MSADM["ms_admin :8089<br/>Configuración global"]
     end
 
     subgraph DB["PostgreSQL (mspi-net)"]
-        PG["Instancia única<br/>esquemas: iam · org · catalog ·<br/>assessment · evidence · reporting"]
+        PG["Instancia única<br/>esquemas: iam · org · catalog · assessment ·<br/>evidence · reporting · audit · admin"]
         PGKC["PostgreSQL Keycloak<br/>(esquema propio)"]
     end
 
@@ -103,7 +103,13 @@ flowchart TB
     MSREP -->|consume dashboard,<br/>gaps, scores| MSASM
     MSREP -->|consume catálogo<br/>escala/plantillas| MSCAT
     MSREP -->|archiva PDF/XLSX<br/>como evidence_file| MSEVI
-    MSASM -->|POST /internal/audit/events<br/>X-Internal-Api-Key| MSIAM
+    MSIAM -->|POST /internal/audit/events<br/>X-Internal-Api-Key| MSAUD
+    MSASM -->|POST /internal/audit/events| MSAUD
+    MSCAT -->|POST /internal/audit/events| MSAUD
+    MSASM -->|GET /internal/system/config| MSADM
+    MSCAT -->|GET /internal/system/config| MSADM
+    Shell -->|Auditoría / Config| MSAUD
+    Shell -->|Auditoría / Config| MSADM
 
     MSIAM --> PG
     MSORG --> PG
@@ -111,6 +117,8 @@ flowchart TB
     MSCAT --> PG
     MSEVI --> PG
     MSREP --> PG
+    MSAUD --> PG
+    MSADM --> PG
     KC --> PGKC
 ```
 
@@ -122,16 +130,16 @@ flowchart TB
 
 | Microservicio | Puerto | Estado | Responsabilidad | Esquema BD propio |
 |---|---|---|---|---|
-| `ms_iam` | 8082 | **Activo** | Autenticación (delegada a Keycloak), perfil local de usuario, 2FA/TOTP, gestión de usuarios y roles, auditoría centralizada (sumidero de eventos propios y de otros MS) | `iam` |
+| `ms_iam` | 8082 | **Activo** | Autenticación (Keycloak), perfil local, 2FA/TOTP, usuarios/roles, solicitudes `SOL-PWD`, correo Brevo | `iam` |
 | `ms_org` | 8083 | **Activo** | CRUD de organizaciones/entidades evaluadas, contactos, geografía, áreas base reutilizables | `org` |
-| `ms_catalog` | 8085 | **Activo** | Catálogo versionado y de solo lectura del instrumento: escalas, plantillas, árbol de controles ISO, ítems PHVA/madurez/NIST, presets de áreas, catálogo de levantamiento | `catalog` |
-| `ms_assessment` | 8084 | **Activo** | Agregado raíz de la evaluación: ciclo de vida, snapshot del instrumento, calificación de controles, rollup jerárquico, PHVA, madurez, NIST, tablero de diagnóstico consolidado | `assessment` |
-| `ms_evidence` | 8086 | **Activo** | Contexto/misión de la entidad, levantamiento de 43 ítems documentales, carga/descarga de archivos multipart | `evidence` |
-| `ms_reporting` | 8087 | **Activo** | Generación asíncrona de reportes (PORTADA PDF/Excel + instrumento completo 11 hojas vía LibreOffice/POI, watermark borrador, oficiales/protegidos), jobs con *polling*, comparativos | `reporting` |
-| `ms_admin` | 8089 | Hexagonal Gradle (SystemConfig) | Configuración global `admin.system_config` | `admin` |
-| `ms_audit` | — (sin asignar) | **Placeholder** — solo `README.md` + `docs/MIGRATION-NOTES.md` + `docs/openapi.yaml` deprecado que reenvía a `ms_iam`; sin código propio | Auditoría transversal dedicada objetivo (funcionalidad real hoy vive dentro de `ms_iam.iam.audit_log`) | — |
+| `ms_catalog` | 8085 | **Activo** | Catálogo versionado del instrumento; solicitudes `SOL-CAT` de eliminación lógica | `catalog` |
+| `ms_assessment` | 8084 | **Activo** | Ciclo de vida de evaluación, cálculo, solicitudes `SOL-ELIM` / `SOL-AMPL` | `assessment` |
+| `ms_evidence` | 8086 | **Activo** | Contexto/misión, levantamiento documental, archivos multipart (soft-delete) | `evidence` |
+| `ms_reporting` | 8087 | **Activo** | Generación asíncrona de reportes PDF/Excel, jobs con *polling*, comparativos | `reporting` |
+| `ms_audit` | 8088 | **Activo** | Bitácora central `audit.audit_log`; consulta admin + ingesta S2S; timeline por `requestNumber` | `audit` |
+| `ms_admin` | 8089 | **Activo** | Configuración global `admin.system_config` (+ historial); plazos/gracia consumidos por assessment/catalog | `admin` |
 
-Fuente: `Documentacion-Backend/ms_admin/03-Diseno.md` §1-2 y `Documentacion-Backend/ms_audit/03-Diseno.md` §1; puertos de `docker-compose.apps.yml`; propiedad de esquema confirmada en `DB-MER.txt` (comentario "Microservicios y dueño de schema", líneas 16-22) y `Documento-Investigacion.md` secc. 10.1.
+Fuente: `Documentacion-Backend/ms_admin/` y `Documentacion-Backend/ms_audit/` (SDLC 2026-10-19); `ms_audit/.../application.yaml` (`SERVER_PORT:8088`); `ms_admin/.../application.yaml` (`SERVER_PORT:8089`); migraciones `patch-audit-schema.sql` / `patch-admin-schema.sql`.
 
 ### 3.1 Dependencias de arranque entre microservicios (Docker Compose)
 
@@ -304,10 +312,9 @@ El sistema define **5 roles de negocio** con autoridades diferenciadas (`Documen
 
 ### 6.4 Auditoría centralizada
 
-- `ms_iam` mantiene `iam.audit_log` (bigserial, `event_type`, `entity_type`, `entity_id`, `assessment_id`, `actor_user_id`, `before_json`/`after_json`, `metadata_json` — `DB-MER.txt` líneas 282-314) como sumidero de:
-  - eventos de autenticación propios (`AUTH_LOGIN_SUCCESS`, `AUTH_LOGIN_FAILED`, `AUTH_LOGIN_INACTIVE`);
-  - eventos de negocio de otros microservicios (`ASSESSMENT_CREATED`, `ASSESSMENT_PUBLISHED`, `ASSESSMENT_CLONED`, `ENTITY_ORDER_TYPE_CHANGED`, `STEWARD_PROPAGATED`, `INVENTORY_DELIVERY_UPDATED`), recibidos vía un canal interno protegido `POST /internal/audit/events` con cabecera `X-Internal-Api-Key` (`Documentacion-Backend/ms_audit/03-Diseno.md` §2.1, diagrama de componentes).
-- `ms_assessment` es el productor identificado de estos eventos (`IamAuditGatewayAdapter` en su módulo `rest-consumer`), lo que confirma un patrón de **auditoría push desde el productor hacia un sumidero centralizado**, no un bus de eventos ni un *event sourcing* completo.
+- **`ms_audit` (:8088)** posee `audit.audit_log` (migrado desde `iam.audit_log` vía `patch-audit-schema.sql`). Ingesta S2S: `POST /internal/audit/events` + `X-Internal-Api-Key`. Consulta admin: `GET /audit/events` y `GET /audit/requests/{requestNumber}` (JWT `AdminSistema`) — `ms_audit/.../AuditApi.java`, `InternalAuditApi.java`.
+- Productores verificados: `ms_iam` (`AuditAuthRestAdapter`, `AuditGatewayAdapter`), `ms_assessment` y `ms_catalog` (`AuditGatewayAdapter`) → `MS_AUDIT_URL`.
+- Correlación de solicitudes por `metadata_json.requestNumber` (prefijos `SOL-ELIM` / `SOL-AMPL` / `SOL-PWD` / `SOL-CAT`). Detalle en [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md).
 
 ---
 
@@ -357,7 +364,7 @@ domain/usecase             → depende de domain/model
 domain/model                sin dependencias (POJOs + Lombok + java.time/util)
 ```
 
-El plugin oficial de Clean Architecture de Bancolombia (`co.com.bancolombia.cleanArchitecture`) aparece **referenciado pero comentado** en el `build.gradle` raíz; la estructura de 8 módulos sigue esa convención manualmente, sin el plugin activo (`Documentacion-Backend/ms_iam/03-Diseno.md` §1). Los demás microservicios activos (`ms_org`, `ms_catalog`, `ms_evidence`, `ms_assessment`) siguen la misma convención estructural, según confirma `Documentacion-Backend/ms_audit/03-Diseno.md` §1 al contrastarlos con `ms_audit` (que no la reproduce).
+El plugin oficial de Clean Architecture de Bancolombia (`co.com.bancolombia.cleanArchitecture`) aparece **referenciado pero comentado** en el `build.gradle` raíz; la estructura multi-módulo sigue esa convención manualmente (`Documentacion-Backend/ms_iam/03-Diseno.md` §1). Los ocho microservicios activos (`ms_iam`, `ms_org`, `ms_catalog`, `ms_evidence`, `ms_assessment`, `ms_reporting`, `ms_audit`, `ms_admin`) reproducen el mismo layout hexagonal Gradle.
 
 ### 7.2 Separación catálogo vs. ejecución (patrón de snapshot)
 
@@ -373,18 +380,18 @@ Implementado mediante el campo `row_version` en `assessment.assessment` (increme
 
 | Capa | Tecnología | Cómo se integra en la arquitectura |
 |---|---|---|
-| Lenguaje / runtime backend | Java 21 sobre `eclipse-temurin:21-jdk-alpine` (build) → `-jre-alpine` (runtime); **excepción:** `ms_reporting` usa `-jre-jammy` + LibreOffice Calc | Cada uno de los 6 microservicios activos compila a un JAR ejecutable independiente, empaquetado en su propia imagen Docker |
+| Lenguaje / runtime backend | Java 21 sobre `eclipse-temurin:21-jdk-alpine` (build) → `-jre-alpine` (runtime); **excepción:** `ms_reporting` usa `-jre-jammy` + LibreOffice Calc | Cada uno de los 8 microservicios activos compila a un JAR ejecutable independiente, empaquetado en su propia imagen Docker |
 | Framework backend | Spring Boot 4.0.2 (Spring MVC, servlet) | Expone los `entry-points/api-rest` de cada microservicio; `SecurityConfig` en `applications/app-service` configura el filtro OAuth2 Resource Server |
 | Build multi-módulo | Gradle 9.3.0 | Materializa físicamente las capas hexagonales como subproyectos con dependencias unidireccionales verificables en tiempo de compilación |
 | Seguridad backend | Spring Security + OAuth2 Resource Server (JWT) | Cada microservicio (excepto `ms_iam`, que además hace de cliente OAuth hacia Keycloak) valida el JWT emitido por Keycloak sin estado compartido entre servicios |
 | Identidad / IdP | Keycloak 26.5.4 (realm `iam`) | Único emisor de tokens del ecosistema; contenedor independiente con su propia base de datos PostgreSQL |
-| Persistencia | Spring Data JPA + Hibernate; H2 en memoria (dev), PostgreSQL 16-alpine (producción/docker) | Cada microservicio mapea entidades JPA solo sobre su propio esquema (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`), aunque la instancia física de PostgreSQL es compartida |
+| Persistencia | Spring Data JPA + Hibernate; H2 en memoria (dev), PostgreSQL 16-alpine (producción/docker) | Cada microservicio mapea entidades JPA solo sobre su propio esquema (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`, `audit`, `admin`), aunque la instancia física de PostgreSQL es compartida |
 | Base de datos | PostgreSQL, esquema `MSPI` particionado por microservicio | Permite claves foráneas físicas entre esquemas (integridad referencial cruzada) mientras conserva la propiedad lógica de cada tabla por microservicio; documentado como decisión reversible hacia *database-per-service* si se requiere en el futuro (`DB-MER.txt` línea 198: *"can be relaxed if DB-per-service later"*) |
 | 2FA/TOTP | java-otp 0.4.0 + commons-codec | Módulo `jpa-repository` de `ms_iam`; secretos Base32 en `iam.user_totp`, desacoplados de Keycloak (Keycloak no almacena este secreto) |
 | Gestión de secretos | Infisical SDK 3.0.2 (alterno: AWS Secrets Manager Sync) | `InfisicalConfig` en `applications/app-service` de `ms_iam`; evita credenciales de BD en texto plano en el repositorio |
 | Resiliencia | Resilience4j Spring Boot 3 (2.3.0) | Aplicado en el módulo `rest-consumer` de `ms_iam` para llamadas salientes a Keycloak y a `ms_org` |
 | Observabilidad backend | Micrometer + Prometheus registry | Expuesto en `api-rest` de cada microservicio activo |
-| Contenerización backend | Docker Compose (`mspi-apps`), red externa `mspi-net` | Orquesta los 6 microservicios activos con `depends_on`/`healthcheck` declarados |
+| Contenerización backend | Docker Compose (`mspi-apps`), red externa `mspi-net` | Orquesta los 8 microservicios activos con `depends_on`/`healthcheck` declarados |
 | Framework frontend | Angular ^19.0.0 (standalone components), TypeScript ~5.6.0 modo `strict` | Cada uno de los 6 microfrontends es un proyecto Angular independiente con su propio `angular.json`, sin *workspace* multi-proyecto compartido |
 | Composición de microfrontends | Iframe + `postMessage` + `localStorage`/cookie (no Module Federation, ver secc. 4) | El *shell* es el único punto de composición visual; cada MF hijo es una SPA autónoma servida por su propio Nginx |
 | UI / diseño | Angular Material + CDK, Tailwind CSS, `@ng-icons/lucide`, `ng2-charts`/Chart.js | Usados dentro de cada MF de forma independiente (sin *design system* compartido a nivel de librería publicada) |
@@ -418,7 +425,7 @@ Implementado mediante el campo `row_version` en `assessment.assessment` (increme
 
 Esta sección documenta con honestidad las brechas encontradas al consolidar los 14 documentos de diseño por componente, citando explícitamente dónde se evidenció cada hallazgo.
 
-1. **`ms_admin` y `ms_audit` están implementados** (8089 / 8088). `ms_admin` solo contiene `README.md` + `docs/openapi.yaml` (`paths: {}`, `version: 0.0.0`), sin `build.gradle` ni estructura de módulos (`Documentacion-Backend/ms_admin/03-Diseno.md` §1-2). `ms_audit` tiene la misma naturaleza documental; su `openapi.yaml` está 100% marcado `deprecated` y reenvía por `externalDocs` al contrato real de `ms_iam` (`Documentacion-Backend/ms_audit/03-Diseno.md` §1). La funcionalidad de auditoría transversal que `ms_audit` debería proveer **ya existe hoy, pero vive dentro de `ms_iam`** (`iam.audit_log` + endpoint interno `POST /internal/audit/events`), lo cual es una solución funcional pero no la separación de responsabilidades que el diseño original contemplaba.
+1. **Extracción de auditoría y configuración desde `ms_iam` (cerrada en código).** `ms_audit` (:8088, esquema `audit`) y `ms_admin` (:8089, esquema `admin`) son microservicios hexagonales activos; la bitácora y el system config ya no viven en `iam.*` (migraciones `patch-audit-schema.sql` / `patch-admin-schema.sql`). Residual documental histórico en borradores antiguos — fuente actual: SDLC 2026-10-19 de ambos MS y [`14-Flujos-…`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md).
 
 2. **Discrepancia entre Module Federation planificado y la integración real por iframe.** El plan de trabajo del backend (`PLAN_TRABAJO_MSPI_v2.md`, sección 10, citado en `Documento-Investigacion.md` secc. 6.2) especifica una configuración `webpack.config.js` con `remotes` de Module Federation para los 6 microfrontends. La verificación directa del código de los 6 `03-Diseno.md` de frontend confirma que **ninguno** implementa Module Federation: todos usan iframe + `postMessage` + almacenamiento compartido. Implicaciones documentadas: URLs `hardcodeadas` a `localhost:420X` sin `environment.prod.ts` que las parametrice (`Documentacion-Frontend/mf_shell/03-Diseno.md`, "Observación de diseño"), y propagación de sesión "parcial" entre orígenes distintos del navegador.
 

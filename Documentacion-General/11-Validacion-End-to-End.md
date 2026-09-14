@@ -7,7 +7,7 @@
 | **Documento** | Validación del flujo completo contra el stack real (Docker) y verificación de que el motor reproduce las fórmulas del Autodiagnóstico MSPI |
 | **Fecha** | 2026-10-09 |
 
-> Ejecutado contra el stack real levantado en Docker (PostgreSQL + Keycloak + 6 microservicios + 6 microfrontends), con la plantilla **v2** activa, usando la API real (JWT de `admin@mspi.local`). Cada agregado se contrastó con el cálculo a mano.
+> Ejecutado contra el stack real levantado en Docker (PostgreSQL + Keycloak + microservicios backend + 6 microfrontends), con la plantilla **v2** activa, usando la API real (JWT de `admin@mspi.local`). Cada agregado se contrastó con el cálculo a mano. Stack actual: **8** microservicios (8082–8089); la corrida original pudo usarse con 6 — revalidar con `ms_audit`/`ms_admin` en línea.
 
 ---
 

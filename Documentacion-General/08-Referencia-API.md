@@ -1,6 +1,6 @@
 # 08 · Referencia de API (consolidada)
 
-Índice consolidado de la API expuesta por los 6 microservicios, **alineado con los controladores `*Api.java` del backend** (`MSPI_NVA_CO_MR_BACK`, revisión 2026-10-07). Para el detalle exacto de cada endpoint (parámetros, DTOs, ejemplos), la fuente de verdad sigue siendo el código y los documentos por microservicio en `Documentacion-Backend/`.
+Índice consolidado de la API expuesta por los **8** microservicios, **alineado con los controladores `*Api.java` del backend** (`MSPI_NVA_CO_MR_BACK`, revisión **2026-10-19**). Para el detalle exacto de cada endpoint (parámetros, DTOs, ejemplos), la fuente de verdad sigue siendo el código y los documentos por microservicio en `Documentacion-Backend/`.
 
 ## Convenciones transversales
 
@@ -15,10 +15,9 @@
 | Auth | `POST /auth/login`, `POST /auth/change-password`, `GET /auth/totp/status`, `POST /auth/totp/setup`, `POST /auth/totp/verify` | Público / autenticado |
 | Usuarios | `GET/POST /users`, `GET /users/statuses`, `GET/PUT /users/{userId}`, `PATCH /users/{userId}/status`, `POST /users/{userId}/reset-password`, `POST /users/disable-by-email` | `AdminSistema` |
 | Roles | `GET /roles` | `AdminSistema` |
-| Sistema (`ms_admin` :8089) | `GET/PUT /system/config`, `GET /system/config/history` | `AdminSistema` |
-| Auditoría (`ms_audit:8088`) | `GET /audit/events` | `AdminSistema` |
+| Reenvío contraseña (`SOL-PWD`) | `POST /users/{userId}/password-reset-requests`, `GET /password-reset-requests`, `POST …/approve\|reject\|cancel` | `AdminSistema` (decidir) |
 | Notificaciones | `GET /notifications`, `POST /notifications/{id}/read`, `POST /notifications/read-all` | Autenticado |
-| Interno | `POST /internal/audit/events` (`ms_audit`), `POST /internal/notifications` (`ms_iam`) | `X-Internal-Api-Key` |
+| Interno | `POST /internal/notifications`, `GET /internal/requests/{requestNumber}` | `X-Internal-Api-Key` |
 
 ## `ms_org` — puerto 8083
 
@@ -73,3 +72,18 @@
 | Jobs | `POST /reports/jobs`, `GET /reports/jobs/{jobId}` (polling) | Autenticado |
 | Comparativo | `POST /reports/comparative/jobs` | Autenticado |
 | Descarga | `GET /reports/jobs/{jobId}/download` | Autenticado |
+
+## `ms_audit` — puerto 8088
+
+| Grupo | Rutas | Rol requerido |
+|---|---|---|
+| Eventos | `GET /audit/events` (filtros `dateFrom`, `dateTo`, `actor`, `requestNumber`, …) | `AdminSistema` |
+| Timeline | `GET /audit/requests/{requestNumber}` | `AdminSistema` |
+| Interno | `POST /internal/audit/events` → 202 | `X-Internal-Api-Key` |
+
+## `ms_admin` — puerto 8089
+
+| Grupo | Rutas | Rol requerido |
+|---|---|---|
+| Config | `GET/PUT /system/config`, `GET /system/config/history?limit=` | `AdminSistema` |
+| Interno | `GET /internal/system/config` | `X-Internal-Api-Key` |

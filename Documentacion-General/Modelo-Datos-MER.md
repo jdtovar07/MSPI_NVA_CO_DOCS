@@ -19,7 +19,9 @@ Vista del modelo de datos MSPI para la wiki. Fuentes canónicas en este director
 
 ## Esquemas PostgreSQL
 
-Instancia única particionada: `iam` · `org` · `catalog` · `assessment` · `evidence` · `reporting`.
+Instancia única particionada (**8**): `iam` · `org` · `catalog` · `assessment` · `evidence` · `reporting` · `audit` · `admin`.
+
+Migraciones de extracción (código): `patch-audit-schema.sql` (`iam.audit_log` → `audit.audit_log`), `patch-admin-schema.sql` (`iam.system_config*` → `admin.*`). Última revisión cruzada con código: **2026-10-19**.
 
 !!! todo "Diagrama SVG/PNG embebido"
-    Si el PDF no se renderiza en el visor del navegador embebido, usar el enlace de descarga o regenerar una imagen PNG desde el `.dbml` y sustituir el iframe.
+    Si el PDF no se renderiza en el visor del navegador embebido, usar el enlace de descarga o regenerar una imagen PNG desde el `.dbml` y sustituir el iframe. El PDF histórico puede aún mostrar tablas bajo `iam.*`; la fuente SQL/dbml de este repo ya refleja `audit`/`admin`.

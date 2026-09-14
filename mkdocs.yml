@@ -98,6 +98,7 @@ nav:
       - Validación end-to-end: Documentacion-General/11-Validacion-End-to-End.md
       - Tipos de entidad y eliminación de catálogo: Documentacion-General/12-Tipos-Entidad-MSPI-y-Eliminacion-Catalogo.md
       - Notificaciones y roles: Documentacion-General/13-Notificaciones-y-Roles.md
+      - Flujos solicitudes, auditoría y seguridad: Documentacion-General/14-Flujos-Solicitudes-Auditoria-y-Seguridad.md
   - Backend (microservicios):
       - ms_iam:
           - Planificación: Documentacion-Backend/ms_iam/01-Planificacion.md

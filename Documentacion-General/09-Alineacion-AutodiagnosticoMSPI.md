@@ -104,7 +104,7 @@ Se levantó un PostgreSQL desechable con los scripts reales de init de Docker (`
 > **Nota importante de infraestructura:** el stack Docker **no** siembra desde `ms_catalog/.../resources/data.sql` (`spring.sql.init.mode: never`, `ddl-auto: none`), sino desde `docker-config/docker/postgres/init/` (`MER-SEED-CATALOG.sql` + `MER-SEED-TESTGUIDANCE.sql` + `MER-SEED-LIFTING-NAMES.sql` y demás `MER-SEED-*.sql`, montados en `/docker-entrypoint-initdb.d`). El texto completo de **PRUEBA** (`test_guidance`) vive en `MER-SEED-TESTGUIDANCE.sql` (93 `UPDATE`); los **nombres reales del levantamiento** viven en `MER-SEED-LIFTING-NAMES.sql` (43 `UPDATE` por `position`). Ambos se replican en `ms_catalog/.../resources/data.sql` para el modo no-Docker. En un volumen Postgres ya existente, hay que reaplicar esos scripts a mano (o hacer reset del volumen) porque el init solo corre al crear el volumen.
 
 ### 6.3 Validación end-to-end por UI — ⬜ pendiente (requiere entorno con secretos)
-Levantar el stack completo (6 microservicios + Keycloak + UI) con los secretos de Infisical, crear una evaluación, cargar los puntajes de muestra del Excel y comparar la PORTADA **celda a celda**. Procedimiento en la sección 7.
+Levantar el stack completo (8 microservicios + Keycloak + UI) con los secretos de Infisical, crear una evaluación, cargar los puntajes de muestra del Excel y comparar la PORTADA **celda a celda**. Procedimiento en la sección 7.
 
 ## 7. Procedimiento de validación (reproducible)
 
