@@ -7,11 +7,11 @@
 
 Project MSPI_Platform {
   database_type: "PostgreSQL"
-  Note: "Una sola instancia de PostgreSQL. Un esquema por microservicio: iam, org, catalog, assessment, evidence, reporting. FK entre esquemas declaradas a nivel de base de datos para integridad referencial."
+  Note: "Una sola instancia de PostgreSQL. Un esquema por microservicio: iam, org, catalog, assessment, evidence, reporting, audit, admin. FK entre esquemas declaradas a nivel de base de datos para integridad referencial."
 }
 
 // ============================
-// SCHEMA: iam (Identidad, autenticación, auditoría, notificaciones, configuración)
+// SCHEMA: iam (Identidad, autenticación, notificaciones; 2FA/TOTP)
 // ============================
 
 Table iam.user {
@@ -57,7 +57,7 @@ Table iam.user_totp {
   enabled_at timestamptz
 }
 
-Table iam.system_config {
+Table admin.system_config {
   key varchar(120) [pk]
   value_json jsonb [not null]
   version int [not null, default: 1]
@@ -65,7 +65,7 @@ Table iam.system_config {
   updated_at timestamptz [not null, default: `now()`]
 }
 
-Table iam.system_config_history {
+Table admin.system_config_history {
   id bigserial [pk]
   key varchar(120) [not null]
   version int [not null]
@@ -96,7 +96,7 @@ Table iam.notification {
   action_url varchar(400)
 }
 
-Table iam.audit_log {
+Table audit.audit_log {
   id bigserial [pk]
   event_type varchar(80) [not null, note: "AUTH_LOGIN_SUCCESS|AUTH_LOGIN_FAILED|AUTH_LOGIN_INACTIVE|ASSESSMENT_STATUS_CHANGE|ASSESSMENT_PUBLISHED|ASSESSMENT_REOPENED|ENTITY_ORDER_TYPE_CHANGED"]
   entity_type varchar(80) [not null, note: "AUTH|ASSESSMENT"]
@@ -903,3 +903,11 @@ Table reporting.analytics_cache {
   source_hash varchar(80) [not null, note: "hash de entradas, para invalidar caché"]
   computed_at timestamptz [not null, default: `now()`]
 }
+
+
+// ============================
+// SCHEMA: audit (ms_audit :8088) — migrado desde iam.audit_log vía patch-audit-schema.sql
+// SCHEMA: admin (ms_admin :8089) — migrado desde iam.system_config(_history) vía patch-admin-schema.sql
+// assessment_id / actor_user_id / updated_by / changed_by: UUID sin FK (desacople)
+// Última revisión cruzada con código: 2026-10-19
+// ============================

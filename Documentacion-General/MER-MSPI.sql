@@ -10,6 +10,10 @@ CREATE SCHEMA "evidence";
 
 CREATE SCHEMA "reporting";
 
+CREATE SCHEMA "audit";
+
+CREATE SCHEMA "admin";
+
 CREATE TABLE "iam"."user" (
   "id" uuid PRIMARY KEY,
   "keycloak_sub" varchar(80) UNIQUE NOT NULL,
@@ -43,7 +47,7 @@ CREATE TABLE "iam"."user_totp" (
   "enabled_at" timestamptz
 );
 
-CREATE TABLE "iam"."system_config" (
+CREATE TABLE "admin"."system_config" (
   "key" varchar(120) PRIMARY KEY,
   "value_json" jsonb NOT NULL,
   "version" int NOT NULL DEFAULT 1,
@@ -58,7 +62,7 @@ CREATE TABLE "iam"."login_attempt" (
   "updated_at" timestamptz NOT NULL DEFAULT (now())
 );
 
-CREATE TABLE "iam"."system_config_history" (
+CREATE TABLE "admin"."system_config_history" (
   "id" bigserial PRIMARY KEY,
   "key" varchar(120) NOT NULL,
   "version" int NOT NULL,
@@ -82,7 +86,7 @@ CREATE TABLE "iam"."notification" (
   "action_url" varchar(400)
 );
 
-CREATE TABLE "iam"."audit_log" (
+CREATE TABLE "audit"."audit_log" (
   "id" bigserial PRIMARY KEY,
   "event_type" varchar(80) NOT NULL,
   "entity_type" varchar(80) NOT NULL,
@@ -885,13 +889,13 @@ CREATE UNIQUE INDEX ON "iam"."user_role" ("user_id", "role_id");
 
 CREATE INDEX ON "iam"."user_role" ("role_id");
 
-CREATE INDEX ON "iam"."audit_log" ("assessment_id", "occurred_at");
+CREATE INDEX ON "audit"."audit_log" ("assessment_id", "occurred_at");
 
-CREATE INDEX ON "iam"."audit_log" ("actor_user_id", "occurred_at");
+CREATE INDEX ON "audit"."audit_log" ("actor_user_id", "occurred_at");
 
-CREATE INDEX ON "iam"."audit_log" ("event_type", "occurred_at");
+CREATE INDEX ON "audit"."audit_log" ("event_type", "occurred_at");
 
-CREATE INDEX ON "iam"."audit_log" ("entity_type", "entity_id");
+CREATE INDEX ON "audit"."audit_log" ("entity_type", "entity_id");
 
 CREATE INDEX ON "org"."organization" ("name");
 
@@ -1242,15 +1246,15 @@ COMMENT ON COLUMN "iam"."user_totp"."secret" IS 'Secreto Base32; se persiste en 
 
 COMMENT ON COLUMN "iam"."user_totp"."enabled_at" IS 'NULL hasta verificar el primer código TOTP válido.';
 
-COMMENT ON COLUMN "iam"."system_config"."key" IS 'Claves relevantes Módulo 1:
+COMMENT ON COLUMN "admin"."system_config"."key" IS 'Claves relevantes Módulo 1:
 - evidence.allowedMimeTypes → ["application/pdf","application/vnd.openxmlformats-officedocument.wordprocessingml.document","image/png","image/jpeg"]
 - evidence.maxFileSizeBytes
 - assessment.autosaveIntervalSeconds
 ';
 
-COMMENT ON TABLE "iam"."audit_log" IS 'Auditoría central (ms_iam o servicio dedicado futuro). HU-CFG-02 exige bitácora al cambiar tipo de entidad MSPI.';
+COMMENT ON TABLE "audit"."audit_log" IS 'Auditoría central (ms_audit :8088). HU-CFG-02 exige bitácora al cambiar tipo de entidad MSPI.';
 
-COMMENT ON COLUMN "iam"."audit_log"."event_type" IS 'Autenticación (ms_iam, entity_type=AUTH; entity_id=usernameOrEmail):
+COMMENT ON COLUMN "audit"."audit_log"."event_type" IS 'Autenticación (ms_iam, entity_type=AUTH; entity_id=usernameOrEmail):
 - AUTH_LOGIN_SUCCESS
 - AUTH_LOGIN_FAILED
 - AUTH_LOGIN_INACTIVE
@@ -1263,9 +1267,9 @@ Eventos Módulo 1 / negocio:
 - INVENTORY_DELIVERY_UPDATED
 ';
 
-COMMENT ON COLUMN "iam"."audit_log"."entity_type" IS 'AUTH|ASSESSMENT|ORGANIZATION|USER|...';
+COMMENT ON COLUMN "audit"."audit_log"."entity_type" IS 'AUTH|ASSESSMENT|ORGANIZATION|USER|...';
 
-COMMENT ON COLUMN "iam"."audit_log"."assessment_id" IS 'FK cuando el evento pertenece a una evaluación.';
+COMMENT ON COLUMN "audit"."audit_log"."assessment_id" IS 'FK cuando el evento pertenece a una evaluación.';
 
 COMMENT ON COLUMN "org"."organization"."name" IS 'Nombre legal de la entidad. Cabecera UI: assessment.organization_name_snapshot.';
 
@@ -1944,7 +1948,7 @@ Módulo 8 (HU-DIAG): el tablero Portada NO usa esta tabla; usa rollup por domini
 COMMENT ON TABLE "evidence"."assessment_context" IS 'HU-CFG-03/04: solo texto; no participa en cálculos numéricos (criterio 11).
 Adjuntos HU-CFG-03: evidence.evidence_file con relation_type=CONTEXT,
 relation_id=assessment_id, context_field=MISSION|CONTEXT_ANALYSIS|PROCESS_MAP|ORGANIGRAM.
-MIME: pdf, docx, png, jpg, jpeg (validar contra iam.system_config evidence.allowedMimeTypes).
+MIME: pdf, docx, png, jpg, jpeg (validar contra allowlist MIME en ms_evidence (código); config global en admin.system_config).
 HU-CFG-04: comparación en reporte es responsabilidad de reporting (Módulo 8/9), datos aquí.
 ';
 
@@ -2241,11 +2245,17 @@ ALTER TABLE "iam"."user_role" ADD FOREIGN KEY ("role_id") REFERENCES "iam"."role
 
 ALTER TABLE "iam"."user_totp" ADD FOREIGN KEY ("keycloak_sub") REFERENCES "iam"."user" ("keycloak_sub") DEFERRABLE INITIALLY IMMEDIATE;
 
-ALTER TABLE "iam"."system_config" ADD FOREIGN KEY ("updated_by") REFERENCES "iam"."user" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+-- Desacople MSPI: sin FK cross-dominio (ms_admin/ms_audit)
+-- ALTER TABLE "admin"."system_config" ADD FOREIGN KEY ("updated_by") REFERENCES "iam"."user" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 
-ALTER TABLE "iam"."audit_log" ADD FOREIGN KEY ("assessment_id") REFERENCES "assessment"."assessment" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 
-ALTER TABLE "iam"."audit_log" ADD FOREIGN KEY ("actor_user_id") REFERENCES "iam"."user" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+-- Desacople MSPI: sin FK cross-dominio (ms_admin/ms_audit)
+-- ALTER TABLE "audit"."audit_log" ADD FOREIGN KEY ("assessment_id") REFERENCES "assessment"."assessment" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+
+
+-- Desacople MSPI: sin FK cross-dominio (ms_admin/ms_audit)
+-- ALTER TABLE "audit"."audit_log" ADD FOREIGN KEY ("actor_user_id") REFERENCES "iam"."user" ("id") DEFERRABLE INITIALLY IMMEDIATE;
+
 
 ALTER TABLE "org"."organization_contact" ADD FOREIGN KEY ("organization_id") REFERENCES "org"."organization" ("id") DEFERRABLE INITIALLY IMMEDIATE;
 
