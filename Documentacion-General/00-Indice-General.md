@@ -5,7 +5,7 @@
 | **Proyecto** | MSPI: Sistema de Gestión de Seguridad y Privacidad de la Información basado en ISO/IEC 27001 |
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Programa** | Ingeniería de Sistemas |
-| **Fecha** | 2026-08-27 (índice inicial); **última revisión API/código** 2026-10-07; **alineación instrumento MSPI (v2)** 2026-10-08; **TANDA A bugs** / **TANDA B UX** / **TANDA C icon-buttons** 2026-10-11; **ms_audit extract** 2026-10-11; **ms_admin extract** 2026-10-11; **reload stack + patches** 2026-10-12 |
+| **Fecha** | 2026-08-27 (índice inicial); extract `ms_audit`/`ms_admin` 2026-10-11; **DOCS-1/DOCS-2** 2026-10-19 (8 MS, diagramas, glosario, changelog, wiki) |
 
 Este índice es el punto de entrada único de toda la documentación generada para el proyecto de grado. Está pensado para que el profesor/asesor pueda revisar el trabajo de lo general a lo particular, sin necesidad de explorar el código fuente directamente.
 
@@ -32,13 +32,16 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) | Arquitectura completa del sistema: diagrama C4 de contenedores, tabla de los 8 microservicios y 6 microfrontends, diagrama de despliegue Docker, arquitectura de seguridad (Keycloak/JWT/RBAC/2FA/auditoría), capas hexagonales, decisiones arquitectónicas y deuda técnica conocida. |
 | [`02-Modelo-de-Dominio.md`](02-Modelo-de-Dominio.md) | Los 8 bounded contexts activos (iam, org, catalog, assessment, evidence, reporting, audit, admin), entidades principales, diagrama ER, patrón catálogo-vs-ejecución, mapa funcional → microservicios y glosario de dominio. |
 | [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) | Objetivo general y objetivos específicos en formato de referencia rápida, con trazabilidad a los módulos que los implementan y su estado real (implementado / con limitaciones / no implementado). |
-| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación interactivo de PostgreSQL (esquemas `iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`). Fuente local: [`MER-MSPI.sql`](MER-MSPI.sql), [`MER-MSPI.dbml`](MER-MSPI.dbml) (DBML actualizado 1:1 con el DDL real ejecutado) y [`MER-MSPI.pdf`](MER-MSPI.pdf). |
+| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación (8 esquemas: `iam`…`admin`). Fuente local: [`MER-MSPI.sql`](MER-MSPI.sql), [`MER-MSPI.dbml`](MER-MSPI.dbml), [`MER-MSPI.pdf`](MER-MSPI.pdf), [`Modelo-Datos-MER.md`](Modelo-Datos-MER.md). |
 | [`04-Decisiones-Tecnicas-Complementarias.md`](04-Decisiones-Tecnicas-Complementarias.md) | Decisiones técnicas puntuales tomadas en la implementación de RBAC fino, catálogo (escalas/bancos de preguntas) y funcionalidades administrativas de `ms_iam` |
 | [`05-Manual-Despliegue.md`](05-Manual-Despliegue.md) | Cómo levantar el stack completo en Docker paso a paso |
 | [`06-Guia-Pruebas-Funcionales.md`](06-Guia-Pruebas-Funcionales.md) | Secuencia de flujos funcionales end-to-end para demostrar el sistema |
 | [`07-Manual-Usuario.md`](07-Manual-Usuario.md) | Qué puede hacer cada rol, en lenguaje de usuario final |
 | [`08-Referencia-API.md`](08-Referencia-API.md) | Índice consolidado de la API de los 8 microservicios (rutas verificadas contra `*Api.java`, 2026-10-19) |
 | [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md) | Radicados SOL-*, auditoría central, reenvío de contraseña, soft-delete, postura de seguridad y privacidad |
+| [`15-Diagramas-C4-y-Secuencias.md`](15-Diagramas-C4-y-Secuencias.md) | C4 contexto/contenedores (8 MS + 6 MF), ER conceptual, secuencias evaluación / SOL-* / reporte / login+2FA (Mermaid) |
+| [`16-Glosario.md`](16-Glosario.md) | Vocabulario de dominio (PHVA, radicado, borrado lógico, gracia, sweeper, iframe bridge, …) |
+| [`17-Changelog.md`](17-Changelog.md) | Control de versiones documental (hitos mayores) |
 | [`09-Alineacion-AutodiagnosticoMSPI.md`](09-Alineacion-AutodiagnosticoMSPI.md) | Trazabilidad entre el instrumento oficial `AutodiagnosticoMSPI.xlsx` (ISO 27001:2022 + NIST CSF 2.0) y la plataforma: brechas detectadas, cambios aplicados en la `template_version` v2 (PHVA 56/16/14/14 de 2 niveles, NIST CSF 2.0 **derivado** del Anexo A/cláusulas, 93 controles Anexo A 2022) y validación (101 pruebas + seed contra PostgreSQL real). Inventario de controles en [`anexo_a_2022_controls.csv`](anexo_a_2022_controls.csv). |
 | [`10-Auditoria-Catalogos.md`](10-Auditoria-Catalogos.md) | Clasificación de los datos de referencia del sistema: qué ya es catálogo en `ms_catalog`, qué está fuera por diseño (roles en Keycloak, estados como enums) y qué debería serlo (geografía, hoy vía API externa Country State City). Incluye nota operativa de la API key de geografía. |
 | [`11-Validacion-End-to-End.md`](11-Validacion-End-to-End.md) | Validación del flujo completo contra el stack real (Docker): bugs corregidos verificados en vivo (email, crear evaluación, tablero único), motor de cálculo (NIST derivado, dominios, PHVA 2 niveles 56/16/14/14) contrastado a mano y **checklist paso a paso para validar en la UI**. |
@@ -95,7 +98,7 @@ Toda la documentación técnica detallada (sección 4) y la documentación gener
 
 - **`ms_admin`** es microservicio activo (puerto 8089, esquema `admin`, SystemConfig); **`ms_audit`** es microservicio activo (puerto 8088, esquema `audit`).
 - **Ningún microfrontend** tiene pruebas automatizadas verificadas (sin `*.spec.ts` ni configuración Karma/Jest).
-- La integración de microfrontends **no usa Module Federation** de Webpack (como sí lo especifica el plan de trabajo v2), sino composición por `iframe` + `postMessage` + almacenamiento compartido — confirmado en los 6 microfrontends.
+- Los **6** microfrontends se componen con **iframe + `postMessage`** (`shell-iframe-bridge`). Module Federation = **evolución futura** — confirmado en los 6 MF.
 - El backend define pruebas y umbrales de cobertura (JaCoCo 80 %) en Gradle, pero el pipeline de CI (`bitbucket-pipelines.yml`) solo ejecuta `assemble`, nunca `test`/`check`.
 - El instrumento fuente usa ISO/IEC 27001:**2013**, mientras la versión vigente de la norma es **2022**.
 

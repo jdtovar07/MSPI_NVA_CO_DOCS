@@ -99,6 +99,9 @@ flowchart TB
 | Seguridad | [Postura de seguridad](Seguridad.md) |
 | Privacidad | [Política de privacidad](../legal/POLITICA-PRIVACIDAD-MSPI.md) |
 | Despliegue | [Manual de despliegue](../Documentacion-General/05-Manual-Despliegue.md) |
+| Diagramas C4 / secuencias | [15 — Diagramas](../Documentacion-General/15-Diagramas-C4-y-Secuencias.md) |
+| Glosario | [16 — Glosario](../Documentacion-General/16-Glosario.md) |
+| Changelog docs | [17 — Changelog](../Documentacion-General/17-Changelog.md) |
 | Cómo servir esta wiki | [WIKI.md](../WIKI.md) |
 
 ---

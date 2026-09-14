@@ -1,12 +1,12 @@
 # MSPI — Documentación del Proyecto de Grado
 
-Repositorio de documentación del **Sistema de Gestión de Seguridad y Privacidad de la Información (MSPI)**, plataforma que automatiza el Instrumento de Identificación de la Línea Base de Seguridad de MinTIC Colombia.
+Repositorio de documentación del **Sistema de Gestión de Seguridad y Privacidad de la Información (MSPI)** / **AUDITCYBER**, plataforma que automatiza el Instrumento de Identificación de la Línea Base de Seguridad de MinTIC Colombia.
 
 Este repositorio **no contiene código fuente**. Agrupa la propuesta de grado, el componente investigativo y la documentación técnica del ciclo de vida de cada microservicio y microfrontend.
 
-**8** microservicios activos · **6** microfrontends · **98** documentos SDLC
+**8** microservicios activos (8082–8089) · **6** microfrontends (4200–4205) · documentos SDLC por componente
 
-`Java 21` · `Spring Boot` · `Arquitectura hexagonal` · `Angular 19` · `Keycloak` · `PostgreSQL` · `Docker`
+`Java 21` · `Spring Boot` · `Arquitectura hexagonal` · `Angular 19` · `Keycloak` · `PostgreSQL` · `Docker` · composición UI: **iframe + postMessage** (`shell-iframe-bridge`)
 
 | Campo | Valor |
 |---|---|
@@ -14,6 +14,25 @@ Este repositorio **no contiene código fuente**. Agrupa la propuesta de grado, e
 | **Autores** | Bairon Alexander Suarez Camacho, Juan Diego Tovar Rodriguez |
 | **Programa** | Ingeniería de Sistemas |
 | **Institución** | CORHUILA |
+| **Última revisión documental** | 2026-10-19 (DOCS-1 / DOCS-2) |
+
+---
+
+## Cómo navegar esta documentación
+
+| Si buscas… | Empieza por |
+|---|---|
+| **Wiki navegable y buscable** (punto de entrada recomendado) | [`WIKI.md`](WIKI.md) → `mkdocs serve` · landing [`wiki/Inicio.md`](wiki/Inicio.md) |
+| Índice completo (asesor) | [`Documentacion-General/00-Indice-General.md`](Documentacion-General/00-Indice-General.md) |
+| Arquitectura + C4 | [`01-Arquitectura-General-del-Sistema.md`](Documentacion-General/01-Arquitectura-General-del-Sistema.md) |
+| Diagramas Mermaid (contexto, contenedores, secuencias) | [`15-Diagramas-C4-y-Secuencias.md`](Documentacion-General/15-Diagramas-C4-y-Secuencias.md) |
+| Modelo de datos / MER | [`Modelo-Datos-MER.md`](Documentacion-General/Modelo-Datos-MER.md) · [dbdocs](https://dbdocs.io/jdtovar-2021a/MER-MSPI) |
+| Glosario | [`16-Glosario.md`](Documentacion-General/16-Glosario.md) |
+| Historial de cambios docs | [`17-Changelog.md`](Documentacion-General/17-Changelog.md) |
+| Flujos SOL-* / auditoría / seguridad | [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](Documentacion-General/14-Flujos-Solicitudes-Auditoria-y-Seguridad.md) |
+| API consolidada | [`08-Referencia-API.md`](Documentacion-General/08-Referencia-API.md) |
+| SDLC por microservicio / MF | `Documentacion-Backend/<ms>/` · `Documentacion-Frontend/<mf>/` |
+| Privacidad | [`legal/POLITICA-PRIVACIDAD-MSPI.md`](legal/POLITICA-PRIVACIDAD-MSPI.md) |
 
 ---
 
@@ -97,7 +116,7 @@ flowchart TB
 La documentación se elaboró leyendo los repositorios reales, no a partir de plantillas. Cuando algo no está implementado, se declara. Detalle y trazabilidad en la [sección de deuda técnica](Documentacion-General/01-Arquitectura-General-del-Sistema.md).
 
 - **`ms_admin`** (:8089) posee la configuración global; **`ms_audit`** (:8088) posee la bitácora.
-- Los microfrontends se componen con **iframe + `postMessage`**, no con Module Federation (aunque el plan de trabajo lo especificaba).
+- Los **6** microfrontends se componen con **iframe + `postMessage`** (`shell-iframe-bridge.ts`). Module Federation queda como **evolución futura**, no como arquitectura actual.
 - El backend define umbral JaCoCo 80 %, pero el pipeline de CI ejecuta `assemble`, no `test`/`check`. Ningún microfrontend tiene pruebas automatizadas verificadas.
 - El instrumento fuente usa **ISO/IEC 27001:2013**; la versión vigente de la norma es **2022**.
 
@@ -110,7 +129,7 @@ La documentación se elaboró leyendo los repositorios reales, no a partir de pl
 | [MSPI Front](https://github.com/jdtovar07/MSPI_NVA_CO_MR_FRONT.git) | Código de microfrontends, UI y lógica de presentación |
 | [MSPI Back](https://github.com/jdtovar07/MSPI_NVA_CO_MR_BACK.git) | Código de microservicios, APIs y lógica de negocio |
 | [Figma](https://www.figma.com/design/tJchFUjVOMD20Homvf5TTC/MSPI---Definitivo?node-id=0-1&t=l4YlEHnhBgfLsxDP-1) | Diseño visual, prototipos y guía de estilo |
-| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación interactivo (esquemas `iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`) |
+| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación interactivo (8 esquemas: `iam`…`admin`) |
 
 Índice de enlaces: [`MSPI-Enlaces.md`](MSPI-Enlaces.md).
 
@@ -223,14 +242,14 @@ El índice completo está en [`Documentacion-General/00-Indice-General.md`](Docu
 
 ---
 
-## Wiki (MkDocs Material)
+## Wiki (MkDocs Material) — punto de entrada navegable
 
-Documentación navegable y buscable generada desde estos Markdown:
+La **wiki** es la forma recomendada de leer este repo (menú, búsqueda, Mermaid):
 
 ```bash
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
-mkdocs serve    # http://127.0.0.1:8000
+mkdocs serve    # http://127.0.0.1:8000  → wiki/Inicio.md
 ```
 
-Guía completa (build, `gh-deploy`, estructura): [`WIKI.md`](WIKI.md).
+Guía completa (build, `gh-deploy`, estructura): [`WIKI.md`](WIKI.md). Landing: [`wiki/Inicio.md`](wiki/Inicio.md).
