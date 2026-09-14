@@ -88,7 +88,7 @@ Proveer un microfrontend Angular independiente y desplegable de forma aislada qu
 **Observaciones:**
 
 - No existen dependencias de terceros más allá del framework Angular y RxJS: no hay librería de gestión de estado (NgRx/Akita), ni componentes de UI de terceros (Material, PrimeNG), ni librerías de manejo de formularios distintas a `@angular/forms`. Toda la interfaz (formularios, tabla, dropzone) está implementada con HTML/CSS y Angular puro.
-- No se encontró configuración de **Module Federation de Webpack** (`@angular-architects/module-federation`, `webpack.config.js`, `federation.config.js` ausentes en el repositorio). La integración con el shell se realiza por **composición en tiempo de ejecución vía navegador** (iframe, `postMessage`, `localStorage` compartido), no por federación de módulos JavaScript — detallado en `03-Diseno.md`.
+- Composición actual: iframe + `postMessage`. No hay configuración de **Module Federation** (evolución futura) (`@angular-architects/module-federation`, `webpack.config.js`, `federation.config.js` ausentes en el repositorio). La integración con el shell se realiza por **composición en tiempo de ejecución vía navegador** (iframe, `postMessage`, `localStorage` compartido), no por federación de módulos JavaScript — detallado en `03-Diseno.md`.
 - A diferencia de `mf_auth`, el repositorio de `mf_evidence` **no contiene artefactos de una plantilla previa** (React/Vite u otra); el árbol `src/` corresponde en su totalidad a la aplicación Angular real.
 
 ## 6. Restricciones y supuestos

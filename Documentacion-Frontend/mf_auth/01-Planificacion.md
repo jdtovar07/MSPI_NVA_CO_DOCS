@@ -80,7 +80,7 @@ Proveer un microfrontend Angular independiente y desplegable de forma aislada qu
 | Lenguaje | TypeScript, modo `strict` | `~5.6.0` |
 | Contenedor | Node 22-alpine (build) + Nginx 1.27-alpine (runtime) | — |
 
-**Nota importante:** el proyecto **no usa Module Federation de Webpack** (no existe `@angular-architects/module-federation` en `package.json`, ni configuración de `webpack.config.js` o `federation.config.js` en el repositorio). La integración con el shell se realiza por **composición en tiempo de ejecución vía navegador** (iframe, `postMessage`, `localStorage`/cookie compartidos y navegación de página completa), no por federación de módulos JavaScript. Este punto se detalla en `03-Diseno.md` e `INTEGRACION-SHELL.md`.
+**Nota importante:** la composición **actual** es iframe + `postMessage` (**Module Federation** = evolución futura; no existe `@angular-architects/module-federation` en `package.json`, ni configuración de `webpack.config.js` o `federation.config.js` en el repositorio). La integración con el shell se realiza por **composición en tiempo de ejecución vía navegador** (iframe, `postMessage`, `localStorage`/cookie compartidos y navegación de página completa), no por federación de módulos JavaScript. Este punto se detalla en `03-Diseno.md` e `INTEGRACION-SHELL.md`.
 
 Adicionalmente, dentro del código fuente conviven artefactos de una plantilla previa (React + Vite, "Clean Architecture Todo App") en `src/features/`, `src/common/presentation/*.tsx`, `src/federated/AppWithProviders.tsx`, `components.json` (shadcn/ui) y `pnpm-workspace.yaml`. Estos archivos **no forman parte del build de Angular real**: `tsconfig.app.json` solo incluye `src/main.ts` y `src/app/**/*.ts`. Se documenta esta situación en detalle en `03-Diseno.md`.
 

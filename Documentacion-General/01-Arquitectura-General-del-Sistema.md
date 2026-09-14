@@ -9,7 +9,7 @@
 | Programa académico | Ingeniería de Sistemas |
 | Dirigido a | Profesor/asesor de trabajo de grado |
 | Fecha de elaboración | 2026-08-27 |
-| Última revisión cruzada con código | **2026-10-19** (8 MS activos; extracción `ms_audit`/`ms_admin`; radicados SOL-*) |
+| Última revisión cruzada con código | **2026-10-19** (DOCS-1: 8 MS; DOCS-2: diagramas, glosario, changelog, composición iframe) |
 | Fuentes primarias | `Documentacion-investigacion/Documento-Investigacion.md`; los 8 `03-Diseno.md` de `Documentacion-Backend/`; los 6 `03-Diseno.md` de `Documentacion-Frontend/`; [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI); `Documentacion-General/MER-MSPI.sql`; `MSPI_NVA_CO_MR_BACK/docs/proyecto/DB-MER.txt` y `DBvsExcel.md`; `docker-compose.apps.yml` / `docker-compose.front.yml` / `docker-compose.yml` (postgres, keycloak) |
 
 > **Nota de trazabilidad.** Cada afirmación técnica de este documento cita, entre paréntesis, el archivo del repositorio en el que se verificó. Cuando un dato no pudo confirmarse en ningún documento fuente, se declara explícitamente como no verificado en lugar de asumirse.
@@ -23,7 +23,7 @@ MSPI es una plataforma web que automatiza el **Instrumento de Identificación de
 El sistema se construyó bajo dos estilos arquitectónicos combinados:
 
 - **Backend de microservicios** (Java 21 / Spring Boot, arquitectura hexagonal): **8 microservicios activos** con puerto y esquema propios — `ms_iam` 8082, `ms_org` 8083, `ms_assessment` 8084, `ms_catalog` 8085, `ms_evidence` 8086, `ms_reporting` 8087, `ms_audit` 8088, `ms_admin` 8089 — verificados en `MSPI_NVA_CO_MR_BACK/ms_*/applications/app-service/.../application.yaml` y `docker-compose.apps.yml`.
-- **Frontend de microfrontends** (Angular 19): 6 aplicaciones independientes compuestas por un *shell* host. La composición real **no usa Module Federation de Webpack** (mecanismo estándar de la industria para microfrontends), sino **iframes embebidos + `window.postMessage` + almacenamiento compartido (`localStorage`/cookie)** — hallazgo verificado explícitamente en el propio código y documentado en `Documentacion-Frontend/mf_shell/03-Diseno.md` y `Documentacion-Frontend/mf_auth/03-Diseno.md` (ver secc. 4 y 9 de este documento).
+- **Frontend de microfrontends** (Angular 19): **6** aplicaciones independientes compuestas por un *shell* host. Composición **canónica**: **iframes + `window.postMessage`** vía `shell-iframe-bridge.ts` (y bridges hijos), con respaldo de sesión en `localStorage`/cookie. **Module Federation** se contempla solo como **evolución futura** (`docs/INTEGRACION-SHELL.md`). Verificado en los 6 MF (`Documentacion-Frontend/*/03-Diseno.md`; secc. 4 y [`15-Diagramas-C4-y-Secuencias.md`](15-Diagramas-C4-y-Secuencias.md)).
 
 La base de datos es una única instancia PostgreSQL particionada en **ocho esquemas** (`iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`, `audit`, `admin`), cada uno propiedad de un microservicio. Las tablas `audit.audit_log` y `admin.system_config(_history)` se migraron desde `iam.*` vía `patch-audit-schema.sql` / `patch-admin-schema.sql` (UUID sin FK cross-dominio). El MER interactivo está en [dbdocs.io/jdtovar-2021a/MER-MSPI](https://dbdocs.io/jdtovar-2021a/MER-MSPI); la fuente SQL local es [`MER-MSPI.sql`](MER-MSPI.sql). La identidad se delega a **Keycloak** como IdP externo (realm `iam`), y el sistema aplica sobre sí mismo controles de seguridad equivalentes a los que audita (2FA/TOTP, auditoría centralizada) — coherencia señalada en `Documento-Investigacion.md`, secc. 4. Flujos de radicado/auditoría: [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md).
 
@@ -156,19 +156,19 @@ Fuente: `Documentacion-Backend/ms_admin/` y `Documentacion-Backend/ms_audit/` (S
 | Microfrontend | Puerto (dev) | Responsabilidad | Integración con el shell |
 |---|---|---|---|
 | `mf_shell` | 4200 | Host/orquestador: layout, menú, guards de ruta y autoridad, tarjetas de dashboard por rol, componentes `*-redirect` que embeben cada MF hijo en un `<iframe>` | Es el host — implementa `shell-iframe-bridge.ts`, el protocolo de mensajería `postMessage` y la lista blanca de orígenes |
-| `mf_auth` | 4201 | Login, 2FA (setup/verify TOTP), cambio de contraseña, gestión de usuarios | **NO Module Federation.** Iframe hijo del shell; además usa navegación de página completa (`window.location.href` a `:4200/dashboard`) tras login exitoso |
-| `mf_org` | 4202 | CRUD de organizaciones; vista de solo lectura `/my-organization` | **NO Module Federation.** Iframe hijo; no origina sesión, solo la consume (lee `localStorage`/`sessionStorage`/cookie) |
-| `mf_assessment` | 4203 | Wizard completo de evaluación y **tablero de diagnóstico consolidado único** (`GET /assessments/{id}/diagnostic/dashboard`): creación, tipo de entidad, áreas, controles, PHVA, madurez, NIST, brechas | **NO Module Federation.** Iframe hijo; envía `MSPI_ACTIVE_ASSESSMENT` y `MSPI_SHELL_NAV` al shell |
-| `mf_evidence` | 4204 | Contexto/misión de la entidad y levantamiento de 43 ítems documentales | **NO Module Federation.** Iframe hijo; recibe sesión activamente vía `MSPI_AUTH_REQUEST` → `MSPI_AUTH_SESSION` |
-| `mf_reports` | 4205 | Generación/descarga de reportes (jobs PDF/Excel); la ruta de “dashboard” redirige a exportación; el diagnóstico vive en `mf_assessment` | **NO Module Federation.** Iframe hijo; sin guards de autoridad `REPORT_EXPORT` verificados en código |
+| `mf_auth` | 4201 | Login, 2FA (setup/verify TOTP), cambio de contraseña, gestión de usuarios | Iframe hijo; tras login navega a `:4200/dashboard` (`window.location.href`) |
+| `mf_org` | 4202 | CRUD de organizaciones; vista de solo lectura `/my-organization` | Iframe hijo; consume sesión (no la origina) |
+| `mf_assessment` | 4203 | Wizard de evaluación y tablero de diagnóstico consolidado | Iframe hijo; `MSPI_ACTIVE_ASSESSMENT`, `MSPI_SHELL_NAV` |
+| `mf_evidence` | 4204 | Contexto/misión y levantamiento documental | Iframe hijo; `MSPI_AUTH_REQUEST` → `MSPI_AUTH_SESSION` |
+| `mf_reports` | 4205 | Generación/descarga de reportes (jobs PDF/Excel) | Iframe hijo |
 
-**Hallazgo arquitectónico central (verificado en código, no solo en un microfrontend piloto):** ninguno de los 6 microfrontends usa Module Federation de Webpack. La integración real es:
+**Composición frontend (canónica, los 6 MF):**
 
-1. **Composición visual por `<iframe>`**: el shell renderiza cada MF hijo en un `<iframe [src]="http://localhost:420X/<ruta>">` (`Documentacion-Frontend/mf_shell/03-Diseno.md`, línea 19: *"Mientras no tengamos Module Federation, usamos un iframe para mantener el menú del dashboard"* — comentario textual en `users-redirect.component.ts`).
-2. **Sincronización de sesión y navegación por `window.postMessage`**: protocolo propio con cuatro tipos de mensaje (`MSPI_AUTH_SESSION`, `MSPI_AUTH_REQUEST`, `MSPI_ACTIVE_ASSESSMENT`, `MSPI_SHELL_NAV`), implementado en `shell-iframe-bridge.ts` (shell) y en bridges equivalentes de cada MF hijo (`auth-parent-bridge.ts`, `shell-bridge.ts`). Lista blanca de orígenes por regex `http://(localhost|127.0.0.1):420[1-5]`.
-3. **Respaldo por almacenamiento compartido**: `localStorage['auth_session']` (y, en `mf_auth`, cookie `auth_session` con `SameSite=Lax`) — necesario porque `localStorage` no se comparte automáticamente entre orígenes (puertos) distintos en el navegador; el `postMessage` es el mecanismo que compensa esa limitación replicando la sesión en cada origen.
+1. **`<iframe>`** — el shell embebe cada hijo (`*-redirect.component.ts` → `http://localhost:420X/…`).
+2. **`postMessage`** — protocolo `MSPI_AUTH_SESSION` / `MSPI_AUTH_REQUEST` / `MSPI_ACTIVE_ASSESSMENT` / `MSPI_SHELL_NAV` en `shell-iframe-bridge.ts` (+ bridges hijos). Orígenes allowlist `http://(localhost|127.0.0.1):420[1-5]`.
+3. **Sesión** — `localStorage`/`cookie` de respaldo (puertos distintos no comparten storage nativo).
 
-El propio documento de integración del shell lo declara sin ambigüedad: `docs/INTEGRACION-SHELL.md` — *"Modelo actual: iframe (no Module Federation activo)"* y *"Module Federation (futuro): El código y comentarios preparan carga de remotos sin iframe; hoy los redirects usan iframe explícito."* Esto contrasta con documentación heredada dentro del propio repositorio (`README.md` raíz y `docs/ARQUITECTURA-CLEAN-ARCHITECTURE.md` de `mf_shell`, y árboles de código residual `src/federated/*` en `mf_auth`/`mf_org`) que describen una arquitectura Vite + React + `@originjs/vite-plugin-federation` **nunca migrada a Angular 19 real** — código muerto de una plantilla previa, no confundir con el sistema en producción.
+`docs/INTEGRACION-SHELL.md`: *"Modelo actual: iframe (no Module Federation activo)"*; Module Federation = **evolución futura**. Árboles `src/federated/*` (plantilla React/Vite) son **código muerto**, no la arquitectura en producción. Diagramas: [`15-Diagramas-C4-y-Secuencias.md`](15-Diagramas-C4-y-Secuencias.md).
 
 ```mermaid
 sequenceDiagram
@@ -207,13 +207,15 @@ flowchart TB
             KCS["keycloak_setup_mspi<br/>(job idempotente, roles admin API)"]
         end
 
-        subgraph AppsStack["docker-compose.apps.yml (mspi-apps)"]
+        subgraph AppsStack["docker-compose.apps.yml (mspi-apps) — 8 MS"]
             IAM["ms_iam :8082"]
             ORG["ms_org :8083"]
             CAT["ms_catalog :8085"]
             EVI["ms_evidence :8086<br/>vol: mspi_evidence_data"]
             ASM["ms_assessment :8084"]
             REP["ms_reporting :8087<br/>vol: mspi_report_outputs"]
+            AUD["ms_audit :8088"]
+            ADM["ms_admin :8089"]
         end
 
         subgraph FrontStack["docker-compose.front.yml (mspi-front)"]
@@ -240,6 +242,8 @@ flowchart TB
     EVI --> PG
     ASM --> PG
     REP --> PG
+    AUD --> PG
+    ADM --> PG
     IAM -->|Resource Owner<br/>Password Credentials| KCC
     KCC --> PGKC
     KCS --> KCC
@@ -393,7 +397,7 @@ Implementado mediante el campo `row_version` en `assessment.assessment` (increme
 | Observabilidad backend | Micrometer + Prometheus registry | Expuesto en `api-rest` de cada microservicio activo |
 | Contenerización backend | Docker Compose (`mspi-apps`), red externa `mspi-net` | Orquesta los 8 microservicios activos con `depends_on`/`healthcheck` declarados |
 | Framework frontend | Angular ^19.0.0 (standalone components), TypeScript ~5.6.0 modo `strict` | Cada uno de los 6 microfrontends es un proyecto Angular independiente con su propio `angular.json`, sin *workspace* multi-proyecto compartido |
-| Composición de microfrontends | Iframe + `postMessage` + `localStorage`/cookie (no Module Federation, ver secc. 4) | El *shell* es el único punto de composición visual; cada MF hijo es una SPA autónoma servida por su propio Nginx |
+| Composición de microfrontends | Iframe + `postMessage` (`shell-iframe-bridge`) + `localStorage`/cookie; Module Federation = evolución futura | El *shell* es el único punto de composición visual; cada MF hijo es una SPA autónoma servida por su propio Nginx |
 | UI / diseño | Angular Material + CDK, Tailwind CSS, `@ng-icons/lucide`, `ng2-charts`/Chart.js | Usados dentro de cada MF de forma independiente (sin *design system* compartido a nivel de librería publicada) |
 | Gestión de estado frontend | Angular Signals (`signal`, `computed`) | `AuthSessionService` (sesión), `AssessmentStateService` (evaluación activa en `localStorage`), `CatalogCacheService` (`sessionStorage`) — patrón repetido de forma independiente en cada MF, sin librería de estado compartida entre ellos |
 | Contenerización frontend | Node 22-alpine (build) → Nginx 1.27-alpine (runtime) | Cada MF se sirve como sitio estático independiente en su propio contenedor, puerto interno 80 mapeado a 420X |
@@ -417,7 +421,7 @@ Implementado mediante el campo `row_version` en `assessment.assessment` (increme
 | Snapshot de catálogo por evaluación | Garantiza que evaluaciones históricas no cambien si se actualiza la plantilla del instrumento; requisito no negociable para auditabilidad de un SGSI | `DBvsExcel.md` secc. 3 |
 | Reportes server-side asíncronos (no generación en cliente, Plan v1 descartado) | El cliente no puede reproducir con exactitud la plantilla oficial de Excel de MinTIC (formato, fórmulas, estilos); un job asíncrono desacopla la generación pesada de la latencia de la petición HTTP | `Documento-Investigacion.md` secc. 9.2 |
 | Microfrontends (6 aplicaciones Angular independientes) | Permite que los 6 dominios funcionales (auth, org, evaluación, evidencia, reportes, shell) se desarrollen y desplieguen de forma desacoplada, cada uno con su propio ciclo de vida de contenedor Nginx | `Documento-Investigacion.md` secc. 6.2 y 7 |
-| Iframe + postMessage en lugar de Module Federation (decisión real, no la planificada) | Evita acoplar el build del shell a los builds de los 5 microfrontends hijos — cada uno se despliega y versiona de forma completamente independiente —, a costa de mayor complejidad en la sincronización de estado entre orígenes distintos | `Documentacion-Frontend/mf_shell/03-Diseno.md`, tabla de decisiones de diseño |
+| Iframe + postMessage como composición actual (Module Federation = futuro) | Evita acoplar el build del shell a los builds de los 5 MF hijos; cada uno se despliega y versiona de forma independiente | `mf_shell/03-Diseno.md`, `INTEGRACION-SHELL.md`, `15-Diagramas-…` |
 
 ---
 
@@ -427,7 +431,7 @@ Esta sección documenta con honestidad las brechas encontradas al consolidar los
 
 1. **Extracción de auditoría y configuración desde `ms_iam` (cerrada en código).** `ms_audit` (:8088, esquema `audit`) y `ms_admin` (:8089, esquema `admin`) son microservicios hexagonales activos; la bitácora y el system config ya no viven en `iam.*` (migraciones `patch-audit-schema.sql` / `patch-admin-schema.sql`). Residual documental histórico en borradores antiguos — fuente actual: SDLC 2026-10-19 de ambos MS y [`14-Flujos-…`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md).
 
-2. **Discrepancia entre Module Federation planificado y la integración real por iframe.** El plan de trabajo del backend (`PLAN_TRABAJO_MSPI_v2.md`, sección 10, citado en `Documento-Investigacion.md` secc. 6.2) especifica una configuración `webpack.config.js` con `remotes` de Module Federation para los 6 microfrontends. La verificación directa del código de los 6 `03-Diseno.md` de frontend confirma que **ninguno** implementa Module Federation: todos usan iframe + `postMessage` + almacenamiento compartido. Implicaciones documentadas: URLs `hardcodeadas` a `localhost:420X` sin `environment.prod.ts` que las parametrice (`Documentacion-Frontend/mf_shell/03-Diseno.md`, "Observación de diseño"), y propagación de sesión "parcial" entre orígenes distintos del navegador.
+2. **Composición por iframe (estándar actual) vs. Module Federation (evolución futura).** Los 6 MF usan iframe + `postMessage` (`shell-iframe-bridge`). El plan v2 mencionaba Module Federation; el código y `INTEGRACION-SHELL.md` fijan iframe como modelo vigente. Residual: URLs de desarrollo a `localhost:420X` y allowlist de orígenes local (`mf_shell/03-Diseno.md`).
 
 3. **Cobertura de pruebas automatizadas heterogénea entre backend y frontend.** `ms_iam` documenta uso disciplinado de JUnit 5, Mockito, ArchUnit, JaCoCo y Pitest (`Documentacion-Backend/ms_iam/03-Diseno.md` §5, referenciado también en `Documento-Investigacion.md` secc. 11.3). En contraste, **ninguno de los 6** `03-Diseno.md` de microfrontends menciona una sola herramienta de pruebas (Jasmine/Karma/Jest/Cypress/Playwright) — ausencia confirmada de forma consistente en los 6 documentos, no solo en el piloto `mf_auth` mencionado en el Documento de Investigación.
 

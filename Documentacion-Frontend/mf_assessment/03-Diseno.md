@@ -181,7 +181,7 @@ sequenceDiagram
 
 Decisiones de diseño verificadas en código:
 
-- **Sin Module Federation**: la integración es 100% por `<iframe>` + `postMessage` + `localStorage`, sin `@angular-architects/module-federation` ni `webpack.config.js`/`federation.config.js` en el repositorio.
+- **Composición actual (iframe)**: la integración es `<iframe>` + `postMessage` + `localStorage`, sin `@angular-architects/module-federation` ni `webpack.config.js`/`federation.config.js` en el repositorio.
 - **Lista blanca de orígenes**: tanto `auth-parent-bridge.ts` (`ALLOWED_PARENTS`) como `shell-bridge.ts` (`SHELL_ORIGINS`) restringen la comunicación a `http://localhost:4200` y `http://127.0.0.1:4200`, verificando `event.origin` antes de procesar cualquier mensaje entrante.
 - **Expiración de sesión defensiva**: `installAuthParentBridge` descarta la sesión recibida si `parsed.expiresAt` ya pasó (`Date.now() >= parsed.expiresAt`), antes de persistirla en `localStorage`.
 - **Fallback fuera de iframe**: `syncActiveAssessmentToShell` y `openShellRoute` detectan `window.parent === window` (ejecución standalone, no embebida) y en ese caso solo escriben en `localStorage` local o navegan con `window.location.href`, sin enviar `postMessage`.

@@ -34,4 +34,4 @@ Los 6 microfrontends generan sus bundles JS/CSS con nombre de archivo hasheado (
 
 ## Integración entre microfrontends: `<iframe>` + sesión compartida por cookies
 
-`mf_shell` embebe cada microfrontend hijo como `<iframe>` apuntando a su propio puerto/origen; la sesión de Keycloak se comparte porque las cookies son de dominio `localhost` (cross-port en desarrollo). No hay *token passing* explícito para autenticación entre shell e hijo — el navegador ya trae la cookie de sesión al navegar al origen del iframe. Es una integración más simple que Module Federation, a costa de que cada microfrontend hijo carga su propio runtime de Angular.
+`mf_shell` embebe cada microfrontend hijo como `<iframe>` apuntando a su propio puerto/origen; la sincronización de sesión/navegación usa `shell-iframe-bridge.ts` (`postMessage`). Es la composición **actual** de los 6 MF; Module Federation queda como **evolución futura**. Cada hijo carga su propio runtime de Angular.
