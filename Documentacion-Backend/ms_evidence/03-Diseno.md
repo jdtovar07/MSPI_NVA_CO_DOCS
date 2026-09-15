@@ -308,3 +308,120 @@ sequenceDiagram
 | `assessmentId` sin FK cross-schema | Cada microservicio posee su propio esquema PostgreSQL (`evidence`); la integridad referencial hacia `ms_assessment` se confía al llamador (validación en `ms_assessment` o el frontend), no a una constraint de base de datos. |
 | Secretos vía Infisical, sin fallback a `.env`/H2 | `InfisicalConfig` (BeanFactoryPostProcessor) inyecta secretos como property source antes de crear el resto de beans; `DBCredentialConfig` falla explícitamente si `DB_CREDENTIAL` no está disponible — diseño más estricto que `ms_iam` (que sí tiene fallback a H2 en desarrollo). |
 | CORS configurado por filtro dedicado de máxima precedencia | `CorsConfig.corsFilter` usa `FilterRegistrationBean` con `Ordered.HIGHEST_PRECEDENCE`, permitiendo credenciales y orígenes configurables por `CORS_ALLOWED_ORIGINS` (separados por coma). |
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid verificados contra el código de `ms_evidence` (puerto **8086**, esquema PostgreSQL **`evidence`**). Estilo: **arquitectura hexagonal / Clean Architecture por convención de carpetas** (puertos y adaptadores).
+
+### I.1 Arquitectura hexagonal
+
+**Título:** Puertos y adaptadores de `ms_evidence`
+
+**Contexto.** El núcleo de dominio no importa Spring ni JPA. Las APIs invocan casos de uso; los gateways se implementan en adaptadores.
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry points"]
+        API["api-rest · *Api JWT"]
+        INT["/internal/** · X-Internal-Api-Key"]
+    end
+    subgraph Domain["Dominio"]
+        UC["domain/usecase"]
+        M["domain/model + Gateway interfaces"]
+        UC --> M
+    end
+    subgraph Driven["Driven adapters"]
+        JPA["jpa-repository"]
+        OUT["rest-consumer / storage / mail"]
+    end
+    API --> UC
+    INT --> UC
+    M -.-> JPA
+    M -.-> OUT
+```
+
+### I.2 Módulos Gradle
+
+**Título:** Layout multi-módulo
+
+**Contexto.** Subproyectos declarados en `settings.gradle` de `ms_evidence`.
+
+```mermaid
+flowchart LR
+    APP[app-service] --> API[api-rest]
+    APP --> UC[usecase]
+    APP --> JPA[jpa-repository]
+    UC --> MOD[model]
+    API --> UC
+    JPA --> MOD
+```
+
+**Módulos:** `app-service, model, usecase, common, api-rest, jpa-repository`.
+
+### I.3 Diagrama de clases (dominio)
+
+**Título:** Tipos principales del dominio
+
+**Contexto.** Clases reales usadas en casos de uso y persistencia (sin DTOs HTTP).
+
+```mermaid
+classDiagram
+    direction TB
+    class EvidenceFile
+    class AssessmentContext
+    class LiftingDocumentDelivery
+    class ProcessScopeMetric
+    class UploadEvidenceFileUseCase
+    class DeleteEvidenceFileUseCase
+    class InitLiftingUseCase
+    class UpdateAssessmentContextUseCase
+    class EvidencePersistenceGateway
+    class FileStorageGateway
+    UploadEvidenceFileUseCase ..> EvidencePersistenceGateway : uses
+```
+
+### I.4 Secuencia — Subida de evidencia con validación MIME
+
+**Contexto.** Flujo representativo implementado en `ms_evidence`.
+
+```mermaid
+sequenceDiagram
+    participant Api as EvidenceFileApi
+    participant UC as UploadEvidenceFileUseCase
+    participant Store as FileStorageGateway
+    participant Pers as EvidencePersistenceGateway
+    Api->>UC: upload multipart
+    UC->>UC: MIME allowlist + magic bytes
+    UC->>Store: store bytes + SHA-256
+    UC->>Pers: save EvidenceFile
+```
+
+### I.5 Mini-ER — esquema `evidence`
+
+**Título:** Entidades JPA del MS
+
+**Contexto.** Tablas bajo el esquema propietario `evidence`.
+
+```mermaid
+erDiagram
+    EvidenceFileEntity {
+        string table_evidence_file
+    }
+    AssessmentContextEntity {
+        string table_assessment_context
+    }
+    LiftingDocumentDeliveryEntity {
+        string table_lifting_document_delivery
+    }
+```
+
+**Mapeo:** EvidenceFileEntity→evidence_file, AssessmentContextEntity→assessment_context, LiftingDocumentDeliveryEntity→lifting_document_delivery.
+
+### I.6 APIs de entrada
+
+| Clase | Base / notas |
+|---|---|
+| `EvidenceFileApi` | ver código |
+| `AssessmentContextApi` | ver código |
+| `LiftingDeliveryApi` | ver código |
+| `InternalLiftingApi` | /internal/assessments |

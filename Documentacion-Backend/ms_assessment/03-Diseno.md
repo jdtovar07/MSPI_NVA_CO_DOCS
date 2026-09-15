@@ -331,3 +331,128 @@ Convenciones de diseño observadas, consistentes con las del resto del ecosistem
 | **Resolvers de dominio sin estado y con métodos estáticos** (`PhvaScoreResolver`, `MaturityScoreResolver`, `NistCiberScoreResolver`) | Firmas `static` verificadas en los tests (`MaturityScoreResolver.compareStatus(...)`, `NistCiberScoreResolver.averageScores(...)`) | Facilita pruebas unitarias puras sin mocks de gateway para la lógica aritmética/de comparación central del dominio |
 | **Gestión de secretos por Infisical en producción** | `InfisicalConfig` (mismo patrón `BeanFactoryPostProcessor` que `ms_iam`) | Sin credenciales hardcodeadas para producción |
 | **Sin manejador genérico de excepciones (`Exception.class`)** en `GlobalExceptionHandler` | Solo 6 `@ExceptionHandler` específicos, comparado con los 10+1 de `ms_iam` | Una excepción no contemplada (p. ej. `NullPointerException` en un cálculo) se propaga como error 500 por defecto de Spring Boot, sin el envoltorio `ErrorResponse` uniforme — inconsistencia de contrato a vigilar (ver `07-Mantenimiento.md`) |
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid verificados contra el código de `ms_assessment` (puerto **8084**, esquema PostgreSQL **`assessment`**). Estilo: **arquitectura hexagonal / Clean Architecture por convención de carpetas** (puertos y adaptadores).
+
+### I.1 Arquitectura hexagonal
+
+**Título:** Puertos y adaptadores de `ms_assessment`
+
+**Contexto.** El núcleo de dominio no importa Spring ni JPA. Las APIs invocan casos de uso; los gateways se implementan en adaptadores.
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry points"]
+        API["api-rest · *Api JWT"]
+        INT["/internal/** · X-Internal-Api-Key"]
+    end
+    subgraph Domain["Dominio"]
+        UC["domain/usecase"]
+        M["domain/model + Gateway interfaces"]
+        UC --> M
+    end
+    subgraph Driven["Driven adapters"]
+        JPA["jpa-repository"]
+        OUT["rest-consumer / storage / mail"]
+    end
+    API --> UC
+    INT --> UC
+    M -.-> JPA
+    M -.-> OUT
+```
+
+### I.2 Módulos Gradle
+
+**Título:** Layout multi-módulo
+
+**Contexto.** Subproyectos declarados en `settings.gradle` de `ms_assessment`.
+
+```mermaid
+flowchart LR
+    APP[app-service] --> API[api-rest]
+    APP --> UC[usecase]
+    APP --> JPA[jpa-repository]
+    UC --> MOD[model]
+    API --> UC
+    JPA --> MOD
+```
+
+**Módulos:** `app-service, model, usecase, common, api-rest, jpa-repository, rest-consumer`.
+
+### I.3 Diagrama de clases (dominio)
+
+**Título:** Tipos principales del dominio
+
+**Contexto.** Clases reales usadas en casos de uso y persistencia (sin DTOs HTTP).
+
+```mermaid
+classDiagram
+    direction TB
+    class Assessment
+    class ControlResponse
+    class AssessmentDeletionRequest
+    class RollupResult
+    class DiagnosticDashboardResult
+    class CreateAssessmentUseCase
+    class PatchControlScoreUseCase
+    class PublishAssessmentUseCase
+    class ApproveAssessmentDeletionUseCase
+    class AssessmentPersistenceGateway
+    class CatalogGateway
+    class AuditGateway
+    class SystemConfigGateway
+    class EvidenceGateway
+    CreateAssessmentUseCase ..> AssessmentPersistenceGateway : uses
+```
+
+### I.4 Secuencia — Aprobar eliminación y auditar
+
+**Contexto.** Flujo representativo implementado en `ms_assessment`.
+
+```mermaid
+sequenceDiagram
+    participant Api as AssessmentDeletionApi
+    participant UC as ApproveAssessmentDeletionUseCase
+    participant Cfg as SystemConfigGateway
+    participant Aud as AuditGateway
+    participant Pers as AssessmentPersistenceGateway
+    Api->>UC: approve(requestId)
+    UC->>Cfg: GET grace days via ms_admin
+    UC->>Pers: schedule soft-delete
+    UC->>Aud: DELETION_APPROVED → ms_audit
+```
+
+### I.5 Mini-ER — esquema `assessment`
+
+**Título:** Entidades JPA del MS
+
+**Contexto.** Tablas bajo el esquema propietario `assessment`.
+
+```mermaid
+erDiagram
+    AssessmentEntity {
+        string table_assessment
+    }
+    ControlResponseEntity {
+        string table_control_response
+    }
+    AssessmentDeletionRequestEntity {
+        string table_assessment_deletion_request
+    }
+    AssessmentMemberEntity {
+        string table_assessment_member
+    }
+```
+
+**Mapeo:** AssessmentEntity→assessment, ControlResponseEntity→control_response, AssessmentDeletionRequestEntity→assessment_deletion_request, AssessmentMemberEntity→assessment_member.
+
+### I.6 APIs de entrada
+
+| Clase | Base / notas |
+|---|---|
+| `AssessmentApi` | /assessments |
+| `AssessmentControlApi` | ver código |
+| `AssessmentDeletionApi` | ver código |
+| `AssessmentDiagnosticApi` | ver código |

@@ -319,3 +319,124 @@ flowchart TD
 - No hay diagrama de despliegue formal (`*.drawio`, `*.puml`) dentro de `ms_catalog/docs/`; solo `openapi.yaml` y `MVP-MSPI-CONTRATOS-Y-MER.md` (este último centrado en el contrato `ms_iam`↔`ms_org`, no en `ms_catalog`).
 - No se encontró un diagrama de secuencia o contrato formal `ms_assessment ↔ ms_catalog` más allá de lo inferible del propio `openapi.yaml` y las referencias a HU en comentarios de código.
 - No hay versión de API en la ruta (`/catalog/...` sin prefijo `/v1`); el versionado de contenido se resuelve por `templateVersionId`, no por versión de API HTTP.
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid verificados contra el código de `ms_catalog` (puerto **8085**, esquema PostgreSQL **`catalog`**). Estilo: **arquitectura hexagonal / Clean Architecture por convención de carpetas** (puertos y adaptadores).
+
+### I.1 Arquitectura hexagonal
+
+**Título:** Puertos y adaptadores de `ms_catalog`
+
+**Contexto.** El núcleo de dominio no importa Spring ni JPA. Las APIs invocan casos de uso; los gateways se implementan en adaptadores.
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry points"]
+        API["api-rest · *Api JWT"]
+        INT["/internal/** · X-Internal-Api-Key"]
+    end
+    subgraph Domain["Dominio"]
+        UC["domain/usecase"]
+        M["domain/model + Gateway interfaces"]
+        UC --> M
+    end
+    subgraph Driven["Driven adapters"]
+        JPA["jpa-repository"]
+        OUT["rest-consumer / storage / mail"]
+    end
+    API --> UC
+    INT --> UC
+    M -.-> JPA
+    M -.-> OUT
+```
+
+### I.2 Módulos Gradle
+
+**Título:** Layout multi-módulo
+
+**Contexto.** Subproyectos declarados en `settings.gradle` de `ms_catalog`.
+
+```mermaid
+flowchart LR
+    APP[app-service] --> API[api-rest]
+    APP --> UC[usecase]
+    APP --> JPA[jpa-repository]
+    UC --> MOD[model]
+    API --> UC
+    JPA --> MOD
+```
+
+**Módulos:** `app-service, model, usecase, common, api-rest, jpa-repository`.
+
+### I.3 Diagrama de clases (dominio)
+
+**Título:** Tipos principales del dominio
+
+**Contexto.** Clases reales usadas en casos de uso y persistencia (sin DTOs HTTP).
+
+```mermaid
+classDiagram
+    direction TB
+    class ControlCatalogNode
+    class Scale
+    class ScaleVersion
+    class QuestionBank
+    class TemplateVersion
+    class GetControlCatalogTreeUseCase
+    class PublishScaleVersionUseCase
+    class RequestCatalogDeletionUseCase
+    class ApproveCatalogDeletionUseCase
+    class CatalogPersistenceGateway
+    class ScaleAdminGateway
+    class AuditGateway
+    class SystemConfigGateway
+    GetControlCatalogTreeUseCase ..> CatalogPersistenceGateway : uses
+```
+
+### I.4 Secuencia — Solicitud de eliminación de catálogo
+
+**Contexto.** Flujo representativo implementado en `ms_catalog`.
+
+```mermaid
+sequenceDiagram
+    participant Api as CatalogDeletionApi
+    participant UC as RequestCatalogDeletionUseCase
+    participant Pers as CatalogDeletionGateway
+    participant Aud as AuditGateway
+    Api->>UC: request
+    UC->>Pers: create SOL-CAT-######
+    UC->>Aud: CATALOG_DELETION_REQUESTED
+```
+
+### I.5 Mini-ER — esquema `catalog`
+
+**Título:** Entidades JPA del MS
+
+**Contexto.** Tablas bajo el esquema propietario `catalog`.
+
+```mermaid
+erDiagram
+    ControlCatalogNodeEntity {
+        string table_control_catalog_node
+    }
+    ScaleEntity {
+        string table_scale
+    }
+    QuestionBankEntity {
+        string table_question_bank
+    }
+    CatalogDeletionRequestEntity {
+        string table_catalog_deletion_request
+    }
+```
+
+**Mapeo:** ControlCatalogNodeEntity→control_catalog_node, ScaleEntity→scale, QuestionBankEntity→question_bank, CatalogDeletionRequestEntity→catalog_deletion_request.
+
+### I.6 APIs de entrada
+
+| Clase | Base / notas |
+|---|---|
+| `CatalogApi` | /catalog |
+| `ScaleAdminApi` | /catalog/scales |
+| `CatalogDeletionApi` | /catalog/deletion-requests |

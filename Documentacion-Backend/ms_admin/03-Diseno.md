@@ -124,3 +124,109 @@ Validación en escritura: cada campo de días, si se envía, debe ser entero **1
 | Defaults en caso de uso (no solo seed SQL) | Lectura siempre útil aunque la fila esté vacía o parcial |
 | UUID `updated_by`/`changed_by` sin FK | Desacople de `iam.user`; label humano en summary/JWT |
 | Sin módulo de “salud del sistema” | Retirado por decisión de producto (comentario en código) |
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid verificados contra el código de `ms_admin` (puerto **8089**, esquema PostgreSQL **`admin`**). Estilo: **arquitectura hexagonal / Clean Architecture por convención de carpetas** (puertos y adaptadores).
+
+### I.1 Arquitectura hexagonal
+
+**Título:** Puertos y adaptadores de `ms_admin`
+
+**Contexto.** El núcleo de dominio no importa Spring ni JPA. Las APIs invocan casos de uso; los gateways se implementan en adaptadores.
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry points"]
+        API["api-rest · *Api JWT"]
+        INT["/internal/** · X-Internal-Api-Key"]
+    end
+    subgraph Domain["Dominio"]
+        UC["domain/usecase"]
+        M["domain/model + Gateway interfaces"]
+        UC --> M
+    end
+    subgraph Driven["Driven adapters"]
+        JPA["jpa-repository"]
+        OUT["rest-consumer / storage / mail"]
+    end
+    API --> UC
+    INT --> UC
+    M -.-> JPA
+    M -.-> OUT
+```
+
+### I.2 Módulos Gradle
+
+**Título:** Layout multi-módulo
+
+**Contexto.** Subproyectos declarados en `settings.gradle` de `ms_admin`.
+
+```mermaid
+flowchart LR
+    APP[app-service] --> API[api-rest]
+    APP --> UC[usecase]
+    APP --> JPA[jpa-repository]
+    UC --> MOD[model]
+    API --> UC
+    JPA --> MOD
+```
+
+**Módulos:** `app-service, model, usecase, common, api-rest, jpa-repository`.
+
+### I.3 Diagrama de clases (dominio)
+
+**Título:** Tipos principales del dominio
+
+**Contexto.** Clases reales usadas en casos de uso y persistencia (sin DTOs HTTP).
+
+```mermaid
+classDiagram
+    direction TB
+    class SystemConfig
+    class SystemConfigHistoryEntry
+    class GetSystemConfigUseCase
+    class UpdateSystemConfigUseCase
+    class GetSystemConfigHistoryUseCase
+    class SystemConfigGateway
+    GetSystemConfigUseCase ..> SystemConfigGateway : uses
+```
+
+### I.4 Secuencia — Actualizar configuración global
+
+**Contexto.** Flujo representativo implementado en `ms_admin`.
+
+```mermaid
+sequenceDiagram
+    participant Api as SystemAdminApi
+    participant UC as UpdateSystemConfigUseCase
+    participant Gw as SystemConfigGateway
+    Api->>UC: PUT /system/config
+    UC->>UC: validate 1..365 days
+    UC->>Gw: save + append history
+```
+
+### I.5 Mini-ER — esquema `admin`
+
+**Título:** Entidades JPA del MS
+
+**Contexto.** Tablas bajo el esquema propietario `admin`.
+
+```mermaid
+erDiagram
+    SystemConfigEntity {
+        string table_system_config
+    }
+    SystemConfigHistoryEntity {
+        string table_system_config_history
+    }
+```
+
+**Mapeo:** SystemConfigEntity→system_config, SystemConfigHistoryEntity→system_config_history.
+
+### I.6 APIs de entrada
+
+| Clase | Base / notas |
+|---|---|
+| `SystemAdminApi` | /system |
+| `InternalSystemConfigApi` | /internal/system/config |

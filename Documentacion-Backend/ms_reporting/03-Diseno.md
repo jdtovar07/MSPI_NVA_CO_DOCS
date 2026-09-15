@@ -443,3 +443,119 @@ sequenceDiagram
 | DT-06 | Archivado a `ms_evidence` desacoplado del resultado del job (best effort, captura `RuntimeException`) | El artefacto ya es útil para el usuario aunque `ms_evidence` esté caído; se prioriza la experiencia del usuario final sobre la completitud de la trazabilidad de evidencias |
 | DT-07 | Autenticación dual: JWT de usuario para la API pública, `X-Internal-Api-Key` para las llamadas server-to-server hacia `ms_assessment`/`ms_evidence`/`ms_catalog` | Evita propagar el JWT del usuario final a servicios internos (que podría expirar durante un procesamiento largo) y separa el plano de confianza "usuario↔gateway" del plano "servicio↔servicio" |
 | DT-08 | Sin `springdoc-openapi`; el contrato OpenAPI se mantiene como archivo estático versionado | Reduce huella de dependencias en runtime; a cambio, el archivo puede desincronizarse del código si no se actualiza manualmente en cada cambio de API (riesgo de documentación desactualizada) |
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid verificados contra el código de `ms_reporting` (puerto **8087**, esquema PostgreSQL **`reporting`**). Estilo: **arquitectura hexagonal / Clean Architecture por convención de carpetas** (puertos y adaptadores).
+
+### I.1 Arquitectura hexagonal
+
+**Título:** Puertos y adaptadores de `ms_reporting`
+
+**Contexto.** El núcleo de dominio no importa Spring ni JPA. Las APIs invocan casos de uso; los gateways se implementan en adaptadores.
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry points"]
+        API["api-rest · *Api JWT"]
+        INT["/internal/** · X-Internal-Api-Key"]
+    end
+    subgraph Domain["Dominio"]
+        UC["domain/usecase"]
+        M["domain/model + Gateway interfaces"]
+        UC --> M
+    end
+    subgraph Driven["Driven adapters"]
+        JPA["jpa-repository"]
+        OUT["rest-consumer / storage / mail"]
+    end
+    API --> UC
+    INT --> UC
+    M -.-> JPA
+    M -.-> OUT
+```
+
+### I.2 Módulos Gradle
+
+**Título:** Layout multi-módulo
+
+**Contexto.** Subproyectos declarados en `settings.gradle` de `ms_reporting`.
+
+```mermaid
+flowchart LR
+    APP[app-service] --> API[api-rest]
+    APP --> UC[usecase]
+    APP --> JPA[jpa-repository]
+    UC --> MOD[model]
+    API --> UC
+    JPA --> MOD
+```
+
+**Módulos:** `app-service, model, usecase, common, api-rest, jpa-repository, rest-consumer`.
+
+### I.3 Diagrama de clases (dominio)
+
+**Título:** Tipos principales del dominio
+
+**Contexto.** Clases reales usadas en casos de uso y persistencia (sin DTOs HTTP).
+
+```mermaid
+classDiagram
+    direction TB
+    class ReportGenerationJob
+    class ReportJobStatus
+    class ReportType
+    class CreateReportJobCommand
+    class CreateReportJobUseCase
+    class ProcessReportJobUseCase
+    class GetReportJobUseCase
+    class DownloadReportJobUseCase
+    class ReportingPersistenceGateway
+    class AssessmentGateway
+    class CatalogGateway
+    class EvidenceGateway
+    class ReportOutputStorageGateway
+    CreateReportJobUseCase ..> ReportingPersistenceGateway : uses
+```
+
+### I.4 Secuencia — Procesar job de reporte
+
+**Contexto.** Flujo representativo implementado en `ms_reporting`.
+
+```mermaid
+sequenceDiagram
+    participant Api as ReportJobApi
+    participant Create as CreateReportJobUseCase
+    participant Proc as ProcessReportJobUseCase
+    participant Asm as AssessmentGateway
+    participant Ev as EvidenceGateway
+    Api->>Create: POST job PENDING
+    Proc->>Asm: export bundle
+    Proc->>Proc: fill template / convert
+    Proc->>Ev: store REPORT_OUTPUT
+```
+
+### I.5 Mini-ER — esquema `reporting`
+
+**Título:** Entidades JPA del MS
+
+**Contexto.** Tablas bajo el esquema propietario `reporting`.
+
+```mermaid
+erDiagram
+    ReportGenerationJobEntity {
+        string table_report_generation_job
+    }
+    ReportJobAssessmentEntity {
+        string table_report_job_assessment
+    }
+```
+
+**Mapeo:** ReportGenerationJobEntity→report_generation_job, ReportJobAssessmentEntity→report_job_assessment.
+
+### I.6 APIs de entrada
+
+| Clase | Base / notas |
+|---|---|
+| `ReportJobApi` | /reports/jobs |
+| `ComparativeReportJobApi` | /reports/comparative/jobs |

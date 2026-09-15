@@ -303,3 +303,119 @@ flowchart LR
 5. **Resolución de `organizationId` con doble fuente** (header explícito + claim JWT) en `getMyOrganization`: preparado para dos integraciones distintas de frontend/BFF, documentado explícitamente en `docs/MVP-MSPI-CONTRATOS-Y-MER.md` como "Opción A" (claim JWT) y "Opción B" (header desde BFF).
 6. **Degradación silenciosa del catálogo de ubicación**: cualquier fallo de la API externa retorna lista vacía en vez de error HTTP, priorizando que un problema de un proveedor externo no autenticado nunca tumbe el flujo de registro de organización (decisión de resiliencia visible en `LocationCatalogAdapter`, sin *circuit breaker* explícito — no hay Resilience4j en este microservicio, a diferencia de `ms_iam`).
 7. **Adaptadores REST salientes ubicados en `app-service`** en lugar de un módulo dedicado (ver §1) — reduce la cantidad de módulos Gradle a mantener pero acopla más responsabilidades al módulo ejecutable que en `ms_iam`.
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid verificados contra el código de `ms_org` (puerto **8083**, esquema PostgreSQL **`org`**). Estilo: **arquitectura hexagonal / Clean Architecture por convención de carpetas** (puertos y adaptadores).
+
+### I.1 Arquitectura hexagonal
+
+**Título:** Puertos y adaptadores de `ms_org`
+
+**Contexto.** El núcleo de dominio no importa Spring ni JPA. Las APIs invocan casos de uso; los gateways se implementan en adaptadores.
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry points"]
+        API["api-rest · *Api JWT"]
+        INT["/internal/** · X-Internal-Api-Key"]
+    end
+    subgraph Domain["Dominio"]
+        UC["domain/usecase"]
+        M["domain/model + Gateway interfaces"]
+        UC --> M
+    end
+    subgraph Driven["Driven adapters"]
+        JPA["jpa-repository"]
+        OUT["rest-consumer / storage / mail"]
+    end
+    API --> UC
+    INT --> UC
+    M -.-> JPA
+    M -.-> OUT
+```
+
+### I.2 Módulos Gradle
+
+**Título:** Layout multi-módulo
+
+**Contexto.** Subproyectos declarados en `settings.gradle` de `ms_org`.
+
+```mermaid
+flowchart LR
+    APP[app-service] --> API[api-rest]
+    APP --> UC[usecase]
+    APP --> JPA[jpa-repository]
+    UC --> MOD[model]
+    API --> UC
+    JPA --> MOD
+```
+
+**Módulos:** `app-service, model, usecase, common, api-rest, jpa-repository`.
+
+### I.3 Diagrama de clases (dominio)
+
+**Título:** Tipos principales del dominio
+
+**Contexto.** Clases reales usadas en casos de uso y persistencia (sin DTOs HTTP).
+
+```mermaid
+classDiagram
+    direction TB
+    class Organization
+    class OrganizationAreaBase
+    class CountryLocation
+    class PagedOrganizations
+    class CreateOrganizationUseCase
+    class GetOrganizationsUseCase
+    class GetMyOrganizationUseCase
+    class ReplaceOrganizationAreasBaseUseCase
+    class OrganizationPersistenceGateway
+    class LocationCatalogGateway
+    class IamGateway
+    CreateOrganizationUseCase ..> OrganizationPersistenceGateway : uses
+```
+
+### I.4 Secuencia — Crear organización
+
+**Contexto.** Flujo representativo implementado en `ms_org`.
+
+```mermaid
+sequenceDiagram
+    participant Api as OrganizationApi
+    participant UC as CreateOrganizationUseCase
+    participant Pers as OrganizationPersistenceGateway
+    participant Iam as IamGateway
+    Api->>UC: create
+    UC->>Pers: save organization
+    UC->>Iam: provision Lector if needed
+```
+
+### I.5 Mini-ER — esquema `org`
+
+**Título:** Entidades JPA del MS
+
+**Contexto.** Tablas bajo el esquema propietario `org`.
+
+```mermaid
+erDiagram
+    OrganizationEntity {
+        string table_organization
+    }
+    OrganizationContactEntity {
+        string table_organization_contact
+    }
+    OrganizationAreaBaseEntity {
+        string table_organization_area_base
+    }
+```
+
+**Mapeo:** OrganizationEntity→organization, OrganizationContactEntity→organization_contact, OrganizationAreaBaseEntity→organization_area_base.
+
+### I.6 APIs de entrada
+
+| Clase | Base / notas |
+|---|---|
+| `OrganizationApi` | /organizations |
+| `LocationApi` | /location |
+| `OrganizationAreasBaseApi` | ver código |

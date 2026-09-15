@@ -288,3 +288,135 @@ Contrato formal en `docs/openapi.yaml` (OpenAPI 3.1.0). Convenciones de diseño 
 | **`EmailGateway` como dependencia opcional** (`@Autowired(required = false)`) | `UserManagementService.emailGateway` | El servicio de creación de usuarios funciona aunque el adaptador de correo no esté disponible/configurado |
 | **TOTP con algoritmo estándar RFC 6238**, ventana de tolerancia ±1 paso de 30s | `TotpAdapter` (`TimeBasedOneTimePasswordGenerator`, `for (i = -1; i <= 1; i++)`) | Tolera desfases de reloj cliente/servidor típicos de apps autenticadoras |
 | **Gestión de secretos por Infisical en producción, fallback H2 en desarrollo** | `InfisicalConfig`, `DBCredentialConfig`, `application.yaml` | Sin credenciales hardcodeadas ni en el repositorio ni en variables planas para producción |
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid verificados contra el código de `ms_iam` (puerto **8082**, esquema PostgreSQL **`iam`**). Estilo: **arquitectura hexagonal / Clean Architecture por convención de carpetas** (puertos y adaptadores).
+
+### I.1 Arquitectura hexagonal
+
+**Título:** Puertos y adaptadores de `ms_iam`
+
+**Contexto.** El núcleo de dominio no importa Spring ni JPA. Las APIs invocan casos de uso; los gateways se implementan en adaptadores.
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry points"]
+        API["api-rest · *Api JWT"]
+        INT["/internal/** · X-Internal-Api-Key"]
+    end
+    subgraph Domain["Dominio"]
+        UC["domain/usecase"]
+        M["domain/model + Gateway interfaces"]
+        UC --> M
+    end
+    subgraph Driven["Driven adapters"]
+        JPA["jpa-repository"]
+        OUT["rest-consumer / storage / mail"]
+    end
+    API --> UC
+    INT --> UC
+    M -.-> JPA
+    M -.-> OUT
+```
+
+### I.2 Módulos Gradle
+
+**Título:** Layout multi-módulo
+
+**Contexto.** Subproyectos declarados en `settings.gradle` de `ms_iam`.
+
+```mermaid
+flowchart LR
+    APP[app-service] --> API[api-rest]
+    APP --> UC[usecase]
+    APP --> JPA[jpa-repository]
+    UC --> MOD[model]
+    API --> UC
+    JPA --> MOD
+```
+
+**Módulos:** `app-service, model, usecase, common, api-rest, jpa-repository, rest-consumer, service, brevo-sender`.
+
+### I.3 Diagrama de clases (dominio)
+
+**Título:** Tipos principales del dominio
+
+**Contexto.** Clases reales usadas en casos de uso y persistencia (sin DTOs HTTP).
+
+```mermaid
+classDiagram
+    direction TB
+    class User
+    class Role
+    class PasswordResetRequest
+    class Notification
+    class LoginResult
+    class TotpSetupResult
+    class LoginUseCase
+    class TotpVerifyUseCase
+    class ApprovePasswordResetUseCase
+    class CreateUserUseCase
+    class KeycloakAuthGateway
+    class TotpGateway
+    class PasswordResetRequestGateway
+    class EmailGateway
+    class UserPersistenceGateway
+    LoginUseCase ..> KeycloakAuthGateway : uses
+```
+
+### I.4 Secuencia — Login + verificación TOTP
+
+**Contexto.** Flujo representativo implementado en `ms_iam`.
+
+```mermaid
+sequenceDiagram
+    participant Api as AuthApi
+    participant UC as LoginUseCase / TotpVerifyUseCase
+    participant KC as KeycloakAuthGateway
+    participant Totp as TotpGateway
+    participant Aud as AuditAuthRestAdapter
+    Api->>UC: execute(login)
+    UC->>KC: authenticate
+    alt requiere 2FA
+        Api->>UC: TotpVerifyUseCase
+        UC->>Totp: verify
+    end
+    UC->>Aud: AUTH_LOGIN_SUCCESS
+```
+
+### I.5 Mini-ER — esquema `iam`
+
+**Título:** Entidades JPA del MS
+
+**Contexto.** Tablas bajo el esquema propietario `iam`.
+
+```mermaid
+erDiagram
+    UserEntity {
+        string table_user
+    }
+    UserTotpEntity {
+        string table_user_totp
+    }
+    PasswordResetRequestEntity {
+        string table_password_reset_request
+    }
+    NotificationEntity {
+        string table_notification
+    }
+    LoginAttemptEntity {
+        string table_login_attempt
+    }
+```
+
+**Mapeo:** UserEntity→user, UserTotpEntity→user_totp, PasswordResetRequestEntity→password_reset_request, NotificationEntity→notification, LoginAttemptEntity→login_attempt.
+
+### I.6 APIs de entrada
+
+| Clase | Base / notas |
+|---|---|
+| `AuthApi` | /auth |
+| `UsersApi` | /users |
+| `PasswordResetRequestsApi` | ver código |
+| `InternalRequestAuditApi` | /internal/requests |

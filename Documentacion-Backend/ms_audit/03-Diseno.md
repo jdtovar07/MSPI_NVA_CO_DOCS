@@ -127,3 +127,115 @@ URLs configurables: `adapter.ms-assessment.url` (`MS_ASSESSMENT_URL`), `adapter.
 | 202 en ingestión | Aceptación asíncrona-friendly; productores no esperan procesamiento pesado |
 | Metadata JSON para `requestNumber` | Flexibilidad sin alterar DDL por cada atributo de correlación |
 | Consulta admin solo `AdminSistema` | Bitácora sensible; panel de administración |
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid verificados contra el código de `ms_audit` (puerto **8088**, esquema PostgreSQL **`audit`**). Estilo: **arquitectura hexagonal / Clean Architecture por convención de carpetas** (puertos y adaptadores).
+
+### I.1 Arquitectura hexagonal
+
+**Título:** Puertos y adaptadores de `ms_audit`
+
+**Contexto.** El núcleo de dominio no importa Spring ni JPA. Las APIs invocan casos de uso; los gateways se implementan en adaptadores.
+
+```mermaid
+flowchart TB
+    subgraph Entry["Entry points"]
+        API["api-rest · *Api JWT"]
+        INT["/internal/** · X-Internal-Api-Key"]
+    end
+    subgraph Domain["Dominio"]
+        UC["domain/usecase"]
+        M["domain/model + Gateway interfaces"]
+        UC --> M
+    end
+    subgraph Driven["Driven adapters"]
+        JPA["jpa-repository"]
+        OUT["rest-consumer / storage / mail"]
+    end
+    API --> UC
+    INT --> UC
+    M -.-> JPA
+    M -.-> OUT
+```
+
+### I.2 Módulos Gradle
+
+**Título:** Layout multi-módulo
+
+**Contexto.** Subproyectos declarados en `settings.gradle` de `ms_audit`.
+
+```mermaid
+flowchart LR
+    APP[app-service] --> API[api-rest]
+    APP --> UC[usecase]
+    APP --> JPA[jpa-repository]
+    UC --> MOD[model]
+    API --> UC
+    JPA --> MOD
+```
+
+**Módulos:** `app-service, model, usecase, common, api-rest, jpa-repository`.
+
+### I.3 Diagrama de clases (dominio)
+
+**Título:** Tipos principales del dominio
+
+**Contexto.** Clases reales usadas en casos de uso y persistencia (sin DTOs HTTP).
+
+```mermaid
+classDiagram
+    direction TB
+    class AuditEvent
+    class AuditEventView
+    class AuditEventFilter
+    class RequestAuditTrail
+    class RequestAuditHeader
+    class RecordAuditEventUseCase
+    class ListAuditEventsUseCase
+    class GetRequestAuditTrailUseCase
+    class AuditEventGateway
+    class RequestOwnerGateway
+    RecordAuditEventUseCase ..> AuditEventGateway : uses
+```
+
+### I.4 Secuencia — Registrar evento y consultar trail
+
+**Contexto.** Flujo representativo implementado en `ms_audit`.
+
+```mermaid
+sequenceDiagram
+    participant Int as InternalAuditApi
+    participant Rec as RecordAuditEventUseCase
+    participant Gw as AuditEventGateway
+    participant Api as AuditApi
+    participant Trail as GetRequestAuditTrailUseCase
+    participant Own as RequestOwnerGateway
+    Int->>Rec: POST /internal/audit/events
+    Rec->>Gw: persist audit_log
+    Api->>Trail: GET /audit/requests/{n}
+    Trail->>Own: resolve SOL-* owner
+    Trail->>Gw: events by requestNumber
+```
+
+### I.5 Mini-ER — esquema `audit`
+
+**Título:** Entidades JPA del MS
+
+**Contexto.** Tablas bajo el esquema propietario `audit`.
+
+```mermaid
+erDiagram
+    AuditLogEntity {
+        string table_audit_log
+    }
+```
+
+**Mapeo:** AuditLogEntity→audit_log.
+
+### I.6 APIs de entrada
+
+| Clase | Base / notas |
+|---|---|
+| `AuditApi` | /audit |
+| `InternalAuditApi` | /internal/audit |
