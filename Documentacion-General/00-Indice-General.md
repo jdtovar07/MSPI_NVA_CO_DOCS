@@ -31,7 +31,7 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) | Arquitectura completa del sistema: diagrama C4 de contenedores, tabla de los 8 microservicios y 6 microfrontends, diagrama de despliegue Docker, arquitectura de seguridad (Keycloak/JWT/RBAC/2FA/auditoría), capas hexagonales, decisiones arquitectónicas y deuda técnica conocida. |
 | [`02-Modelo-de-Dominio.md`](02-Modelo-de-Dominio.md) | Los 8 bounded contexts activos (iam, org, catalog, assessment, evidence, reporting, audit, admin), entidades principales, diagrama ER, patrón catálogo-vs-ejecución, mapa funcional → microservicios y glosario de dominio. |
 | [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) | Objetivo general y objetivos específicos en formato de referencia rápida, con trazabilidad a los módulos que los implementan y su estado real (implementado / con limitaciones / no implementado). |
-| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación (8 esquemas: `iam`…`admin`). Fuente local: [`MER-MSPI.sql`](MER-MSPI.sql), [`MER-MSPI.dbml`](MER-MSPI.dbml), [`MER-MSPI.pdf`](MER-MSPI.pdf), [`Modelo-Datos-MER.md`](Modelo-Datos-MER.md). |
+| [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación (8 esquemas: `iam`…`admin`). Fuente local: [`MER-MSPI.sql`](MER-MSPI.sql), [`MER-MSPI.dbml`](MER-MSPI.dbml), [`MER-MSPI.svg`](MER-MSPI.svg), [`Modelo-Datos-MER.md`](Modelo-Datos-MER.md). |
 | [`04-Decisiones-Tecnicas-Complementarias.md`](04-Decisiones-Tecnicas-Complementarias.md) | Decisiones técnicas puntuales tomadas en la implementación de RBAC fino, catálogo (escalas/bancos de preguntas) y funcionalidades administrativas de `ms_iam` |
 | [`05-Manual-Despliegue.md`](05-Manual-Despliegue.md) | Cómo levantar el stack completo en Docker paso a paso |
 | [`06-Guia-Pruebas-Funcionales.md`](06-Guia-Pruebas-Funcionales.md) | Secuencia de flujos funcionales end-to-end para demostrar el sistema |
@@ -111,7 +111,7 @@ Estos hallazgos están documentados con detalle y trazabilidad en cada component
 2. [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) — qué se propuso lograr.
 3. [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) — cómo está construido.
 4. [`02-Modelo-de-Dominio.md`](02-Modelo-de-Dominio.md) — qué dominios de negocio cubre.
-5. [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) — modelo físico de la base de datos (también [`MER-MSPI.sql`](MER-MSPI.sql) / [`MER-MSPI.pdf`](MER-MSPI.pdf)).
+5. [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) — modelo físico de la base de datos (también [`MER-MSPI.sql`](MER-MSPI.sql) / [`MER-MSPI.svg`](MER-MSPI.svg)).
 6. Uno o dos componentes de la sección 4 en detalle (por ejemplo, `ms_iam` y `mf_auth`, que fueron los primeros documentados como piloto y sirven de referencia de profundidad) — para verificar el nivel de detalle técnico disponible por componente.
 7. [`Documentacion-investigacion/Documento-Investigacion.md`](../Documentacion-investigacion/Documento-Investigacion.md) — como referencia ampliada si se requiere profundizar en algún punto académico.
 

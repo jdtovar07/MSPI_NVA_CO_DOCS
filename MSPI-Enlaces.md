@@ -15,8 +15,8 @@
 ### 🗄️ Base de datos
 - **MER interactivo:** [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI)
 - **SQL:** [`Documentacion-General/MER-MSPI.sql`](Documentacion-General/MER-MSPI.sql)
-- **PDF:** [`Documentacion-General/MER-MSPI.pdf`](Documentacion-General/MER-MSPI.pdf)
-- **Descripción:** Modelo entidad-relación de PostgreSQL, particionado en los esquemas `iam`, `org`, `catalog`, `assessment`, `evidence` y `reporting`.
+- **SVG (vectorial):** [`Documentacion-General/MER-MSPI.svg`](Documentacion-General/MER-MSPI.svg)
+- **Descripción:** Modelo entidad-relación de PostgreSQL, particionado en ocho esquemas: `iam`, `org`, `catalog`, `assessment`, `evidence`, `reporting`, `audit`, `admin`.
 
 ---
 
