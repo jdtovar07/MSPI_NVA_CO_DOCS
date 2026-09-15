@@ -10,11 +10,21 @@ Vista del modelo de datos MSPI para la wiki. Fuentes canónicas en este director
 
 [Descargar MER-MSPI.svg](MER-MSPI.svg) · vectorial (Graphviz / dbml-renderer)
 
+## Vista de alta calidad (exportada desde dbdocs.io)
+
+**Contexto.** Diagrama exportado directamente desde dbdocs.io, con mejor calidad visual (estilo, agrupación
+por esquema y tipografía). Disponible en SVG vectorial y PDF, ambos nítidos a cualquier zoom.
+
+- 🖼️ [MER-MSPI-dbdocs.svg](MER-MSPI-dbdocs.svg) — SVG vectorial de alta calidad.
+- 📄 [MER-MSPI-dbdocs.pdf](MER-MSPI-dbdocs.pdf) — PDF vectorial de alta calidad.
+
 ## Fuentes
 
 | Artefacto | Descripción |
 |---|---|
-| [MER-MSPI.svg](MER-MSPI.svg) | Diagrama visual vectorial |
+| [MER-MSPI-dbdocs.svg](MER-MSPI-dbdocs.svg) | Diagrama de alta calidad (dbdocs.io), SVG vectorial |
+| [MER-MSPI-dbdocs.pdf](MER-MSPI-dbdocs.pdf) | Diagrama de alta calidad (dbdocs.io), PDF vectorial |
+| [MER-MSPI.svg](MER-MSPI.svg) | Diagrama visual vectorial (dbml-renderer) |
 | [MER-MSPI.sql](MER-MSPI.sql) | DDL consolidado (`pg_dump --schema-only` tras base + patches) |
 | [MER-MSPI.dbml](MER-MSPI.dbml) | Fuente dbdiagram / dbdocs |
 | [dbdocs.io — MER-MSPI](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Vista interactiva online |
