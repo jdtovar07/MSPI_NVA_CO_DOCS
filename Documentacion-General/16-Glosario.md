@@ -6,6 +6,8 @@
 
 Términos usados de forma consistente en la documentación. No sustituye normas ISO/NIST; solo el uso **en este proyecto**.
 
+**Cómo leer diagramas Mermaid** (flowchart, sequence, ER, class): ver sección 0 de [`15-Diagramas-C4-y-Secuencias.md`](15-Diagramas-C4-y-Secuencias.md). Cada diagrama en la wiki lleva título y párrafo de contexto.
+
 | Término | Definición en MSPI |
 |---|---|
 | **Instrumento** | Instrumento de Identificación de la Línea Base de Seguridad (MinTIC): plantilla Excel de autodiagnóstico cuyas reglas de cálculo reproduce la plataforma. |
