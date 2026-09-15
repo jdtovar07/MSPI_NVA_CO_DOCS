@@ -212,3 +212,79 @@ stateDiagram-v2
 - **No existe verificación de autoridad `REPORT_EXPORT` en el código.** La pantalla de exportación menciona el requisito solo como texto informativo (`reports-export-page.component.ts`, `<p class="hint">`); no hay guard de ruta ni verificación condicional que oculte o bloquee los botones de generación si el usuario carece de esa autoridad. Se declara como brecha de seguridad de UI (defensa en profundidad — el backend `ms_reporting` presumiblemente sí valida la autoridad, pero el frontend no refuerza esa restricción).
 - **Sin `CanActivate` guards en `app.routes.ts`.** Las tres rutas son de acceso libre a nivel de router; la protección de acceso, si existe, depende enteramente de que las llamadas HTTP fallen con 401/403 en el backend.
 - **Doble llamada a metadatos de evaluación en el flujo de creación de job sin `organizationId`.** Si `ReportsExportPageComponent` no recibe `organizationId` por query param, `ApiReportingRepository.createReportJob` hace una llamada adicional a `GET /assessments/{id}` — llamada que también se hizo previamente al cargar el tablero. No hay caché entre pantallas.
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid del microfrontend `mf_reports` (puerto **4205**). Composición en el host: **iframe + postMessage** (Module Federation = evolución futura).
+
+### I.1 Estructura por capas
+
+**Título:** Capas Angular standalone de `mf_reports`
+
+**Contexto.** Flujo de dependencias: presentation llama application; application depende de puertos de domain; infrastructure implementa esos puertos (HTTP, bridges).
+
+```mermaid
+flowchart TB
+    subgraph Presentation["presentation"]
+        Pages["pages / components / guards"]
+    end
+    subgraph Application["application"]
+        UC["use-cases"]
+    end
+    subgraph Domain["domain"]
+        Ports["repositorios abstractos / models"]
+    end
+    subgraph Infra["infrastructure"]
+        Api["api repositories + interceptors"]
+        Bridge["auth / shell bridges"]
+    end
+    Pages --> UC
+    UC --> Ports
+    Api -.->|implements| Ports
+    Bridge -.-> Pages
+```
+
+**Capas presentes:** presentation · application · domain · infrastructure.
+
+### I.2 Rutas principales
+
+**Título:** Mapa de rutas de `mf_reports`
+
+**Contexto.** Paths de `app.routes.ts` usados en navegación real.
+
+```mermaid
+flowchart LR
+    Root["mf_reports:4205"]
+    Root --> R0["/reports"]
+    Root --> R1["/assessments/:id/export"]
+    Root --> R2["/assessments/:id/dashboard"]
+```
+
+**Rutas:** `/reports`, `/assessments/:id/export`, `/assessments/:id/dashboard`.
+
+### I.3 Secuencia — Generar y descargar reporte
+
+**Contexto.** Flujo representativo con clases TypeScript reales del MF.
+
+```mermaid
+sequenceDiagram
+    participant Page as ReportsExportPageComponent
+    participant Create as CreateReportJobUseCase
+    participant Get as GetReportJobUseCase
+    participant Dl as ReportDownloadService
+    Page->>Create: POST /reports/jobs
+    loop poll
+        Page->>Get: GET /reports/jobs/{id}
+    end
+    Page->>Dl: downloadReport
+```
+
+**Bridge con el shell:** `infrastructure/auth/auth-parent-bridge.ts`.
+
+### I.4 Componentes destacados
+
+| Componente |
+|---|
+| `ReportsHomePageComponent` |
+| `ReportsExportPageComponent` |
+| `DiagnosticDashboardPageComponent` |

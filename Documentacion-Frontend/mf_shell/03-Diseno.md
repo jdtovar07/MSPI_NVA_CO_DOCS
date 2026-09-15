@@ -190,3 +190,86 @@ Este diagrama consolida y verifica con el código el diagrama presentado en `doc
 - No existe *feature flag* ni configuración para alternar entre el modelo iframe actual y una futura integración por Module Federation; el cambio implicaría reescribir `infrastructure/shell-iframe-bridge.ts` y los seis componentes `*-redirect`.
 - El cálculo de autoridades (`ROLE_AUTHORITIES`) está duplicado por diseño en cada microfrontend que lo necesita (mismo patrón que en `mf_auth`), sin una fuente única de verdad compartida en tiempo de ejecución; un cambio de política de roles exige actualizar el archivo en varios repositorios.
 - El `environment.ts` del shell no distingue configuración de desarrollo/producción (no hay `environment.prod.ts`); las URLs de microservicios están fijas a `localhost` en el único archivo de entorno versionado.
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid del microfrontend `mf_shell` (puerto **4200**). Composición en el host: **iframe + postMessage** (Module Federation = evolución futura).
+
+### I.1 Estructura por capas
+
+**Título:** Capas Angular standalone de `mf_shell`
+
+**Contexto.** Flujo de dependencias: presentation llama application; application depende de puertos de domain; infrastructure implementa esos puertos (HTTP, bridges).
+
+```mermaid
+flowchart TB
+    subgraph Presentation["presentation"]
+        Pages["pages / components / guards"]
+    end
+    subgraph Application["application"]
+        UC["use-cases"]
+    end
+    subgraph Domain["domain"]
+        Ports["repositorios abstractos / models"]
+    end
+    subgraph Infra["infrastructure"]
+        Api["api repositories + interceptors"]
+        Bridge["auth / shell bridges"]
+    end
+    Pages --> UC
+    UC --> Ports
+    Api -.->|implements| Ports
+    Bridge -.-> Pages
+```
+
+**Capas presentes:** presentation · application · domain · infrastructure (+ shell-iframe-bridge.ts).
+
+### I.2 Rutas principales
+
+**Título:** Mapa de rutas de `mf_shell`
+
+**Contexto.** Paths de `app.routes.ts` usados en navegación real.
+
+```mermaid
+flowchart LR
+    Root["mf_shell:4200"]
+    Root --> R0["/dashboard"]
+    Root --> R1["/audit"]
+    Root --> R2["/audit/requests/:requestNumber"]
+    Root --> R3["/system-settings"]
+    Root --> R4["/evaluations (iframe)"]
+    Root --> R5["/login"]
+```
+
+**Rutas:** `/dashboard`, `/audit`, `/audit/requests/:requestNumber`, `/system-settings`, `/evaluations (iframe)`, `/login`, `/privacidad`.
+
+### I.3 Secuencia — Montar iframe y retransmitir sesión
+
+**Contexto.** Flujo representativo con clases TypeScript reales del MF.
+
+```mermaid
+sequenceDiagram
+    participant U as Usuario
+    participant Shell as ShellLayoutComponent
+    participant Bridge as shell-iframe-bridge
+    participant Child as MF hijo iframe
+    U->>Shell: navega /evaluations
+    Shell->>Child: iframe src :4203
+    Child->>Bridge: postMessage MSPI_AUTH_REQUEST
+    Bridge-->>Child: MSPI_AUTH_SESSION
+    Child->>Bridge: MSPI_ACTIVE_ASSESSMENT
+```
+
+**Bridge con el shell:** `infrastructure/shell-iframe-bridge.ts`.
+
+### I.4 Componentes destacados
+
+| Componente |
+|---|
+| `ShellLayoutComponent` |
+| `DashboardPageComponent` |
+| `AuditPageComponent` |
+| `AuditRequestsPageComponent` |
+| `SystemSettingsPageComponent` |
+| `EvaluationsRedirectComponent` |
+| `PrivacyPageComponent` |

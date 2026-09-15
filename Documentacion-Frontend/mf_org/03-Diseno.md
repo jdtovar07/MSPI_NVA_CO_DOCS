@@ -260,3 +260,77 @@ docs/
 ## 9. Conclusión de diseño
 
 La aplicación real de `mf_org` implementa una Clean Architecture ligera adaptada a Angular 19 standalone, siguiendo el mismo patrón arquitectónico que `mf_auth`: repositorios abstractos como token de DI, casos de uso de responsabilidad única, e interceptor funcional para el manejo transversal de HTTP. Su particularidad frente a `mf_auth` es doble: (1) no gestiona sesión propia, solo la **consume** para decidir la redirección del rol `Lector`; y (2) introduce un mapeador de vocabulario dedicado para reconciliar el idioma de la UI con el contrato en inglés del backend `ms_org`. La integración con el shell tampoco es Module Federation, sino composición por `iframe` con sesión compartida vía `localStorage`/cookie, con la misma limitación reconocida de puertos distintos en entorno local. El repositorio conserva un árbol de código muerto de una plantilla React/Vite con intención original de Module Federation, del cual **un solo archivo** (`src/data/locations.ts`) resultó ser una dependencia real del build Angular — un matiz que distingue a `mf_org` de la limpieza más simple que aplicaría a `mf_auth`.
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid del microfrontend `mf_org` (puerto **4202**). Composición en el host: **iframe + postMessage** (Module Federation = evolución futura).
+
+### I.1 Estructura por capas
+
+**Título:** Capas Angular standalone de `mf_org`
+
+**Contexto.** Flujo de dependencias: presentation llama application; application depende de puertos de domain; infrastructure implementa esos puertos (HTTP, bridges).
+
+```mermaid
+flowchart TB
+    subgraph Presentation["presentation"]
+        Pages["pages / components / guards"]
+    end
+    subgraph Application["application"]
+        UC["use-cases"]
+    end
+    subgraph Domain["domain"]
+        Ports["repositorios abstractos / models"]
+    end
+    subgraph Infra["infrastructure"]
+        Api["api repositories + interceptors"]
+        Bridge["auth / shell bridges"]
+    end
+    Pages --> UC
+    UC --> Ports
+    Api -.->|implements| Ports
+    Bridge -.-> Pages
+```
+
+**Capas presentes:** presentation · application · domain · infrastructure.
+
+### I.2 Rutas principales
+
+**Título:** Mapa de rutas de `mf_org`
+
+**Contexto.** Paths de `app.routes.ts` usados en navegación real.
+
+```mermaid
+flowchart LR
+    Root["mf_org:4202"]
+    Root --> R0["/organizations"]
+    Root --> R1["/organizations/new"]
+    Root --> R2["/organizations/:id"]
+    Root --> R3["/my-organization"]
+```
+
+**Rutas:** `/organizations`, `/organizations/new`, `/organizations/:id`, `/my-organization`.
+
+### I.3 Secuencia — Crear organización
+
+**Contexto.** Flujo representativo con clases TypeScript reales del MF.
+
+```mermaid
+sequenceDiagram
+    participant Page as OrganizationFormPageComponent
+    participant UC as CreateOrganizationUseCase
+    participant Repo as ApiOrganizationRepository
+    Page->>UC: submit form
+    UC->>Repo: POST /organizations
+    Repo-->>Page: created
+```
+
+**Bridge con el shell:** `infrastructure/auth/auth-parent-bridge.ts`.
+
+### I.4 Componentes destacados
+
+| Componente |
+|---|
+| `OrganizationListPageComponent` |
+| `OrganizationFormPageComponent` |
+| `MyOrganizationPageComponent` |

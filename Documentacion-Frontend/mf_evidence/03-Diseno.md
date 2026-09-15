@@ -240,3 +240,79 @@ docs/
 ## 8. Conclusión de diseño
 
 `mf_evidence` implementa una Clean Architecture ligera equivalente a la de `mf_auth`, adaptada a Angular 19 standalone, con un único agregado de dominio (`EvidenceRepository`) que concentra contexto, métrica de alcance, levantamiento documental y archivos. La integración con el shell reutiliza el mismo patrón de composición por navegador que `mf_auth` (iframe + `postMessage` + `localStorage` compartido), pero con roles invertidos: `mf_evidence` **consume** la sesión en vez de originarla, y añade un bridge propio de navegación saliente (`shell-bridge.ts`) para comunicar al shell la evaluación activa. A diferencia de `mf_auth`, el repositorio **no contiene código muerto de una plantilla previa**, todo el árbol `src/` corresponde a la aplicación real. La principal deuda de diseño identificada es la ausencia de *route guards* que validen la evaluación activa en las rutas de contexto/levantamiento, y la duplicación de la lógica de sesión (`AuthSessionService`, bridge) respecto a `mf_auth`, sin una librería compartida entre microfrontends.
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid del microfrontend `mf_evidence` (puerto **4204**). Composición en el host: **iframe + postMessage** (Module Federation = evolución futura).
+
+### I.1 Estructura por capas
+
+**Título:** Capas Angular standalone de `mf_evidence`
+
+**Contexto.** Flujo de dependencias: presentation llama application; application depende de puertos de domain; infrastructure implementa esos puertos (HTTP, bridges).
+
+```mermaid
+flowchart TB
+    subgraph Presentation["presentation"]
+        Pages["pages / components / guards"]
+    end
+    subgraph Application["application"]
+        UC["use-cases"]
+    end
+    subgraph Domain["domain"]
+        Ports["repositorios abstractos / models"]
+    end
+    subgraph Infra["infrastructure"]
+        Api["api repositories + interceptors"]
+        Bridge["auth / shell bridges"]
+    end
+    Pages --> UC
+    UC --> Ports
+    Api -.->|implements| Ports
+    Bridge -.-> Pages
+```
+
+**Capas presentes:** presentation · application · domain · infrastructure.
+
+### I.2 Rutas principales
+
+**Título:** Mapa de rutas de `mf_evidence`
+
+**Contexto.** Paths de `app.routes.ts` usados en navegación real.
+
+```mermaid
+flowchart LR
+    Root["mf_evidence:4204"]
+    Root --> R0["/"]
+    Root --> R1["/assessments/:id/context"]
+    Root --> R2["/assessments/:id/inventory"]
+```
+
+**Rutas:** `/`, `/assessments/:id/context`, `/assessments/:id/inventory`.
+
+### I.3 Secuencia — Actualizar contexto y subir archivo
+
+**Contexto.** Flujo representativo con clases TypeScript reales del MF.
+
+```mermaid
+sequenceDiagram
+    participant Page as ContextPageComponent
+    participant Ctx as PatchContextUseCase
+    participant Up as UploadEvidenceFileUseCase
+    participant Api as Evidence API
+    Page->>Ctx: patch context
+    Ctx->>Api: PATCH /assessments/{id}/context
+    Page->>Up: upload file
+    Up->>Api: POST multipart /files
+```
+
+**Bridge con el shell:** `auth-parent-bridge.ts + shell-bridge.ts`.
+
+### I.4 Componentes destacados
+
+| Componente |
+|---|
+| `EvidenceHomePageComponent` |
+| `ContextPageComponent` |
+| `InventoryPageComponent` |
+| `FileUploaderComponent` |

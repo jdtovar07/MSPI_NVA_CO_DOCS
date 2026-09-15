@@ -217,3 +217,80 @@ Este patrón (`runWithRowVersionConflict`) se reutiliza en los casos de uso que 
 3. **Persistencia dual en `localStorage`/`sessionStorage`** para suplir carencias del backend (listado de evaluaciones) y para performance (caché de catálogo), documentada explícitamente como solución temporal ("limitación actual") en `docs/DESCRIPCION.md`.
 4. **Componente de árbol recursivo con `forwardRef`**, patrón necesario en Angular standalone components para que un componente se autorreferencia en su propio array `imports`.
 5. **Reconciliación de nombres API↔dominio centralizada en un único archivo de mappers** (`assessment-api.mapper.ts`), en lugar de mapeos dispersos en cada repositorio o componente.
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid del microfrontend `mf_assessment` (puerto **4203**). Composición en el host: **iframe + postMessage** (Module Federation = evolución futura).
+
+### I.1 Estructura por capas
+
+**Título:** Capas Angular standalone de `mf_assessment`
+
+**Contexto.** Flujo de dependencias: presentation llama application; application depende de puertos de domain; infrastructure implementa esos puertos (HTTP, bridges).
+
+```mermaid
+flowchart TB
+    subgraph Presentation["presentation"]
+        Pages["pages / components / guards"]
+    end
+    subgraph Application["application"]
+        UC["use-cases"]
+    end
+    subgraph Domain["domain"]
+        Ports["repositorios abstractos / models"]
+    end
+    subgraph Infra["infrastructure"]
+        Api["api repositories + interceptors"]
+        Bridge["auth / shell bridges"]
+    end
+    Pages --> UC
+    UC --> Ports
+    Api -.->|implements| Ports
+    Bridge -.-> Pages
+```
+
+**Capas presentes:** presentation · application · domain · infrastructure (+ shell-bridge).
+
+### I.2 Rutas principales
+
+**Título:** Mapa de rutas de `mf_assessment`
+
+**Contexto.** Paths de `app.routes.ts` usados en navegación real.
+
+```mermaid
+flowchart LR
+    Root["mf_assessment:4203"]
+    Root --> R0["/evaluations"]
+    Root --> R1["/evaluations/:id"]
+    Root --> R2["/evaluations/:id/controls/admin"]
+    Root --> R3["/evaluations/:id/phva"]
+    Root --> R4["/evaluations/deletion-requests"]
+```
+
+**Rutas:** `/evaluations`, `/evaluations/:id`, `/evaluations/:id/controls/admin`, `/evaluations/:id/phva`, `/evaluations/deletion-requests`.
+
+### I.3 Secuencia — Guardar puntaje de control
+
+**Contexto.** Flujo representativo con clases TypeScript reales del MF.
+
+```mermaid
+sequenceDiagram
+    participant Page as ControlsPageComponent
+    participant UC as PatchControlScoreUseCase
+    participant Repo as ApiAssessmentRepository
+    Page->>UC: patch score
+    UC->>Repo: PATCH /assessments/{id}/controls/{nodeId}
+    Repo-->>Page: updated + rowVersion
+```
+
+**Bridge con el shell:** `auth-parent-bridge.ts + shell/shell-bridge.ts`.
+
+### I.4 Componentes destacados
+
+| Componente |
+|---|
+| `EvaluationListPageComponent` |
+| `EvaluationDashboardPageComponent` |
+| `ControlsPageComponent` |
+| `InformationGatheringPageComponent` |
+| `MyAssignedEvaluationsPageComponent` |

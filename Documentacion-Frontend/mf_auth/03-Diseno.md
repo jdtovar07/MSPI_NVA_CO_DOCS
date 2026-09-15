@@ -293,3 +293,85 @@ docs/
 ## 9. Conclusión de diseño
 
 La aplicación real de `mf_auth` implementa consistentemente una Clean Architecture ligera adaptada a Angular 19 standalone, con inyección de dependencias como mecanismo de composición y sin acoplamiento directo a HTTP en las capas de dominio y aplicación. La integración con el shell **no** es Module Federation sino una composición basada en navegador (navegación + `postMessage` + almacenamiento compartido), con limitaciones reconocidas por el propio equipo en `docs/INTEGRACION-SHELL.md`. El repositorio conserva además un árbol de código muerto (plantilla React/Vite) que debe considerarse deuda técnica de limpieza, documentada aquí para evitar confusiones en trabajos futuros sobre el proyecto.
+
+## Ilustraciones (DOCS-3)
+
+Diagramas Mermaid del microfrontend `mf_auth` (puerto **4201**). Composición en el host: **iframe + postMessage** (Module Federation = evolución futura).
+
+### I.1 Estructura por capas
+
+**Título:** Capas Angular standalone de `mf_auth`
+
+**Contexto.** Flujo de dependencias: presentation llama application; application depende de puertos de domain; infrastructure implementa esos puertos (HTTP, bridges).
+
+```mermaid
+flowchart TB
+    subgraph Presentation["presentation"]
+        Pages["pages / components / guards"]
+    end
+    subgraph Application["application"]
+        UC["use-cases"]
+    end
+    subgraph Domain["domain"]
+        Ports["repositorios abstractos / models"]
+    end
+    subgraph Infra["infrastructure"]
+        Api["api repositories + interceptors"]
+        Bridge["auth / shell bridges"]
+    end
+    Pages --> UC
+    UC --> Ports
+    Api -.->|implements| Ports
+    Bridge -.-> Pages
+```
+
+**Capas presentes:** presentation · application · domain · infrastructure.
+
+### I.2 Rutas principales
+
+**Título:** Mapa de rutas de `mf_auth`
+
+**Contexto.** Paths de `app.routes.ts` usados en navegación real.
+
+```mermaid
+flowchart LR
+    Root["mf_auth:4201"]
+    Root --> R0["/login"]
+    Root --> R1["/setup-2fa"]
+    Root --> R2["/verify-2fa"]
+    Root --> R3["/change-password"]
+    Root --> R4["/users"]
+    Root --> R5["/users/:id"]
+```
+
+**Rutas:** `/login`, `/setup-2fa`, `/verify-2fa`, `/change-password`, `/users`, `/users/:id`.
+
+### I.3 Secuencia — Login y publicación de sesión al shell
+
+**Contexto.** Flujo representativo con clases TypeScript reales del MF.
+
+```mermaid
+sequenceDiagram
+    participant Page as LoginPageComponent
+    participant UC as LoginUseCase
+    participant Repo as ApiAuthRepository
+    participant Sess as AuthSessionService
+    participant Shell as parent mf_shell
+    Page->>UC: execute credentials
+    UC->>Repo: POST /auth/login
+    Repo-->>UC: JWT
+    UC->>Sess: setSession
+    Sess->>Shell: postMessage MSPI_AUTH_SESSION
+```
+
+**Bridge con el shell:** `infrastructure/auth/auth-parent-bridge.ts`.
+
+### I.4 Componentes destacados
+
+| Componente |
+|---|
+| `LoginPageComponent` |
+| `Setup2FAPageComponent` |
+| `Verify2FAPageComponent` |
+| `UserListPageComponent` |
+| `ChangePasswordPageComponent` |
