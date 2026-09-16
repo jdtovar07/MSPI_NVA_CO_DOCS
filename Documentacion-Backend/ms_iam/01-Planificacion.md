@@ -20,7 +20,7 @@ MSPI es un sistema de gestión de seguridad de la información construido como u
 
 - **Autenticación de usuarios** contra Keycloak (Resource Owner Password Credentials — ROPC) y emisión de JWT.
 - **Cambio de contraseña** (flujo de primer acceso con contraseña temporal, y cambio voluntario).
-- **Segundo factor de autenticación (2FA/TOTP)** opcional, autogestionado por el usuario autenticado.
+- **Segundo factor de autenticación (2FA/TOTP)** obligatorio: todo usuario sin 2FA es llevado a configurarlo (QR) al iniciar sesión; el administrador puede reiniciarlo mediante una solicitud `SOL-PWD` aprobada.
 - **Gestión administrativa de usuarios** (alta, edición, activación/inactivación, restablecimiento de contraseña, listado paginado con búsqueda y filtros) restringida al rol `AdminSistema`.
 - **Catálogo de roles** del *realm* de Keycloak, expuesto con etiquetas en español para consumo de los frontends.
 - **Productor de eventos de autenticación**: cada intento de inicio de sesión (`AUTH_LOGIN_SUCCESS`, `AUTH_LOGIN_FAILED`, `AUTH_LOGIN_INACTIVE`) se envía a la bitácora central de `ms_audit` (`POST /internal/audit/events`, API key interna). `ms_iam` ya **no** almacena la bitácora: se extrajo a `ms_audit` (esquema `audit`).
