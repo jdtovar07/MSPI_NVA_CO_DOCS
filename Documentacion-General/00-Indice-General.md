@@ -30,13 +30,14 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 |---|---|
 | [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) | Arquitectura completa del sistema: diagrama C4 de contenedores, tabla de los 8 microservicios y 6 microfrontends, diagrama de despliegue Docker, arquitectura de seguridad (Keycloak/JWT/RBAC/2FA/auditoría), capas hexagonales, decisiones arquitectónicas y deuda técnica conocida. |
 | [`02-Modelo-de-Dominio.md`](02-Modelo-de-Dominio.md) | Los 8 bounded contexts activos (iam, org, catalog, assessment, evidence, reporting, audit, admin), entidades principales, diagrama ER, patrón catálogo-vs-ejecución, mapa funcional → microservicios y glosario de dominio. |
-| [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) | Objetivo general y objetivos específicos en formato de referencia rápida, con trazabilidad a los módulos que los implementan y su estado real (implementado / con limitaciones / no implementado). |
+| [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) | Objetivo general y objetivos específicos en formato de referencia rápida, con su estado real y las capacidades transversales añadidas (`ms_audit`, `ms_admin`, solicitudes aprobables). |
+| [`18-Matriz-Trazabilidad.md`](18-Matriz-Trazabilidad.md) | Cada objetivo → pantallas → endpoints → tablas → pruebas automatizadas y funcionales; brechas de cobertura. |
 | [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) | Modelo entidad-relación (8 esquemas: `iam`…`admin`). Fuente local: [`MER-MSPI.sql`](MER-MSPI.sql), [`MER-MSPI.dbml`](MER-MSPI.dbml), [`MER-MSPI.svg`](MER-MSPI.svg), [`Modelo-Datos-MER.md`](Modelo-Datos-MER.md). |
 | [`04-Decisiones-Tecnicas-Complementarias.md`](04-Decisiones-Tecnicas-Complementarias.md) | Decisiones técnicas puntuales tomadas en la implementación de RBAC fino, catálogo (escalas/bancos de preguntas) y funcionalidades administrativas de `ms_iam` |
 | [`05-Manual-Despliegue.md`](05-Manual-Despliegue.md) | Cómo levantar el stack completo en Docker paso a paso |
-| [`06-Guia-Pruebas-Funcionales.md`](06-Guia-Pruebas-Funcionales.md) | Secuencia de flujos funcionales end-to-end para demostrar el sistema |
-| [`07-Manual-Usuario.md`](07-Manual-Usuario.md) | Qué puede hacer cada rol, en lenguaje de usuario final |
-| [`08-Referencia-API.md`](08-Referencia-API.md) | Índice consolidado de la API de los 8 microservicios (rutas verificadas contra `*Api.java`) |
+| [`06-Guia-Pruebas-Funcionales.md`](06-Guia-Pruebas-Funcionales.md) | 33 casos de prueba funcionales (CP-01…CP-33) con rol, pasos y resultado esperado, y registro de ejecución |
+| [`07-Manual-Usuario.md`](07-Manual-Usuario.md) | Primer ingreso con 2FA, matriz de capacidades por rol, ciclo de la evaluación, solicitudes y radicados, preguntas frecuentes |
+| [`08-Referencia-API.md`](08-Referencia-API.md) | Inventario de los 156 endpoints, grafo de llamadas entre servicios y contraste frontend ↔ backend; enlaza la referencia detallada de cada microservicio |
 | [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md) | Radicados SOL-*, auditoría central, reenvío de contraseña, soft-delete, postura de seguridad y privacidad |
 | [`15-Diagramas-C4-y-Secuencias.md`](15-Diagramas-C4-y-Secuencias.md) | C4 contexto/contenedores (8 MS + 6 MF), ER conceptual, secuencias evaluación / SOL-* / reporte / login+2FA (Mermaid) |
 | [`16-Glosario.md`](16-Glosario.md) | Vocabulario de dominio (PHVA, radicado, borrado lógico, gracia, sweeper, iframe bridge, …) |
@@ -47,13 +48,13 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`12-Tipos-Entidad-MSPI-y-Eliminacion-Catalogo.md`](12-Tipos-Entidad-MSPI-y-Eliminacion-Catalogo.md) | Tipos oficiales de entidad MSPI (Nacional / Territorial A–C + Otra; metas PHVA; instructivo MinTIC / Ley 617) y flujo de eliminación lógica de escalas/bancos (`is_base`, `catalog_deletion_request`, gracia, sweeper). |
 | [`13-Notificaciones-y-Roles.md`](13-Notificaciones-y-Roles.md) | Consolidación de roles IAM (Evaluador+Revisor→EvaluadorRevisor; AdminSistema) y notificaciones in-app (eventos, API interna, campanita, marcar leído). |
 
-Estos documentos son el **punto de entrada recomendado para el profesor**: en menos de 30 minutos de lectura dan una visión completa de qué se construyó, cómo está arquitecturado y qué dominios de negocio cubre, sin tener que leer los 99 documentos técnicos detallados por componente.
+Estos documentos son el **punto de entrada recomendado para el profesor**: en menos de 30 minutos de lectura dan una visión completa de qué se construyó, cómo está arquitecturado y qué dominios de negocio cubre, sin tener que leer los 112 documentos técnicos detallados por componente.
 
 ## 4. Documentación técnica detallada por componente (ciclo de vida completo)
 
-Cada uno de los 8 microservicios backend y los 6 microfrontends tiene **7 documentos propios**, uno por cada fase del ciclo de vida del desarrollo de software (Planificación → Análisis → Diseño → Desarrollo → Pruebas → Implementación/Despliegue → Mantenimiento), construidos a partir de la lectura directa del código fuente real de cada repositorio.
+Cada uno de los 8 microservicios backend y los 6 microfrontends tiene **7 documentos propios**, uno por cada fase del ciclo de vida del desarrollo de software (Planificación → Análisis → Diseño → Desarrollo → Pruebas → Implementación/Despliegue → Mantenimiento), construidos a partir de la lectura directa del código fuente real de cada repositorio, más un **octavo documento de referencia generado desde el código**: `08-Referencia-API.md` en cada microservicio y `08-Mapa-Rutas-y-Endpoints.md` en cada microfrontend.
 
-### 4.1 Backend — `Documentacion-Backend/` (8 microservicios × 7 documentos = 56 documentos)
+### 4.1 Backend — `Documentacion-Backend/` (8 microservicios × 8 documentos = 64 documentos)
 
 | Microservicio | Estado | Carpeta |
 |---|---|---|
@@ -62,11 +63,11 @@ Cada uno de los 8 microservicios backend y los 6 microfrontends tiene **7 docume
 | `ms_catalog` — Catálogo versionado de controles, escalas, PHVA, madurez, NIST | ✅ Activo | [`Documentacion-Backend/ms_catalog/`](../Documentacion-Backend/ms_catalog/) |
 | `ms_assessment` — Ciclo de vida de evaluaciones y motor de cálculo | ✅ Activo | [`Documentacion-Backend/ms_assessment/`](../Documentacion-Backend/ms_assessment/) |
 | `ms_evidence` — Contexto organizacional y evidencias documentales | ✅ Activo | [`Documentacion-Backend/ms_evidence/`](../Documentacion-Backend/ms_evidence/) |
-| `ms_reporting` — Generación asíncrona de reportes PDF/Excel | ✅ Activo (con limitaciones) | [`Documentacion-Backend/ms_reporting/`](../Documentacion-Backend/ms_reporting/) |
+| `ms_reporting` — Generación asíncrona de reportes PDF/Excel | ✅ Activo | [`Documentacion-Backend/ms_reporting/`](../Documentacion-Backend/ms_reporting/) |
 | `ms_admin` — Configuración global del sistema | ✅ Activo (puerto 8089) | [`Documentacion-Backend/ms_admin/`](../Documentacion-Backend/ms_admin/) |
 | `ms_audit` — Auditoría transversal | ✅ Activo (puerto 8088) | [`Documentacion-Backend/ms_audit/`](../Documentacion-Backend/ms_audit/) |
 
-### 4.2 Frontend — `Documentacion-Frontend/` (6 microfrontends × 7 documentos = 42 documentos)
+### 4.2 Frontend — `Documentacion-Frontend/` (6 microfrontends × 8 documentos = 48 documentos)
 
 | Microfrontend | Puerto | Carpeta |
 |---|---|---|
@@ -87,6 +88,8 @@ Cada uno de los 14 componentes tiene la misma estructura interna:
 05-Pruebas.md
 06-Implementacion-Despliegue.md
 07-Mantenimiento.md
+08-Referencia-API.md        (microservicios)
+08-Mapa-Rutas-y-Endpoints.md (microfrontends)
 ```
 
 ---
@@ -96,7 +99,7 @@ Cada uno de los 14 componentes tiene la misma estructura interna:
 Toda la documentación técnica detallada (sección 4) y la documentación general (sección 3) se construyó **a partir de la lectura directa del código fuente real** de los repositorios `MSPI_NVA_CO_MR_BACK` y `MSPI_NVA_CO_MR_FRONT` — no es contenido genérico ni una plantilla rellenada por adivinanza. Cuando un dato no pudo confirmarse en el código (por ejemplo, cobertura real de pruebas, existencia de CI/CD, o alcance normativo exacto), se declaró explícitamente como ausente o como `[PENDIENTE: a completar por los autores]`, en vez de inventarse. Esto incluye hallazgos honestos y relevantes para la sustentación, entre ellos:
 
 - **`ms_admin`** es microservicio activo (puerto 8089, esquema `admin`, SystemConfig); **`ms_audit`** es microservicio activo (puerto 8088, esquema `audit`).
-- **Ningún microfrontend** tiene pruebas automatizadas verificadas (sin `*.spec.ts` ni configuración Karma/Jest).
+- **Solo `mf_org`** tiene una prueba automatizada (`organization-form.validation.spec.ts`); los demás microfrontends no tienen suite de pruebas.
 - Los **6** microfrontends se componen con **iframe + `postMessage`** (`shell-iframe-bridge`). Module Federation = **evolución futura** — confirmado en los 6 MF.
 - El backend define pruebas y umbrales de cobertura (JaCoCo 80 %) en Gradle, pero el pipeline de CI (`bitbucket-pipelines.yml`) solo ejecuta `assemble`, nunca `test`/`check`.
 - El instrumento fuente usa ISO/IEC 27001:**2013**, mientras la versión vigente de la norma es **2022**.
@@ -108,7 +111,7 @@ Estos hallazgos están documentados con detalle y trazabilidad en cada component
 ## 6. Recomendación de orden de lectura para el profesor
 
 1. [`Propuesta-grado/Propuesta_de_Grado_MSPI.docx`](../Propuesta-grado/Propuesta_de_Grado_MSPI.docx) — documento formal completo.
-2. [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) — qué se propuso lograr.
+2. [`03-Objetivos-del-Proyecto.md`](03-Objetivos-del-Proyecto.md) — qué se propuso lograr, y [`18-Matriz-Trazabilidad.md`](18-Matriz-Trazabilidad.md) — dónde está cada objetivo en el código.
 3. [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) — cómo está construido.
 4. [`02-Modelo-de-Dominio.md`](02-Modelo-de-Dominio.md) — qué dominios de negocio cubre.
 5. [MER-MSPI (dbdocs)](https://dbdocs.io/jdtovar-2021a/MER-MSPI) — modelo físico de la base de datos (también [`MER-MSPI.sql`](MER-MSPI.sql) / [`MER-MSPI.svg`](MER-MSPI.svg)).

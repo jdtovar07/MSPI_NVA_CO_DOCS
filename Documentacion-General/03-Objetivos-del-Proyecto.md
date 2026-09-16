@@ -29,20 +29,33 @@
 | 6 | Implementar el módulo de evaluación frente al marco NIST CSF 2.0 (seis funciones, incluyendo Gobernar / GV). | `ms_assessment`, `mf_assessment` | ✅ Implementado |
 | 7 | Implementar un tablero de diagnóstico consolidado (efectividad por dominio, avance PHVA, madurez, NIST, brechas priorizadas). | `ms_assessment`, `mf_assessment` | ✅ Implementado (hub único en la evaluación; `mf_reports` solo exporta PDF/Excel) |
 | 8 | Implementar el subsistema de identidad y control de acceso (autenticación centralizada, 5 roles de negocio, 2FA/TOTP, auditoría centralizada). | `ms_iam`, `mf_auth` | ✅ Implementado |
-| 9 | Implementar la generación de reportes de resultados (PDF/Excel), replicando la plantilla oficial de MinTIC. | `ms_reporting`, `mf_reports` | ⚠️ Implementado con limitaciones (ver hallazgos de `ms_reporting`) |
+| 9 | Implementar la generación de reportes de resultados (PDF/Excel), replicando la plantilla oficial de MinTIC. | `ms_reporting`, `mf_reports` | ✅ Implementado: instrumento oficial completo (11 hojas) en Excel protegido y PDF; pendiente la verificación final en vivo |
+
+Matriz detallada objetivo → evidencia en código: [`18-Matriz-Trazabilidad.md`](18-Matriz-Trazabilidad.md).
 
 **Nota de trazabilidad:** los objetivos específicos 1–9 se derivan directamente de los ocho módulos funcionales documentados en `Historias_Usuario_MSPI_v2.md` y de los ocho sprints de `PLAN_TRABAJO_MSPI_v2.md` del repositorio backend. El estado "Implementado" indica que existe código funcional real verificado durante la elaboración de la documentación técnica (`Documentacion-Backend/`, `Documentacion-Frontend/`); no certifica ausencia de errores ni cobertura de pruebas completa — ver limitaciones en [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md).
 
 ---
 
-## Alcance explícitamente fuera de los objetivos actuales
+## Capacidades transversales añadidas al alcance
 
-Para que el profesor tenga claridad de frontera de alcance, se declara explícitamente qué **no** se implementó dentro del perímetro funcional actual, aunque la arquitectura lo contempla:
+Además de los nueve objetivos específicos, la plataforma incorporó dos microservicios transversales que
+originalmente estaban solo previstos en la arquitectura y que hoy están **implementados y en operación**:
 
-- **Administración general del sistema** — microservicio `ms_admin` (:8089): configuración global `admin.system_config` (+ historial), consumida por `ms_assessment`/`ms_catalog` vía `/internal/system/config` (`Documentacion-Backend/ms_admin/`).
-- **Auditoría transversal consolidada** — microservicio `ms_audit` (:8088): bitácora `audit.audit_log`, ingesta S2S y consulta admin con timeline por radicado (`Documentacion-Backend/ms_audit/`).
+| Capacidad | Microservicio | Qué aporta |
+|---|---|---|
+| Auditoría transversal consolidada | `ms_audit` (:8088, esquema `audit`) | Bitácora central de eventos de todos los servicios y línea de tiempo por radicado `SOL-*` |
+| Administración general del sistema | `ms_admin` (:8089, esquema `admin`) | Parámetros globales versionados (plazos, días de gracia, tipos de archivo) con historial |
 
-Ambos se documentan en detalle en `Documentacion-Backend/ms_admin/` y `Documentacion-Backend/ms_audit/`.
+También se agregaron las **solicitudes aprobables** con radicado (ampliación, eliminación lógica con periodo de
+gracia, eliminación de catálogo y reenvío de contraseña con reinicio de 2FA). Detalle en
+[`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md).
+
+## Fuera de alcance
+
+- Despliegue productivo en una entidad real (el proyecto se valida con datos de prueba).
+- Composición de microfrontends con Module Federation (la composición actual es iframe + `postMessage`).
+- Integración con sistemas externos de la entidad (directorio activo, gestor documental).
 
 ---
 

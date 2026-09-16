@@ -18,6 +18,12 @@
 | 2026-09-15 | **DOCS-3** | Ilustración profesional: C4/despliegue/ER/secuencias generales + diagramas hexagonales/clases/rutas en cada `03-Diseno` (8 MS + 6 MF). |
 | 2026-09-15 | MER regenerado | `MER-MSPI.sql`/`.dbml`/`.pdf` desde base + todos los `patch-*.sql` (incl. `password_reset_request`, `request_number`, `audit`/`admin`). |
 | 2026-09-15 | MER vectorial | Sustituye PDF raster por `MER-MSPI.svg`; `erDiagram` Mermaid por esquema en `Modelo-Datos-MER.md`. |
+| 2026-09-15 | Referencia de API por microservicio | `08-Referencia-API.md` en los 8 ms (156 endpoints generados desde el código) e inventario/grafo de llamadas en la referencia consolidada. |
+| 2026-09-16 | MER completo | `erDiagram` por esquema con las 73 tablas, 684 columnas y 135 FK; propósito de cada tabla y dependencias entre esquemas. |
+| 2026-09-16 | Diagramas validados | Los diagramas Mermaid del repositorio compilan sin errores; se corrigieron 3 secuencias de reportes. |
+| 2026-09-16 | SDLC alineado al código | `ms_iam` sin bitácora/config; inventario de pruebas generado en cada `05-Pruebas.md`. |
+| 2026-09-16 | Mapas de microfrontends | `08-Mapa-Rutas-y-Endpoints.md` en los 6 mf; contraste de 148 llamadas frontend ↔ backend. |
+| 2026-09-16 | Documentos generales | Guía de pruebas (CP-01…CP-33), manual de usuario, glosario, objetivos, ADR y matriz de trazabilidad (`18`). |
 | — | Extracción `ms_audit` / `ms_admin` (código) | Auditoría → `:8088` esquema `audit`; config → `:8089` esquema `admin` (patches SQL). Ver BACK. |
 | — | Features de solicitudes (código) | Radicados `SOL-*`, soft-delete + gracia + sweeper; bandeja en `mf_shell`. |
 | — | SEG-A (código) | Rate limit, cabeceras, magic bytes, constant-time API-key, log sanitizer — `wiki/Seguridad.md`. |

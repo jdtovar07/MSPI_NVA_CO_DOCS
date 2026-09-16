@@ -38,4 +38,15 @@ Términos usados de forma consistente en la documentación. No sustituye normas 
 | **RBAC** | Control de acceso por roles de negocio (`AdminSistema`, `AdminInstrumento`, `Evaluador`, `Revisor`, `EvaluadorRevisor`, `Lector`). |
 | **Bounded context** | Partición de dominio con esquema PostgreSQL propio (8 contextos activos). |
 | **Hexagonal / Clean Architecture** | Capas `domain` / `usecase` / adaptadores Gradle por microservicio. |
-| **Wiki** | Sitio MkDocs Material generado desde este repo (`mkdocs serve` / `WIKI.md`). |
+| **Wiki** | GitHub Wiki del repositorio DOCS (`MSPI_NVA_CO_DOCS.wiki`): hub navegable que enlaza a estos documentos. La configuración MkDocs del repo es una alternativa local (`mkdocs serve`). |
+| **AUDITCYBER** | Nombre comercial de la plataforma MSPI que ven los usuarios (correos, interfaz). |
+| **Keycloak** | Proveedor de identidad (IdP): guarda credenciales, emite los JWT y administra los roles del *realm*. |
+| **Brevo** | Proveedor de correo transaccional usado para enviar contraseñas temporales y avisos. |
+| **Contraseña temporal** | Contraseña de un solo uso enviada por correo; obliga a cambiarla en el primer ingreso. |
+| **Reenvío de contraseña (`SOL-PWD`)** | Solicitud aprobable que genera una contraseña temporal nueva y **reinicia el 2FA** del usuario. |
+| **Estado de evaluación** | Borrador → En diligenciamiento → En revisión → Cerrada (con devolución y reapertura), validado por `AssessmentStatuses`. |
+| **Ítem heredado / manual** | En PHVA, Madurez y NIST: el heredado se calcula a partir de los controles; el manual lo califica el evaluador. |
+| **Instrumento oficial (reporte)** | Libro Excel de 11 hojas o su PDF, diligenciado con los datos de la evaluación y protegido contra edición. |
+| **Trabajo de reporte (job)** | Generación asíncrona de un reporte: PENDING → RUNNING → COMPLETED/FAILED. |
+| **Datos personales / titular** | Información de personas naturales (usuarios); su tratamiento sigue la Ley 1581 de 2012 y la política de privacidad del proyecto. |
+| **Habeas data** | Derecho del titular a conocer, actualizar, rectificar y suprimir sus datos (Ley 1581 de 2012, art. 8). |
