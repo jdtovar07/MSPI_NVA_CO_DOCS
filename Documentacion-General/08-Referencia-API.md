@@ -2,6 +2,45 @@
 
 Índice consolidado de la API expuesta por los **8** microservicios, **alineado con los controladores `*Api.java` del backend** (`MSPI_NVA_CO_MR_BACK`). Para el detalle exacto de cada endpoint (parámetros, DTOs, ejemplos), la fuente de verdad sigue siendo el código y los documentos por microservicio en `Documentacion-Backend/`.
 
+## Inventario por microservicio
+
+Detalle endpoint por endpoint (método, ruta, acceso, parámetros, cuerpo, código HTTP y caso de uso), generado desde el código:
+
+| Microservicio | Puerto | Endpoints | Internos | Referencia detallada |
+|---|---|---|---|---|
+| `ms_iam` | 8082 | 26 | 2 | [08-Referencia-API](../Documentacion-Backend/ms_iam/08-Referencia-API.md) |
+| `ms_org` | 8083 | 10 | 0 | [08-Referencia-API](../Documentacion-Backend/ms_org/08-Referencia-API.md) |
+| `ms_assessment` | 8084 | 52 | 3 | [08-Referencia-API](../Documentacion-Backend/ms_assessment/08-Referencia-API.md) |
+| `ms_catalog` | 8085 | 40 | 1 | [08-Referencia-API](../Documentacion-Backend/ms_catalog/08-Referencia-API.md) |
+| `ms_evidence` | 8086 | 17 | 6 | [08-Referencia-API](../Documentacion-Backend/ms_evidence/08-Referencia-API.md) |
+| `ms_reporting` | 8087 | 4 | 0 | [08-Referencia-API](../Documentacion-Backend/ms_reporting/08-Referencia-API.md) |
+| `ms_audit` | 8088 | 3 | 1 | [08-Referencia-API](../Documentacion-Backend/ms_audit/08-Referencia-API.md) |
+| `ms_admin` | 8089 | 4 | 1 | [08-Referencia-API](../Documentacion-Backend/ms_admin/08-Referencia-API.md) |
+| **Total** | | **156** | **14** | |
+
+```mermaid
+flowchart TB
+  subgraph Navegador
+    MF["Microfrontends (JWT)"]
+  end
+  subgraph Servidores
+    IAM["ms_iam · 26"]; ORG["ms_org · 10"]; ASS["ms_assessment · 52"]; CAT["ms_catalog · 40"]
+    EVI["ms_evidence · 17"]; REP["ms_reporting · 4"]; AUD["ms_audit · 3"]; ADM["ms_admin · 4"]
+  end
+  MF --> IAM & ORG & ASS & CAT & EVI & REP & AUD & ADM
+  ASS -.-> ADM & AUD & CAT & EVI & IAM & ORG
+  AUD -. "trail por radicado" .-> ASS & CAT & IAM
+  CAT -.-> ADM & AUD & IAM
+  IAM -.-> AUD & ORG
+  ORG -.-> IAM
+  REP -.-> ASS & CAT & EVI & IAM
+```
+
+**Contexto.** Las flechas continuas son llamadas del navegador con el token del usuario; las punteadas son
+llamadas servidor-a-servidor configuradas por variables `MS_*_URL` en cada servicio (p. ej. `ms_assessment` → `ms_audit`
+para registrar eventos, → `ms_admin` para leer la configuración global). Las rutas `/internal/**` nunca se exponen
+al navegador y se autentican con la clave compartida `X-Internal-Api-Key`. El número junto a cada servicio es la cantidad de endpoints que expone.
+
 ## Convenciones transversales
 
 - **Envelope de respuesta:** `{ "meta": {...}, "data": ... }` en éxito, `{ "meta": {...}, "error": [{ "code", "message" }] }` en error.
@@ -23,9 +62,10 @@
 
 | Grupo | Rutas | Rol requerido |
 |---|---|---|
-| Organizaciones | `GET/POST /organizations`, `GET/PUT /organizations/{organizationId}`, `GET /organizations/my-organization` | Autenticado |
-| Geografía | `GET /location/countries`, `GET /location/countries/{iso2}/states`, `GET .../states/{iso2}/cities` | Autenticado |
-| Áreas base | `GET/PUT /organizations/{organizationId}/areas-base` | `AdminSistema`, `AdminInstrumento` |
+| Organizaciones | `GET/POST /organizations`, `GET/PUT /organizations/{organizationId}` | `AdminSistema` |
+| Mi organización | `GET /organizations/my-organization` | Rol `Lector` (todo usuario de negocio) |
+| Geografía | `GET /location/countries`, `GET /location/countries/{iso2}/states`, `GET .../states/{iso2}/cities` | Público (proxy a Country State City con API key de servidor) |
+| Áreas base | `GET/PUT /organizations/{organizationId}/areas-base` | `AdminSistema` |
 
 ## `ms_assessment` — puerto 8084
 
