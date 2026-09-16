@@ -8,6 +8,20 @@
 
 ---
 
+## 0. Inventario actualizado de pruebas (desde el código)
+
+**5 clases de prueba · 24 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+
+| Módulo | Clase de prueba | Casos | Tipo |
+|---|---|---|---|
+| `domain/usecase` | `ListAuditEventsUseCaseTest` | 1 | Unitaria |
+| `domain/usecase` | `RecordAuditEventUseCaseTest` | 8 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `CorsConfigTest` | 3 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `GlobalExceptionHandlerTest` | 8 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `TraceIdFilterTest` | 4 | Unitaria |
+
+Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`).
+
 ## 1. Frameworks
 
 Heredados de la plantilla Gradle MSPI (`main.gradle` / `build.gradle`):

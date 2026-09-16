@@ -7,6 +7,19 @@
 
 ---
 
+## 0. Inventario actualizado de pruebas (desde el código)
+
+**4 clases de prueba · 18 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+
+| Módulo | Clase de prueba | Casos | Tipo |
+|---|---|---|---|
+| `domain/usecase` | `ContentMagicValidatorTest` | 3 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `CorsConfigTest` | 3 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `GlobalExceptionHandlerTest` | 8 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `TraceIdFilterTest` | 4 | Unitaria |
+
+Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`).
+
 ## 1. Frameworks de prueba declarados (verificados en `build.gradle`)
 
 | Framework / librería | Versión | Uso | Módulo(s) que la declaran |
@@ -27,7 +40,7 @@ infrastructure/entry-points/api-rest/src/test/java/co/com/mspi/api/
 └── exception/GlobalExceptionHandlerTest.java
 ```
 
-Se identificaron **3 clases de prueba** en todo el repositorio de `ms_evidence`, todas concentradas en el módulo `api-rest`, y todas sobre componentes transversales de infraestructura HTTP (CORS, trazabilidad, manejo de excepciones), no sobre la lógica de negocio del dominio.
+Se identificaron **4 clases de prueba** en todo el repositorio de `ms_evidence`, todas concentradas en el módulo `api-rest`, y todas sobre componentes transversales de infraestructura HTTP (CORS, trazabilidad, manejo de excepciones), no sobre la lógica de negocio del dominio.
 
 ### 2.1 Módulos sin pruebas propias (ausencia explícita)
 

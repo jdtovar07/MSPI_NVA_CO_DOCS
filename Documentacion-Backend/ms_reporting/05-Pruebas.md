@@ -7,6 +7,23 @@
 
 ---
 
+## 0. Inventario actualizado de pruebas (desde el código)
+
+**8 clases de prueba · 25 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+
+| Módulo | Clase de prueba | Casos | Tipo |
+|---|---|---|---|
+| `domain/model` | `AssessmentStatusSupportTest` | 3 | Unitaria |
+| `domain/usecase` | `CreateReportJobUseCaseTest` | 7 | Unitaria |
+| `domain/usecase` | `InstrumentWorkbookValidityTest` | 2 | Unitaria |
+| `domain/usecase` | `MspiInstrumentTemplateFillerTest` | 2 | Unitaria |
+| `domain/usecase` | `MspiPortadaTemplateFillerTest` | 6 | Unitaria |
+| `domain/usecase` | `PdfDraftWatermarkerTest` | 2 | Unitaria |
+| `domain/usecase` | `ProcessReportJobOfficialGuardTest` | 1 | Unitaria |
+| `domain/usecase` | `WorkbookFullProtectionTest` | 2 | Unitaria |
+
+Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`).
+
 ## 1. Frameworks configurados (a nivel de build)
 
 Declarados en `main.gradle` (aplicados a **todos** los subproyectos) y en `applications/app-service/build.gradle`:
@@ -23,7 +40,7 @@ Declarados en `main.gradle` (aplicados a **todos** los subproyectos) y en `appli
 
 ## 2. Inventario real de pruebas
 
-Se localizaron **exactamente 2 clases de prueba** en todo el repositorio, ambas en el módulo `domain/usecase` (`domain/usecase/src/test/java/co/com/mspi/usecase/reporting/`):
+Se localizaron **exactamente 8 clases de prueba** en todo el repositorio, ambas en el módulo `domain/usecase` (`domain/usecase/src/test/java/co/com/mspi/usecase/reporting/`):
 
 | Clase | Método(s) de prueba | Qué valida |
 |---|---|---|

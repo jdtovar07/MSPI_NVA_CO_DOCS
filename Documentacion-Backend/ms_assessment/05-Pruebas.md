@@ -7,6 +7,32 @@
 
 ---
 
+## 0. Inventario actualizado de pruebas (desde el código)
+
+**17 clases de prueba · 92 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+
+| Módulo | Clase de prueba | Casos | Tipo |
+|---|---|---|---|
+| `domain/model` | `AssessmentStatusesTest` | 2 | Unitaria |
+| `domain/model` | `MemberRolesTest` | 1 | Unitaria |
+| `domain/usecase` | `AssessmentApproverNotifierTest` | 1 | Unitaria |
+| `domain/usecase` | `ChangeAssessmentStatusUseCaseTest` | 4 | Unitaria |
+| `domain/usecase` | `ComputeAssessmentRollupUseCaseTest` | 11 | Unitaria |
+| `domain/usecase` | `ComputeDomainEffectivenessUseCaseTest` | 2 | Unitaria |
+| `domain/usecase` | `ComputeNistSummaryUseCaseTest` | 1 | Unitaria |
+| `domain/usecase` | `ComputePhvaAdvanceUseCaseTest` | 3 | Unitaria |
+| `domain/usecase` | `ListGapsUseCaseTest` | 1 | Unitaria |
+| `domain/usecase` | `MaturityScoreResolverTest` | 14 | Unitaria |
+| `domain/usecase` | `NistCiberScoreResolverTest` | 11 | Unitaria |
+| `domain/usecase` | `PatchControlScoreUseCaseTest` | 13 | Unitaria |
+| `domain/usecase` | `ReviewControlUseCaseTest` | 4 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `AssessmentAccessGuardTest` | 9 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `CorsConfigTest` | 3 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `GlobalExceptionHandlerTest` | 8 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `TraceIdFilterTest` | 4 | Unitaria |
+
+Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`).
+
 ## 1. Frameworks de prueba (verificados en `build.gradle`)
 
 | Framework / librería | Versión | Uso | Módulo(s) |
@@ -38,7 +64,7 @@ infrastructure/entry-points/api-rest/src/test/java/co/com/mspi/api/
 └── exception/GlobalExceptionHandlerTest.java
 ```
 
-En total se identificaron **10 clases de prueba**, todas concentradas en 2 de los 7 módulos del proyecto (`:usecase` y `:api-rest`). Los módulos `:model`, `:common`, `:jpa-repository`, `:rest-consumer` y `:app-service` **no tienen ninguna prueba propia** en el repositorio. Esta es una cobertura estructural notablemente menor que la de `ms_iam` (21 clases en 7 de 9 módulos): `ms_assessment` prueba en profundidad el **núcleo de cálculo de dominio** (rollup, madurez, NIST, brechas, calificación de controles) pero deja sin prueba automatizada toda la capa de persistencia JPA, todos los adaptadores REST salientes, y 8 de los 9 controladores REST (`AssessmentApi`, `AssessmentAreasApi`, `AssessmentControlApi`, `AssessmentPhvaApi`, `AssessmentMaturityApi`, `AssessmentNistApi`, `AssessmentDiagnosticApi`, `AssessmentGapsApi`, `ControlStewardApi`, `InternalAssessmentReportingApi` — ninguno tiene test propio, solo se prueban la configuración transversal `CorsConfig`/`TraceIdFilter` y el `GlobalExceptionHandler`).
+En total se identificaron **17 clases de prueba**, todas concentradas en 2 de los 7 módulos del proyecto (`:usecase` y `:api-rest`). Los módulos `:model`, `:common`, `:jpa-repository`, `:rest-consumer` y `:app-service` **no tienen ninguna prueba propia** en el repositorio. Esta es una cobertura estructural notablemente menor que la de `ms_iam` (21 clases en 7 de 9 módulos): `ms_assessment` prueba en profundidad el **núcleo de cálculo de dominio** (rollup, madurez, NIST, brechas, calificación de controles) pero deja sin prueba automatizada toda la capa de persistencia JPA, todos los adaptadores REST salientes, y 8 de los 9 controladores REST (`AssessmentApi`, `AssessmentAreasApi`, `AssessmentControlApi`, `AssessmentPhvaApi`, `AssessmentMaturityApi`, `AssessmentNistApi`, `AssessmentDiagnosticApi`, `AssessmentGapsApi`, `ControlStewardApi`, `InternalAssessmentReportingApi` — ninguno tiene test propio, solo se prueban la configuración transversal `CorsConfig`/`TraceIdFilter` y el `GlobalExceptionHandler`).
 
 ## 3. Tipos de prueba evidenciados
 
@@ -81,7 +107,7 @@ Configuración **idéntica en estructura** a la de `ms_iam` (misma sección `sub
 
 Dado que el pipeline actual solo ejecuta `./gradlew clean assemble` (sin `test` ni `check`) antes de desplegar a Railway, y que la cobertura real de pruebas está concentrada casi exclusivamente en el módulo de cálculo de dominio:
 
-1. **Incorporar `./gradlew check` al pipeline** (idéntica recomendación que en `ms_iam`), de forma que el umbral del 80% y las 10 clases de prueba existentes actúen como *gate* real antes de desplegar.
+1. **Incorporar `./gradlew check` al pipeline** (idéntica recomendación que en `ms_iam`), de forma que el umbral del 80% y las 17 clases de prueba existentes actúen como *gate* real antes de desplegar.
 2. **Cerrar la brecha de cobertura de `AssessmentJpaAdapter`**: al ser la única implementación de un puerto de 39 métodos que incluye lógica no trivial (materialización de snapshots, clonación de árboles completos), su ausencia de prueba es el riesgo más alto de regresión silenciosa del proyecto.
 3. **Añadir pruebas de los 5 adaptadores `rest-consumer`** con MockWebServer (patrón ya usado en `ms_iam` para `KeycloakAuthAdapterTest`), especialmente `CatalogGatewayAdapter` por ser el más extenso y crítico para la materialización de snapshots.
 4. **Añadir pruebas de los 21 casos de uso sin cobertura**, priorizando `CreateAssessmentUseCase`, `PublishAssessmentUseCase` y `CloneAssessmentUseCase` por concentrar las reglas de negocio de ciclo de vida (estado, concurrencia optimista, clonación) descritas en `02-Analisis.md`.

@@ -7,11 +7,24 @@
 
 ---
 
+## 0. Inventario actualizado de pruebas (desde el código)
+
+**4 clases de prueba · 17 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+
+| Módulo | Clase de prueba | Casos | Tipo |
+|---|---|---|---|
+| `applications/app-service` | `V2AnnexA2022ControlCatalogSeedTest` | 2 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `CorsConfigTest` | 3 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `GlobalExceptionHandlerTest` | 8 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `TraceIdFilterTest` | 4 | Unitaria |
+
+Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`).
+
 ## 1. Frameworks de prueba declarados (verificados en `build.gradle`)
 
 | Framework / librería | Versión | Declarado en | Uso real evidenciado |
 |---|---|---|---|
-| JUnit 5 (Jupiter) | gestionada por BOM Spring Boot 4.0.2; `test { useJUnitPlatform() }` en `main.gradle` | Todos los módulos (heredado de `main.gradle`) | Sí, en los 3 archivos de prueba existentes |
+| JUnit 5 (Jupiter) | gestionada por BOM Spring Boot 4.0.2; `test { useJUnitPlatform() }` en `main.gradle` | Todos los módulos (heredado de `main.gradle`) | Sí, en los 4 archivos de prueba existentes |
 | `spring-boot-starter-test` | gestionada por BOM | Declarada en `main.gradle` para todos los subproyectos | Sí (JUnit 5, Mockito, AssertJ) |
 | `spring-security-test` | gestionada por BOM | `app-service/build.gradle` | No se encontró ninguna clase de prueba que la utilice |
 | `archunit` | 1.4.1 | `app-service/build.gradle` (`testImplementation 'com.tngtech.archunit:archunit:1.4.1'`) | **No se encontró ninguna clase de prueba ArchUnit** pese a la dependencia declarada |
@@ -27,7 +40,7 @@ infrastructure/entry-points/api-rest/src/test/java/co/com/mspi/api/
 └── exception/GlobalExceptionHandlerTest.java
 ```
 
-**En total se identificaron 3 clases de prueba en todo el repositorio**, las 3 concentradas en el módulo `:api-rest`. Los 5 módulos restantes (`:model`, `:usecase`, `:common`, `:jpa-repository`, `:app-service`) **no tienen ninguna clase de prueba propia**:
+**En total se identificaron 4 clases de prueba en todo el repositorio**, las 3 concentradas en el módulo `:api-rest`. Los 5 módulos restantes (`:model`, `:usecase`, `:common`, `:jpa-repository`, `:app-service`) **no tienen ninguna clase de prueba propia**:
 
 - `:model` — sin lógica, solo POJOs (`@Data @Builder`); coherente con la ausencia de pruebas.
 - `:usecase` — **contiene los 17 casos de uso con la única lógica de negocio real del microservicio** (resolución de plantilla activa, filtrado por `controlType`, etc.) y **no tiene ninguna prueba unitaria**. Es la ausencia de cobertura más significativa del proyecto, dado que es la capa que concentra las reglas de negocio documentadas en `02-Analisis.md` §3.
