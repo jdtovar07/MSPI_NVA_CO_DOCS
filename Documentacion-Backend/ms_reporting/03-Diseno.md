@@ -416,7 +416,7 @@ sequenceDiagram
   R->>R: status=RUNNING, progressPct=10
   R->>A: GET /internal/assessments/{id}/report-export-bundle (X-Internal-Api-Key)
   A-->>R: bundle { assessment, diagnosticDashboard{...} }
-  R->>R: MspiPortadaTemplateFiller.fillWorkbook(bundle)\n(PORTADA; o MspiInstrumentTemplateFiller 11 hojas)
+  R->>R: MspiInstrumentTemplateFiller.fillWorkbook(bundle)\n(instrumento oficial completo, 11 hojas)
   R->>R: LibreOfficePdfConverter.convertXlsxToPdf\n(+ PdfDraftWatermarker si borrador)
   R->>R: FileSystemReportOutputStorage.save(jobId, pdf)\nprogressPct=90
   R->>E: POST /internal/assessments/{id}/report-outputs (multipart)
@@ -436,7 +436,7 @@ sequenceDiagram
 | DT-01 | Procesamiento asíncrono con `CompletableFuture.runAsync` + `ThreadPoolTaskExecutor` propio, en lugar de una cola de mensajería externa (Kafka/RabbitMQ) | README explícito: "No aplica (procesamiento en memoria con `CompletableFuture`, sin cola externa)". Reduce infraestructura operativa a costa de perder durabilidad de la tarea si el proceso JVM se reinicia mientras un job está `RUNNING` (quedaría "atascado" en ese estado hasta una intervención manual, ya que no hay reconciliación al arranque) |
 | DT-02 | Generar el PDF de diagnóstico **convirtiendo el Excel ya diligenciado** con LibreOffice, en vez de dibujar el PDF directamente con OpenPDF | Preserva gráficos nativos de Excel (radar ISO, barras PHVA, radar NIST), colores y logos; `soffice` en imagen Jammy; `ProcessBuilder` con `Redirect.DISCARD` y perfil `UserInstallation` aislado por job (evita deadlock de pipes y contención de perfil) |
 | DT-03 | Ubicar las clases de generación de documentos (`engine/`, con dependencias directas a Apache POI/OpenPDF/`ProcessBuilder`) dentro de `domain/usecase` en lugar de un módulo de infraestructura aparte | Mantiene junta la lógica de "qué se genera" (reglas de mapeo bundle→celda, reglas de qué hoja se conserva) sin fragmentarla en un puerto adicional; compromiso consciente de pureza hexagonal a cambio de cohesión del dominio de reportes |
-| DT-04 | PORTADA: `retainOnlyPortadaSheet`. Instrumento completo: conservar las 11 hojas de `plantilla-instrumento-completo-2022.xlsx` y escribir solo celdas de entrada | Fidelidad al Autodiagnóstico oficial; fórmulas/gráficos recalculados por LibreOffice (`fullCalcOnLoad`) |
+| DT-04 | Los reportes oficiales (Excel y PDF) usan **siempre el instrumento completo** (`MspiInstrumentTemplateFiller`); `MspiPortadaTemplateFiller`/`retainOnlyPortadaSheet` se conserva solo por compatibilidad y no se usa en el flujo de trabajos. Instrumento completo: conservar las 11 hojas de `plantilla-instrumento-completo-2022.xlsx` y escribir solo celdas de entrada | Fidelidad al Autodiagnóstico oficial; fórmulas/gráficos recalculados por LibreOffice (`fullCalcOnLoad`) |
 | DT-09 | Watermark de borrador en PDF con PDFBox (overlay semitransparente), no header/footer POI | Visible en el PDF entregado; no depende de impresión de encabezados de Excel |
 | DT-10 | Protección total de Excel oficial (`WorkbookFullProtection` + `REPORT_PROTECTION_PASSWORD`) | Impide edición casual; **no es cifrado** — inmutabilidad real = PDF oficial |
 | DT-05 | Caché local en disco (`FileSystemReportOutputStorage`, volumen Docker `mspi_report_outputs`) como primera fuente de descarga, con `ms_evidence` como respaldo | Evita una llamada de red adicional en el camino feliz de descarga inmediata tras generación; degrada con gracia si el archivado remoto falló (RN-12) |
@@ -525,11 +525,11 @@ classDiagram
 ```mermaid
 sequenceDiagram
     participant Api as ReportJobApi
-    participant Create as CreateReportJobUseCase
+    participant CreateUC as CreateReportJobUseCase
     participant Proc as ProcessReportJobUseCase
     participant Asm as AssessmentGateway
     participant Ev as EvidenceGateway
-    Api->>Create: POST job PENDING
+    Api->>CreateUC: POST job PENDING
     Proc->>Asm: export bundle
     Proc->>Proc: fill template / convert
     Proc->>Ev: store REPORT_OUTPUT

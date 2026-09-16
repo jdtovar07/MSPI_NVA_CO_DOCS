@@ -269,10 +269,10 @@ flowchart LR
 ```mermaid
 sequenceDiagram
     participant Page as ReportsExportPageComponent
-    participant Create as CreateReportJobUseCase
+    participant CreateUC as CreateReportJobUseCase
     participant Get as GetReportJobUseCase
     participant Dl as ReportDownloadService
-    Page->>Create: POST /reports/jobs
+    Page->>CreateUC: POST /reports/jobs
     loop poll
         Page->>Get: GET /reports/jobs/{id}
     end
