@@ -16,7 +16,8 @@
 | **AdminInstrumento, Evaluador, Revisor, Lector** | Roles de negocio del catálogo (`iam.role`, seed en `schema-iam-mvp.sql`) | Consumidores de autenticación; no tienen endpoints administrativos propios en este microservicio |
 | **Keycloak** | Sistema externo (Identity Provider) | Autoridad de credenciales; emite JWT; expone Admin REST API para gestión de usuarios (`KeycloakAdminGateway`) |
 | **ms_org** | Microservicio par | Consultado por `ms_iam` (`GET /organizations/{id}`) al crear usuarios `Lector`; invoca `POST /users` y `POST /users/disable-by-email` sobre `ms_iam` |
-| **ms_assessment (y otros MS)** | Microservicio par | Consumidor de `POST /internal/audit/events` mediante `X-Internal-Api-Key` |
+| **ms_audit** | Microservicio par | Recibe los eventos de autenticación (`POST /internal/audit`) y consulta `GET /internal/requests/{requestNumber}` |
+| **ms_assessment / ms_catalog** | Microservicios pares | Crean notificaciones con `POST /internal/notifications` (`X-Internal-Api-Key`) |
 | **Brevo** | Sistema externo (proveedor de correo transaccional) | Recibe solicitudes de `BrevoEmailAdapter` para notificar contraseñas temporales/reset |
 | **Equipo DBA/DevOps** | Rol operativo | Aplica manualmente `schema-iam-mvp.sql` / `schema-iam-patch.sql`, ya que el microservicio no ejecuta DDL |
 
@@ -49,7 +50,10 @@ Extraídos de los controladores REST (`infrastructure/entry-points/api-rest/src/
 | RF-18d | Rechazar / cancelar solicitud de reenvío | `POST .../reject` · `POST .../cancel` | AdminSistema |
 | RF-19 | Desactivar usuario por correo (usado por `ms_org` al cambiar el contacto de una organización) | `POST /users/disable-by-email` → `DisableUserByEmailUseCase` | AdminSistema / ms_org |
 | RF-20 | Listar catálogo de roles del realm de Keycloak con etiquetas en español | `GET /roles` → `GetRolesUseCase` / `RolesApi` | Usuario autenticado |
-| RF-21 | Registrar eventos de auditoría de negocio provenientes de otros microservicios | `POST /internal/audit/events` → `InternalAuditApi` → `RecordAuditEventUseCase` | Microservicios (vía API key interna) |
+| RF-21 | Enviar cada intento de autenticación a la bitácora central (`ms_audit`) | `LoginService` → `AuditAuthGateway` → `AuditAuthRestAdapter` → `POST {MS_AUDIT_URL}/internal/audit` | Sistema |
+| RF-21b | Listar, marcar como leídas y limpiar notificaciones del usuario | `GET /notifications`, `POST /notifications/{id}/read`, `/read-all`, `/{id}/clear`, `/clear-read` → `NotificationApi` | Usuario autenticado |
+| RF-21c | Crear notificaciones desde otros microservicios | `POST /internal/notifications` → `InternalNotificationApi` → `CreateNotificationUseCase` | Microservicios (API key interna) |
+| RF-21d | Exponer la instantánea de una solicitud `SOL-PWD` por radicado | `GET /internal/requests/{requestNumber}` → `InternalRequestAuditApi` | `ms_audit` (API key interna) |
 | RF-22 | Exponer estado de salud y metadatos del servicio | `GET /actuator/health`, `GET /actuator/info` | Infraestructura (Docker healthcheck) |
 
 ## 3. Reglas de negocio (identificadas en `domain/usecase` e infraestructura de servicio)
@@ -88,7 +92,7 @@ Extraídos de los controladores REST (`infrastructure/entry-points/api-rest/src/
 | RNF-09 | **CORS configurable por entorno**: orígenes permitidos parametrizables vía `CORS_ALLOWED_ORIGINS` | `application.yaml`, `CorsConfig` |
 | RNF-10 | **Contenedor de imagen mínima y no root**: build multi-stage sobre Alpine, usuario `mspi` sin privilegios | `deployment/Dockerfile` |
 | RNF-11 | **Cobertura mínima de pruebas exigida en build**: `check.dependsOn jacocoTestCoverageVerification` con mínimo 80% de instrucciones cubiertas (excluyendo DTOs, mappers, entidades y configuración) | `main.gradle` |
-| RNF-12 | **Auditabilidad transversal**: `ms_iam` actúa como *sink* de auditoría no solo de sus propios eventos sino de eventos de negocio de otros microservicios, con índices por actor, entidad, tipo y fecha | `schema-iam-mvp.sql` (tabla `iam.audit_log` + 4 índices) |
+| RNF-12 | **Auditabilidad**: todo intento de autenticación y toda decisión sobre solicitudes `SOL-PWD` queda en la bitácora central de `ms_audit` (esquema `audit`), desacoplada de `ms_iam` | `AuditAuthRestAdapter`, `patch-audit-schema.sql` |
 | RNF-13 | **Internacionalización de mensajes de error**: mensajes de negocio y catálogos (roles, estados) en español, alineado con el público objetivo del sistema | `docs/README.md`, `RolesApi`, `UsersApi.listStatuses` |
 
 ## 5. Casos de uso (formalizados desde `domain/usecase`)

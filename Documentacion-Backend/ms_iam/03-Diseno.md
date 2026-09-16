@@ -87,10 +87,11 @@ ms_iam/
 │               │             LoginResponse, UserResponse)
 │               ├── config/   CorsConfig, SecurityHeadersFilter, TraceIdFilter
 │               ├── exception/ GlobalExceptionHandler
-│               ├── internal/ InternalAuditApi (+ dto/ AuditEventRequest)
+│               ├── internal/ InternalNotificationApi, InternalRequestAuditApi (+ dto/)
+│               ├── notification/ NotificationApi (+ dto/)
 │               ├── mapper/   AuthApiMapper
 │               ├── roles/    RolesApi (+ dto/ RoleCatalogItem)
-│               └── users/    UsersApi (+ dto/ 6 clases, mapper/ UsersApiMapper)
+│               └── users/    UsersApi, PasswordResetRequestsApi, CurrentUserResolver (+ dto/, mapper/)
 └── applications/
     └── app-service/                    (:app-service — ejecutable Spring Boot)
         └── co.com.mspi/
@@ -126,7 +127,7 @@ El ensamblaje puerto↔adaptador↔caso de uso ocurre exclusivamente en el módu
 ```mermaid
 flowchart TB
     subgraph EntryPoints["infrastructure/entry-points"]
-        API[api-rest<br/>AuthApi · UsersApi · RolesApi · InternalAuditApi]
+        API[api-rest<br/>AuthApi · UsersApi · PasswordResetRequestsApi · RolesApi · NotificationApi · Internal*Api]
     end
 
     subgraph Domain["domain (sin dependencias de framework)"]
@@ -191,8 +192,7 @@ erDiagram
     "iam.user" ||--o| "iam.user_totp" : configura
     "iam.user" ||--o{ "iam.password_reset_request" : destino_de
     "iam.user" ||--o{ "iam.password_reset_request" : solicita
-    "iam.user" ||--o{ "iam.audit_log" : actor_de
-    "iam.user" ||--o{ "iam.system_config" : actualiza
+    "iam.user" ||--o{ "iam.notification" : recibe
 
     "iam.user" {
         UUID id PK
@@ -230,25 +230,23 @@ erDiagram
         timestamptz executed_at
         boolean email_sent
     }
-    "iam.audit_log" {
-        bigserial id PK
-        varchar event_type
-        varchar entity_type
-        varchar entity_id
+    "iam.notification" {
+        UUID id PK
+        uuid user_id "destinatario"
+        varchar type
+        varchar priority
+        varchar title
+        varchar message
         uuid assessment_id
-        uuid actor_user_id FK
-        timestamptz occurred_at
-        varchar ip
-        varchar user_agent
-        jsonb before_json
-        jsonb after_json
-        jsonb metadata_json
+        varchar action_url
+        boolean is_read
+        timestamptz read_at
+        timestamptz cleared_at "limpieza lógica"
     }
-    "iam.system_config" {
-        varchar key PK
-        jsonb value_json
-        int version
-        uuid updated_by FK
+    "iam.login_attempt" {
+        varchar identifier PK "correo o usuario"
+        integer failed_count
+        timestamptz locked_until "bloqueo 15 min tras 3 fallos"
         timestamptz updated_at
     }
 ```
@@ -258,9 +256,9 @@ erDiagram
 - **`iam.user` no almacena contraseñas**: las credenciales viven en Keycloak; el vínculo es `keycloak_sub` (único). Esto es coherente con el objetivo de centralizar autenticación fuera del microservicio.
 - **`iam.user_totp` es una extensión propia de `ms_iam`**, no contemplada en el MER general del proyecto (comentario explícito en el SQL: "extensión ms_iam, no en MER"). Se indexa por `keycloak_sub` en lugar de `user.id`, lo que acopla la funcionalidad TOTP directamente a la identidad de Keycloak.
 - **`iam.password_reset_request`**: solicitudes de reenvío de contraseña temporal con ciclo PENDING→APPROVED/REJECTED/CANCELLED y radicado legible `SOL-PWD-######` (secuencia `iam.seq_password_reset_request_number`). Al aprobar se ejecuta reset de contraseña + `TotpGateway.resetTotp`, se envía el correo con la misma plantilla AUDITCYBER que `brevo-sender/email-preview.html`, y se registra `email_sent` / `email_error` sin dejar el estado inconsistente si falla el correo.
-- **`iam.audit_log` es polimórfica**: `entity_type` + `entity_id` (string, no FK tipada) permite registrar eventos sobre cualquier tipo de entidad de cualquier microservicio, incluyendo `assessment_id` como columna dedicada por ser el caso de uso principal de auditoría externa (`ms_assessment`). Tres columnas `JSONB` (`before_json`, `after_json`, `metadata_json`) permiten capturar diffs de negocio sin necesidad de tablas específicas por tipo de evento.
-- **`iam.system_config`** existe en el DDL (clave-valor JSONB versionado) pero no se identificó código de aplicación (adaptador/gateway) que la use activamente en los módulos revisados; aparenta ser una tabla reservada del MER para configuración paramétrica futura.
-- **Índices**: 4 índices sobre `audit_log` optimizan las consultas típicas de auditoría (por `assessment_id`+fecha, por actor+fecha, por tipo de evento+fecha, por entidad). `user.email` y `user.keycloak_sub` tienen índices únicos adicionales explícitos aunque ya son `UNIQUE` a nivel de columna.
+- **La bitácora y la configuración global ya no viven en `iam`**: `iam.audit_log` se migró a `audit.audit_log` (`ms_audit`, `patch-audit-schema.sql`) e `iam.system_config*` a `admin.system_config*` (`ms_admin`, `patch-admin-schema.sql`). `ms_iam` solo **produce** eventos de autenticación hacia `ms_audit`.
+- **`iam.notification`**: notificaciones in-app por destinatario; la limpieza es lógica (`cleared_at`), coherente con la regla de negocio de no borrar físicamente.
+- **`iam.login_attempt`**: contador de intentos fallidos por identificador; tras 3 fallos seguidos bloquea 15 minutos (`locked_until`).
 - **`schema-iam-patch.sql`** es un script idempotente (`CREATE TABLE IF NOT EXISTS`, bloques `DO $$ ... EXCEPTION WHEN ...`) pensado para bases de datos ya provisionadas a las que les falten tablas nuevas (p. ej. `audit_log`), evitando recrear el volumen completo en entornos Docker locales.
 
 ## 6. Diseño de la API (REST)
@@ -268,7 +266,7 @@ erDiagram
 Contrato formal en `docs/openapi.yaml` (OpenAPI 3.1.0). Convenciones de diseño observadas:
 
 - **Envoltorio uniforme de respuesta**: éxito → `CorrectResponse { meta: {traceId, timestamp}, data }`; error → `ErrorResponse { meta, error: [{code, message, field?}] }`. Construido centralmente por `ApiResponseMapper` (`:common`) y usado por todos los controladores.
-- **Un `RestController` por subdominio**, mapeado 1:1 a un prefijo de ruta: `AuthApi` (`/auth`), `UsersApi` (`/users`), `RolesApi` (`/roles`), `InternalAuditApi` (`/internal/audit`).
+- **Un `RestController` por subdominio**, mapeado 1:1 a un prefijo de ruta: `AuthApi` (`/auth`), `UsersApi` (`/users`), `PasswordResetRequestsApi` (`/password-reset-requests`), `RolesApi` (`/roles`), `NotificationApi` (`/notifications`), `InternalNotificationApi` (`/internal/notifications`) e `InternalRequestAuditApi` (`/internal/requests`). Referencia completa: [`08-Referencia-API.md`](08-Referencia-API.md).
 - **DTO de entrada validado con Bean Validation** (`@Valid`) en cada `@RequestBody`, y mapeo explícito DTO↔dominio en clases `*Mapper` (`AuthApiMapper`, `UsersApiMapper`) — el controlador nunca recibe ni retorna directamente objetos de `domain/model`.
 - **Manejo de errores centralizado** en `GlobalExceptionHandler` (`@RestControllerAdvice`), que traduce cada excepción de dominio (`:common/exception`) a un código HTTP y un `code` de negocio estable (`VALIDATION`, `BUSINESS_RULES`, `INVALID_CREDENTIALS`, `USER_INACTIVE`, `DUPLICATE_EMAIL`, `AUTH_SERVICE_UNAVAILABLE`, `NOT_FOUND`, `INTERNAL_ERROR`, `REMOTE_SERVICE_ERROR`), evitando fugas de detalles internos salvo en el caso explícito de errores 4xx/5xx remotos (con mensaje truncado a 500 caracteres). En `MethodArgumentNotValidException`, cada `ErrorDetail` lleva `field` = `FieldError.getField()` y `message` = mensaje por defecto **sin** prefijo `campo:`.
 - **Doble esquema de seguridad**: `bearerAuth` (JWT vía Spring Security OAuth2 Resource Server) para la mayoría de rutas, e `internalApiKey` (header `X-Internal-Api-Key`) para `/internal/**`, implementado como filtro Servlet manual (`InternalApiKeyFilter`) insertado antes del filtro Bearer (`addFilterBefore(..., BearerTokenAuthenticationFilter.class)`).

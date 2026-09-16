@@ -153,7 +153,7 @@ pipelines:
 
 ## 5. Infraestructura de despliegue local (Docker Compose)
 
-`ms_iam` está declarado en `docker-config/docker/docker-compose.apps.yml`, dentro del proyecto Compose `mspi-apps`, junto a otros 5 microservicios activos (`ms-org`, `ms-catalog`, `ms-evidence`, y al menos un `ms-frontend`/gateway que depende de todos). Requiere que la infraestructura base (red Docker `mspi-net`, PostgreSQL y Keycloak) esté levantada primero mediante los compose independientes en `docker-config/docker/postgres/docker-compose.yml` y `docker-config/docker/keycloak/docker-compose.yml`.
+`ms_iam` está declarado en `docker-config/docker/docker-compose.apps.yml`, dentro del proyecto Compose `mspi-apps`, junto a los otros 7 microservicios (`ms-audit`, `ms-admin`, `ms-org`, `ms-catalog`, `ms-evidence`, `ms-assessment`, `ms-reporting`); los microfrontends se levantan aparte con `docker-compose.front.yml`. Requiere que la infraestructura base (red Docker `mspi-net`, PostgreSQL y Keycloak) esté levantada primero mediante los compose independientes en `docker-config/docker/postgres/docker-compose.yml` y `docker-config/docker/keycloak/docker-compose.yml`.
 
 ```yaml
 ms-iam:

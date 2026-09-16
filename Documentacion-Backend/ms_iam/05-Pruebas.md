@@ -7,6 +7,40 @@
 
 ---
 
+## 0. Inventario actualizado de pruebas (desde el código)
+
+**25 clases de prueba · 114 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+
+| Módulo | Clase de prueba | Casos | Tipo |
+|---|---|---|---|
+| `applications/app-service` | `AuthRateLimitFilterTest` | 2 | Unitaria |
+| `domain/model` | `RoleNormalizerTest` | 6 | Unitaria |
+| `domain/usecase` | `GetUsersUseCaseTest` | 2 | Unitaria |
+| `domain/usecase` | `LoginUseCaseTest` | 1 | Unitaria |
+| `domain/usecase` | `TotpStatusUseCaseTest` | 4 | Unitaria |
+| `domain/usecase` | `TotpVerifyUseCaseTest` | 5 | Unitaria |
+| `infrastructure/driven-adapters/brevo-sender` | `BrevoEmailAdapterTest` | 5 | Unitaria |
+| `infrastructure/driven-adapters/jpa-repository` | `JpaConfigTest` | 3 | Unitaria |
+| `infrastructure/driven-adapters/rest-consumer` | `AuditAuthRestAdapterTest` | 2 | Unitaria |
+| `infrastructure/driven-adapters/rest-consumer` | `KeycloakAuthAdapterTest` | 5 | Unitaria |
+| `infrastructure/driven-adapters/rest-consumer` | `UserInfoMapperTest` | 2 | Unitaria |
+| `infrastructure/driven-adapters/rest-consumer` | `ValidatorsTest` | 15 | Unitaria |
+| `infrastructure/driven-adapters/service` | `LoginServiceTest` | 5 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `AuthApiMapperTest` | 2 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `AuthApiTest` | 7 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `CorsConfigTest` | 1 | Integración (Spring) |
+| `infrastructure/entry-points/api-rest` | `GlobalExceptionHandlerTest` | 17 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `RolesApiTest` | 2 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `SecurityHeadersFilterTest` | 1 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `TraceIdFilterTest` | 4 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `UsersApiMapperTest` | 5 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `UsersApiTest` | 8 | Unitaria |
+| `infrastructure/helpers/common` | `ApiResponseMapperTest` | 4 | Unitaria |
+| `infrastructure/helpers/common` | `ExceptionsTest` | 5 | Unitaria |
+| `infrastructure/helpers/common` | `LogSanitizerTest` | 1 | Unitaria |
+
+Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`).
+
 ## 1. Frameworks de prueba (verificados en `build.gradle`)
 
 | Framework / librería | Versión | Uso | Módulo(s) |
@@ -59,7 +93,7 @@ infrastructure/helpers/common/src/test/java/co/com/mspi/common/
 └── mapper/ApiResponseMapperTest.java
 ```
 
-En total se identificaron **21 clases de prueba** distribuidas en 7 de los 9 módulos del proyecto. Los módulos `domain/model` (`:model`) y `applications/app-service` (`:app-service`, salvo el marcador `.gitignore` en su carpeta de test) **no tienen pruebas propias** en el repositorio: `:model` por ser solo POJOs/interfaces sin lógica, y `:app-service` porque su contenido (configuración de wiring, `MainApplication`) se excluye explícitamente del análisis de cobertura (`sonar.exclusions`) y de las reglas de JaCoCo (ver §4).
+En total se identificaron **25 clases de prueba** distribuidas en 7 de los 9 módulos del proyecto. Los módulos `domain/model` (`:model`) y `applications/app-service` (`:app-service`, salvo el marcador `.gitignore` en su carpeta de test) **no tienen pruebas propias** en el repositorio: `:model` por ser solo POJOs/interfaces sin lógica, y `:app-service` porque su contenido (configuración de wiring, `MainApplication`) se excluye explícitamente del análisis de cobertura (`sonar.exclusions`) y de las reglas de JaCoCo (ver §4).
 
 ## 3. Tipos de prueba evidenciados
 

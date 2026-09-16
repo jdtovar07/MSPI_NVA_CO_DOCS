@@ -12,7 +12,7 @@
 
 MSPI es un sistema de gestión de seguridad de la información construido como un conjunto de microservicios Java/Spring independientes que colaboran vía HTTP/REST y comparten un modelo de datos lógico (`DB-MER.txt`) particionado por esquema de base de datos (uno por microservicio: `iam`, `org`, `catalog`, `evidence`, `assessment`, `audit`, …). El repositorio contenedor `MSPI_NVA_CO_MR_BACK` agrupa cada microservicio como carpeta independiente (`ms_iam`, `ms_org`, `ms_catalog`, `ms_evidence`, `ms_assessment`, `ms_audit`, `ms_admin`, …), y `docker-config/` centraliza la orquestación local con Docker Compose (`docker-config/docker/docker-compose.apps.yml`), incluyendo Keycloak como Identity Provider.
 
-`ms_iam` es el microservicio de **Identidad y Acceso** (IAM) del sistema. Es un servicio fundacional: los demás microservicios dependen de él para autenticación (emisión/validación de JWT vía Keycloak) y para la bitácora centralizada de auditoría (`iam.audit_log`), razón por la cual en `docker-compose.apps.yml` los demás servicios declaran `depends_on: ms-iam: condition: service_healthy`.
+`ms_iam` es el microservicio de **Identidad y Acceso** (IAM) del sistema. Es un servicio fundacional: los demás microservicios dependen de él para autenticación (emisión/validación de JWT vía Keycloak) y para la resolución de usuarios y roles, razón por la cual en `docker-compose.apps.yml` los demás servicios declaran `depends_on: ms-iam: condition: service_healthy`.
 
 ## 2. Alcance del microservicio
 
@@ -23,11 +23,14 @@ MSPI es un sistema de gestión de seguridad de la información construido como u
 - **Segundo factor de autenticación (2FA/TOTP)** opcional, autogestionado por el usuario autenticado.
 - **Gestión administrativa de usuarios** (alta, edición, activación/inactivación, restablecimiento de contraseña, listado paginado con búsqueda y filtros) restringida al rol `AdminSistema`.
 - **Catálogo de roles** del *realm* de Keycloak, expuesto con etiquetas en español para consumo de los frontends.
-- **Bitácora de auditoría centralizada** (`iam.audit_log`): registra tanto los propios eventos de autenticación (`AUTH_LOGIN_SUCCESS`, `AUTH_LOGIN_FAILED`, `AUTH_LOGIN_INACTIVE`) como eventos de negocio que otros microservicios (p. ej. `ms_assessment`) envían vía `POST /internal/audit/events` protegido con una API key interna compartida.
+- **Productor de eventos de autenticación**: cada intento de inicio de sesión (`AUTH_LOGIN_SUCCESS`, `AUTH_LOGIN_FAILED`, `AUTH_LOGIN_INACTIVE`) se envía a la bitácora central de `ms_audit` (`POST /internal/audit`, API key interna). `ms_iam` ya **no** almacena la bitácora: se extrajo a `ms_audit` (esquema `audit`).
+- **Solicitudes de reenvío de contraseña temporal** (radicado `SOL-PWD`): un administrador solicita, otro decide; al aprobar se genera una contraseña temporal nueva, se envía por correo y se **reinicia el segundo factor** (TOTP) para obligar a reconfigurarlo.
+- **Notificaciones in-app** por usuario (listar, marcar leídas, limpiar) y endpoint interno para que otros servicios las creen (`POST /internal/notifications`).
+- **Instantánea de solicitud por radicado** (`GET /internal/requests/{requestNumber}`) para que `ms_audit` arme la línea de tiempo de una solicitud `SOL-PWD`.
 - **Integración saliente con `ms_org`**: al crear un usuario con rol `Lector`, `ms_iam` valida contra `ms_org` (`GET /organizations/{id}`) que la organización exista.
 - **Notificaciones por correo** (Brevo) al crear usuarios o restablecer contraseñas.
 
-Quedan **fuera de alcance** de `ms_iam` (y son responsabilidad de otros microservicios del sistema): la gestión de organizaciones (`ms_org`), catálogos de instrumentos/controles (`ms_catalog`), evidencias (`ms_evidence`), evaluaciones (`ms_assessment`) y consolidación de auditoría transversal (`ms_audit`). `ms_iam` únicamente persiste y expone su propia tabla `iam.audit_log`, que además sirve como sumidero (*sink*) de auditoría para otros servicios.
+Quedan **fuera de alcance** de `ms_iam` (y son responsabilidad de otros microservicios del sistema): la gestión de organizaciones (`ms_org`), catálogos de instrumentos/controles (`ms_catalog`), evidencias (`ms_evidence`), evaluaciones (`ms_assessment`) consolidación de auditoría transversal (`ms_audit`) y configuración global del sistema (`ms_admin`).
 
 ## 3. Objetivos
 
@@ -110,6 +113,7 @@ Dado que no existe evidencia de un cronograma o backlog propio de `ms_iam`, este
 | `AdminSistema` (administrador del sistema MSPI) | Consumidor directo de `/users/**`, gestiona altas, bajas y restablecimientos de contraseña |
 | Usuarios finales (`Evaluador`, `Revisor`, `Lector`, `AdminInstrumento`) | Consumidores de `/auth/login`, `/auth/change-password`, `/auth/totp/*` |
 | `ms_org` | Consumidor de `POST /users` y `POST /users/disable-by-email`; proveedor de `GET /organizations/{id}` consultado por `ms_iam` |
-| `ms_assessment` (y otros microservicios) | Consumidores de `POST /internal/audit/events` mediante `INTERNAL_API_KEY` compartida |
+| `ms_audit` | Destino de los eventos de autenticación; consulta `GET /internal/requests/{requestNumber}` para la línea de tiempo de `SOL-PWD` |
+| `ms_assessment`, `ms_catalog` | Crean notificaciones vía `POST /internal/notifications` (API key interna) |
 | Equipo DevOps / DBA | Responsables de aplicar `schema-iam-mvp.sql` / `schema-iam-patch.sql`, dado que el microservicio no ejecuta DDL |
 | Keycloak (IdP) | Proveedor de identidad; `ms_iam` actúa como *Resource Server* y como cliente administrativo (*service account* `mspi-backend`) |
