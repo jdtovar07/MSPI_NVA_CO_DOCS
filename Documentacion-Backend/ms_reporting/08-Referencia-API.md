@@ -52,13 +52,13 @@ flowchart LR
 
 | Método | Ruta | Acceso | Parámetros | Cuerpo | HTTP | Caso de uso / guarda |
 |---|---|---|---|---|---|---|
-| `POST` | `/reports/comparative/jobs` | JWT (cualquier rol) | — | `CreateComparativeReportJobRequest` | 200 | `CreateComparativeReportJobUseCase`, `ProcessReportJobUseCase` |
+| `POST` | `/reports/comparative/jobs` | JWT (cualquier rol) | — | `CreateComparativeReportJobRequest` | 202 | `CreateComparativeReportJobUseCase`, `ProcessReportJobUseCase` |
 
 ### `ReportJobApi`
 
 | Método | Ruta | Acceso | Parámetros | Cuerpo | HTTP | Caso de uso / guarda |
 |---|---|---|---|---|---|---|
-| `POST` | `/reports/jobs` | JWT (cualquier rol) | — | `CreateReportJobRequest` | 200 | `CreateReportJobUseCase`, `ProcessReportJobUseCase` |
+| `POST` | `/reports/jobs` | JWT (cualquier rol) | — | `CreateReportJobRequest` | 202 | `CreateReportJobUseCase`, `ProcessReportJobUseCase` |
 | `GET` | `/reports/jobs/{jobId}` | JWT (cualquier rol) | `jobId` | — | 200 | `GetReportJobUseCase` |
 | `GET` | `/reports/jobs/{jobId}/download` | JWT (cualquier rol) | `jobId` | — | archivo | `DownloadReportJobUseCase` |
 

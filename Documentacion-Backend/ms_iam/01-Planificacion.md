@@ -23,7 +23,7 @@ MSPI es un sistema de gestión de seguridad de la información construido como u
 - **Segundo factor de autenticación (2FA/TOTP)** opcional, autogestionado por el usuario autenticado.
 - **Gestión administrativa de usuarios** (alta, edición, activación/inactivación, restablecimiento de contraseña, listado paginado con búsqueda y filtros) restringida al rol `AdminSistema`.
 - **Catálogo de roles** del *realm* de Keycloak, expuesto con etiquetas en español para consumo de los frontends.
-- **Productor de eventos de autenticación**: cada intento de inicio de sesión (`AUTH_LOGIN_SUCCESS`, `AUTH_LOGIN_FAILED`, `AUTH_LOGIN_INACTIVE`) se envía a la bitácora central de `ms_audit` (`POST /internal/audit`, API key interna). `ms_iam` ya **no** almacena la bitácora: se extrajo a `ms_audit` (esquema `audit`).
+- **Productor de eventos de autenticación**: cada intento de inicio de sesión (`AUTH_LOGIN_SUCCESS`, `AUTH_LOGIN_FAILED`, `AUTH_LOGIN_INACTIVE`) se envía a la bitácora central de `ms_audit` (`POST /internal/audit/events`, API key interna). `ms_iam` ya **no** almacena la bitácora: se extrajo a `ms_audit` (esquema `audit`).
 - **Solicitudes de reenvío de contraseña temporal** (radicado `SOL-PWD`): un administrador solicita, otro decide; al aprobar se genera una contraseña temporal nueva, se envía por correo y se **reinicia el segundo factor** (TOTP) para obligar a reconfigurarlo.
 - **Notificaciones in-app** por usuario (listar, marcar leídas, limpiar) y endpoint interno para que otros servicios las creen (`POST /internal/notifications`).
 - **Instantánea de solicitud por radicado** (`GET /internal/requests/{requestNumber}`) para que `ms_audit` arme la línea de tiempo de una solicitud `SOL-PWD`.

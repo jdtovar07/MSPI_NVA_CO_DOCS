@@ -62,7 +62,7 @@ flowchart LR
 
 | Método | Ruta | Acceso | Parámetros | Cuerpo | HTTP | Caso de uso / guarda |
 |---|---|---|---|---|---|---|
-| `POST` | `/internal/audit/events` | API-key interna (`X-Internal-Api-Key`) | — | `AuditEventRequest` | 200 | `RecordAuditEventUseCase` |
+| `POST` | `/internal/audit/events` | API-key interna (`X-Internal-Api-Key`) | — | `AuditEventRequest` | 202 | `RecordAuditEventUseCase` |
 
 ---
 
