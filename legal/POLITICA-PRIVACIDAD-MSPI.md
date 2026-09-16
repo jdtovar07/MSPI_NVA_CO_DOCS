@@ -1,92 +1,126 @@
-# Política de Privacidad y Tratamiento de Datos Personales — AUDITCYBER / MSPI
+# Política de privacidad y tratamiento de datos personales — AUDITCYBER / MSPI
 
-> **Borrador para revisión legal.** Reemplaza los marcadores `[[ ... ]]` con los datos reales de la
-> organización antes de publicar. Alineado con la Ley 1581 de 2012, el Decreto 1377 de 2013 y la Ley 1266
-> de 2008 (Colombia). Revísalo con el área jurídica antes de su publicación oficial.
+**Versión:** 1.1 · Alineada con la Ley 1581 de 2012, el Decreto 1377 de 2013 (compilado en el Decreto 1074 de
+2015) y el artículo 15 de la Constitución Política.
 
-**Responsable del tratamiento:** [[Razón social]] — NIT [[NIT]]
-**Domicilio:** [[Dirección]], [[Ciudad]], Colombia
-**Correo de contacto / habeas data:** [[correo@dominio]] · **Teléfono:** [[teléfono]]
-**Vigente desde:** [[fecha]] · **Versión:** 1.0
+> Esta política se publica en la plataforma en la ruta `/privacidad`. Los datos entre `[[ … ]]` los diligencia la
+> entidad que adopte la plataforma; ver el [marco legal](README.md) para los dos escenarios de uso.
 
----
+## 1. Responsable del tratamiento
 
-## 1. Objeto
-Esta política regula la recolección, almacenamiento, uso, circulación y supresión de los datos personales
-tratados por AUDITCYBER a través de la plataforma MSPI (Modelo de Seguridad y Privacidad de la Información),
-en el marco de las evaluaciones de seguridad y privacidad de la información para entidades.
+| Escenario | Responsable | Contacto para *habeas data* |
+|---|---|---|
+| Prototipo académico (datos de prueba) | Equipo del proyecto: Bairon Alexander Suarez Camacho y Juan Diego Tovar Rodriguez, estudiantes de Ingeniería de Sistemas de la Corporación Universitaria del Huila – CORHUILA, Neiva | Correo institucional del proyecto: [[correo del proyecto]] |
+| Entidad que adopte la plataforma | [[Razón social]] — NIT [[NIT]], domicilio [[dirección, ciudad]], Colombia | [[correo de protección de datos]] · [[teléfono]] |
 
-## 2. Definiciones (Ley 1581/2012, art. 3)
-- **Dato personal:** cualquier información vinculada o que pueda asociarse a una persona natural determinada
-  o determinable.
-- **Dato sensible:** el que afecta la intimidad o cuyo uso indebido puede generar discriminación.
+## 2. Objeto y alcance
+Esta política regula la recolección, almacenamiento, uso, circulación y supresión de los datos personales que se
+tratan en la plataforma MSPI para ejecutar evaluaciones del Modelo de Seguridad y Privacidad de la Información.
+Aplica a todos los usuarios de la plataforma y a los encargados que traten datos por cuenta del responsable.
+
+## 3. Definiciones (Ley 1581 de 2012, art. 3)
+- **Dato personal:** información vinculada o que pueda asociarse a una persona natural determinada o determinable.
+- **Dato sensible:** el que afecta la intimidad del titular o cuyo uso indebido puede generar discriminación.
 - **Titular:** persona natural cuyos datos son objeto de tratamiento.
-- **Responsable / Encargado:** quien decide / quien trata los datos por cuenta del responsable.
-- **Tratamiento:** cualquier operación sobre datos personales (recolección, uso, circulación, supresión).
+- **Responsable:** quien decide sobre la base de datos y el tratamiento.
+- **Encargado:** quien trata los datos por cuenta del responsable.
+- **Tratamiento:** cualquier operación sobre datos personales.
+- **Transferencia / transmisión:** envío de datos a un responsable / a un encargado, dentro o fuera de Colombia.
 
-## 3. Datos que se recolectan
-La plataforma trata principalmente datos de **usuarios institucionales** (no de público general):
-- **Identificación y contacto:** nombre, correo electrónico, rol en la entidad.
-- **Datos de cuenta y autenticación:** credenciales gestionadas vía Keycloak, segundo factor (TOTP),
-  registros de inicio de sesión e intentos fallidos.
-- **Datos de actividad:** acciones dentro de la plataforma, registros de auditoría (quién hizo qué y cuándo),
-  solicitudes (eliminación, ampliación, reenvío de contraseña) y sus decisiones.
-- **Documentos y evidencias** cargados por las entidades como soporte de las evaluaciones.
+## 4. Principios
+El tratamiento se rige por los principios de legalidad, finalidad, libertad, veracidad o calidad, transparencia,
+acceso y circulación restringida, seguridad y confidencialidad (Ley 1581 de 2012, art. 4).
 
-> MSPI **no** está diseñada para recolectar datos sensibles. Si una entidad adjunta documentos con datos
-> sensibles o de terceros, es responsable de contar con la autorización correspondiente.
+## 5. Datos que se tratan
 
-## 4. Finalidades del tratamiento
-1. Crear y administrar cuentas de usuario y controlar el acceso por roles.
-2. Ejecutar y gestionar las evaluaciones de seguridad y privacidad (MSPI).
-3. Generar reportes, instrumentos y documentos oficiales de las evaluaciones.
-4. Garantizar la **trazabilidad y auditoría** de las operaciones realizadas.
-5. Enviar notificaciones operativas (p. ej. contraseña temporal, estados de solicitudes).
-6. Cumplir obligaciones legales, contractuales y de seguridad de la información.
+| Categoría | Datos | Dónde se guardan |
+|---|---|---|
+| Identificación y contacto | Nombre completo, correo electrónico, organización, rol | `iam.user`, `org.organization_contact` |
+| Credenciales | Contraseña (solo en Keycloak, nunca en la base de la aplicación) y secreto del segundo factor | Keycloak, `iam.user_totp` |
+| Seguridad de la cuenta | Intentos fallidos de inicio de sesión y bloqueos | `iam.login_attempt` |
+| Actividad | Eventos de auditoría (quién, qué, cuándo, dirección IP y navegador), solicitudes y decisiones | `audit.audit_log`, tablas de solicitudes |
+| Comunicaciones | Notificaciones dentro de la plataforma | `iam.notification` |
+| Documentos | Evidencias que cargan las entidades y reportes generados | `evidence.evidence_file` y almacenamiento de archivos |
 
-## 5. Autorización del titular
-La autorización se obtiene al momento de la creación de la cuenta y/o aceptación de los términos de uso, de
-forma previa, expresa e informada, por medios que permiten su posterior consulta (registro de aceptación).
+La plataforma **no está diseñada para tratar datos sensibles ni datos de niños, niñas o adolescentes**. Si una
+entidad carga evidencias que contengan datos de terceros, es responsable de contar con la autorización de esos
+titulares.
 
-## 6. Derechos del titular (Ley 1581/2012, art. 8)
-El titular puede: **conocer, actualizar y rectificar** sus datos; solicitar **prueba de la autorización**;
-ser **informado** sobre el uso dado a sus datos; **presentar quejas** ante la SIC; **revocar** la autorización
-y/o solicitar la **supresión** cuando proceda; y **acceder** gratuitamente a sus datos.
+## 6. Finalidades
+1. Crear y administrar cuentas, autenticar con segundo factor y controlar el acceso por roles.
+2. Ejecutar, revisar y cerrar evaluaciones del instrumento MSPI.
+3. Generar reportes e instrumentos oficiales de las evaluaciones.
+4. Mantener la trazabilidad y auditoría de las operaciones.
+5. Enviar notificaciones operativas y correos transaccionales (contraseñas temporales, estado de solicitudes).
+6. Proteger la seguridad de la plataforma (detección de accesos indebidos, bloqueo por intentos fallidos).
+7. Cumplir obligaciones legales y atender requerimientos de autoridades.
 
-## 7. Procedimiento para ejercer los derechos (consultas y reclamos)
-- **Canal:** [[correo@dominio]] con asunto "Habeas Data — [consulta/reclamo]".
-- **Consultas:** se atienden en máximo **10 días hábiles** (prorrogables 5 más).
-- **Reclamos:** en máximo **15 días hábiles** (prorrogables 8 más), conforme a los arts. 14 y 15 de la Ley
-  1581/2012.
+Los datos no se usan con fines publicitarios ni se venden o ceden a terceros.
 
-## 8. Seguridad de la información
-AUDITCYBER aplica medidas técnicas y administrativas razonables para proteger los datos:
-- Autenticación con **Keycloak** y **segundo factor (TOTP)**; contraseñas no almacenadas en texto plano.
-- Comunicaciones cifradas en tránsito (**HTTPS/TLS**).
-- Control de acceso por **roles** y principio de mínimo privilegio.
-- **Registros de auditoría** de las operaciones y conservación de evidencias.
-- **Borrado lógico**: la información no se elimina físicamente; se conserva bajo estado lógico eliminado
-  para fines de trazabilidad, salvo obligación legal de supresión definitiva.
-- Secretos gestionados fuera del código (gestor de secretos), sin credenciales embebidas.
+## 7. Autorización
+La autorización se obtiene de forma previa, expresa e informada mediante el formato de
+[autorización de tratamiento](AUTORIZACION-TRATAMIENTO-DATOS.md), al crear la cuenta o en el primer ingreso, y se
+conserva prueba de ella. No se requiere autorización en los casos del art. 10 de la Ley 1581 de 2012.
 
-## 9. Conservación y supresión
-Los datos se conservan mientras exista la relación con la entidad y por el término exigido por obligaciones
-legales o contractuales. Vencido el plazo o ante una solicitud procedente, se aplicará supresión o
-anonimización según corresponda.
+## 8. Derechos de los titulares (Ley 1581 de 2012, art. 8)
+Conocer, actualizar y rectificar sus datos; solicitar prueba de la autorización; ser informado sobre el uso dado a
+sus datos; presentar quejas ante la Superintendencia de Industria y Comercio (SIC); revocar la autorización o
+solicitar la supresión cuando no exista un deber legal o contractual de conservarlos; y acceder gratuitamente a sus
+datos.
 
-## 10. Transferencia y transmisión de datos
-[[Indicar si hay encargados/proveedores (p. ej. hosting, correo transaccional) y su ubicación. Con
-proveedores que actúen como Encargados se suscriben acuerdos de tratamiento.]]
+## 9. Procedimiento para consultas y reclamos
 
-## 11. Uso de cookies
-[[Si la plataforma usa cookies/almacenamiento local, describir cuáles y su finalidad. MSPI usa
-almacenamiento local del navegador para conveniencia de sesión; no se usa para rastreo publicitario.]]
+```mermaid
+sequenceDiagram
+  participant T as Titular
+  participant R as Responsable
+  participant S as SIC
+  T->>R: Consulta o reclamo (correo de habeas data)
+  R-->>T: Acuse de recibo
+  alt Consulta
+    R-->>T: Respuesta en máximo 10 días hábiles (prórroga de 5)
+  else Reclamo
+    R-->>T: Respuesta en máximo 15 días hábiles (prórroga de 8)
+  end
+  T->>S: Queja, solo después de agotar el trámite ante el responsable
+```
 
-## 12. Vigencia y cambios
-Esta política rige desde su publicación. Cualquier cambio sustancial será comunicado a los titulares por los
-canales de la plataforma. La versión vigente estará siempre disponible en la ruta `/privacidad`.
+**Contexto.** Los plazos son los de los artículos 14 y 15 de la Ley 1581 de 2012. Si el reclamo está incompleto,
+el responsable pide completarlo dentro de los 5 días siguientes; si pasan 2 meses sin respuesta del titular, se
+entiende desistido.
 
----
+- **Canal:** el correo de *habeas data* de la sección 1, asunto «Habeas data — consulta» o «Habeas data — reclamo».
+- **Contenido del reclamo:** identificación del titular, descripción de los hechos, dirección de respuesta y
+  documentos de soporte.
 
-*Documento generado como borrador técnico para el proyecto MSPI. Requiere validación del área jurídica de
-la organización antes de su adopción oficial.*
+## 10. Transmisión y transferencia de datos
+
+| Tercero | Rol | Datos | Ubicación | Garantía |
+|---|---|---|---|---|
+| Proveedor de correo transaccional (Brevo) | Encargado | Nombre y correo del destinatario, contenido del mensaje | Unión Europea | Contrato o términos de tratamiento del proveedor; país con nivel adecuado de protección según la SIC |
+| Proveedor de alojamiento | Encargado | Todos los datos de la plataforma | [[país del alojamiento]] | Contrato de transmisión de datos |
+| Servicio de geografía (Country State City) | No recibe datos personales | Solo códigos de país y departamento | Externo | — |
+
+Los demás componentes (Keycloak, PostgreSQL, almacenamiento de archivos) se operan en la infraestructura del
+responsable.
+
+## 11. Cookies y almacenamiento local
+La plataforma usa almacenamiento del navegador **solo para su funcionamiento** (sesión y preferencias de trabajo),
+nunca para publicidad ni rastreo. Detalle en la
+[política de cookies y almacenamiento local](POLITICA-COOKIES-ALMACENAMIENTO.md).
+
+## 12. Seguridad
+Se aplican medidas técnicas y administrativas descritas en la
+[política de seguridad de la información](POLITICA-SEGURIDAD-INFORMACION.md): autenticación con Keycloak y segundo
+factor obligatorio, contraseñas fuera de la base de la aplicación, control de acceso por roles, cifrado en
+tránsito, auditoría de operaciones, validación del contenido de archivos y gestión de secretos fuera del código.
+
+## 13. Conservación y supresión
+La información **no se elimina físicamente** durante la operación: se marca como eliminada para conservar la
+trazabilidad. Los plazos y el procedimiento de supresión definitiva o anonimización ante una solicitud procedente
+están en la [política de retención y borrado](POLITICA-RETENCION-Y-BORRADO.md).
+
+## 14. Vigencia y cambios
+Esta política rige desde su publicación en la plataforma. Los cambios sustanciales se comunican a los titulares
+por los canales de la plataforma antes de aplicarse y, cuando cambien las finalidades, se solicita una nueva
+autorización. La versión vigente está siempre disponible en `/privacidad`.
