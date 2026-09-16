@@ -127,3 +127,26 @@ al navegador y se autentican con la clave compartida `X-Internal-Api-Key`. El n�
 |---|---|---|
 | Config | `GET/PUT /system/config`, `GET /system/config/history?limit=` | `AdminSistema` |
 | Interno | `GET /internal/system/config` | `X-Internal-Api-Key` |
+
+## Contraste frontend ↔ backend
+
+Se cruzaron las **148 llamadas HTTP** de los 6 microfrontends contra los 156 endpoints del backend:
+
+- **0 llamadas rotas**: toda ruta que usa la interfaz existe en el backend con el mismo método.
+- **5 endpoints de negocio sin consumidor directo en la interfaz** (todos con explicación):
+
+| Endpoint | Motivo |
+|---|---|
+| `POST /users/{userId}/reset-password` (`ms_iam`) | Reemplazado en la UI por el flujo aprobable `SOL-PWD` (`/users/{userId}/password-reset-requests`). Se conserva para administración directa. |
+| `POST /users/disable-by-email` (`ms_iam`) | Uso servidor-a-servidor desde `ms_org` al cambiar el contacto de una organización. |
+| `GET /users/statuses` (`ms_iam`) | Catálogo estático; la UI tiene los estados embebidos. |
+| `POST /password-reset-requests/{id}/cancel` (`ms_iam`) | La bandeja de solicitudes solo ofrece aprobar/rechazar; cancelar queda disponible por API. |
+| `PUT /assessments/{assessmentId}/areas` (`ms_assessment`) | En `mf_assessment` el repositorio `replaceAreas` no llama al backend (las áreas se inicializan desde el preset al crear la evaluación y solo se editan sus temas con `PUT …/areas/{areaId}/topics`). |
+
+Mapas por microfrontend (rutas, permisos y endpoints consumidos):
+[mf_shell](../Documentacion-Frontend/mf_shell/08-Mapa-Rutas-y-Endpoints.md) ·
+[mf_auth](../Documentacion-Frontend/mf_auth/08-Mapa-Rutas-y-Endpoints.md) ·
+[mf_org](../Documentacion-Frontend/mf_org/08-Mapa-Rutas-y-Endpoints.md) ·
+[mf_assessment](../Documentacion-Frontend/mf_assessment/08-Mapa-Rutas-y-Endpoints.md) ·
+[mf_evidence](../Documentacion-Frontend/mf_evidence/08-Mapa-Rutas-y-Endpoints.md) ·
+[mf_reports](../Documentacion-Frontend/mf_reports/08-Mapa-Rutas-y-Endpoints.md)
