@@ -71,8 +71,6 @@ archivo queda en el historial de Git.
 ## 3. Datos personales en el repositorio
 
 El repositorio `MSPI_NVA_CO_DOCS` es **público** y las cartas contienen números de cédula y códigos estudiantiles.
-Por la Ley 1581 de 2012 y por seguridad se recomienda una de estas opciones (decisión de los autores):
-
-1. Volver privado el repositorio, o
-2. Retirar las cartas del repositorio público y conservarlas fuera de él (la eliminación del historial requiere
-   reescribir Git).
+**Decisión de los autores:** el repositorio se mantiene público y el riesgo queda en seguimiento (registrado en la
+[política de seguridad](../legal/POLITICA-SEGURIDAD-INFORMACION.md)). Si el repositorio se difunde fuera del ámbito
+académico, se deben retirar esos datos de las cartas y del historial.

@@ -39,7 +39,7 @@ los secretos de configuración, en todos sus entornos.
 | URLs `localhost` fijas en el frontend | Medio (operación) | Pasarlas a configuración por entorno antes de desplegar (tarea registrada) |
 | Token de sesión en almacenamiento accesible por JavaScript | Medio | Mitigado con CSP estricta y tokens de 1 hora; migrar a cookie `HttpOnly` en producción |
 | El pipeline de integración solo compila (no ejecuta pruebas) | Medio | Agregar `test`/`check` al pipeline |
-| Repositorio de documentación público con datos personales en cartas académicas | Medio | Volver privado el repositorio o retirar esos datos |
+| Repositorio de documentación público con datos personales en cartas académicas | Medio | **Riesgo aceptado por los autores**: el repositorio sigue público y se mantiene en seguimiento; retirar los datos si el repositorio se difunde fuera del ámbito académico |
 | Sin pruebas automatizadas en 5 de 6 microfrontends | Bajo | Plan de pruebas en la matriz de trazabilidad |
 
 ## 4. Gestión de incidentes
