@@ -62,7 +62,7 @@ No existe un `ROADMAP.md` propio de `ms_iam` (a diferencia de otros microservici
 1. **Recuperación de contraseña autoservicio** ("forgot password" sin intervención de `AdminSistema"), dado que hoy `POST /auth/change-password` exige conocer la contraseña actual.
 2. **Deshabilitación/reset de TOTP** por parte de un administrador (para usuarios que pierden su dispositivo), ya que solo existen `setup`, `verify` y `status`.
 3. **Formalización de pruebas de arquitectura con ArchUnit**, aprovechando que la dependencia ya está declarada (`archunit:1.4.1` en `app-service`) pero no tiene pruebas asociadas.
-4. **Corregir el control de acceso de notificaciones**: hoy `GET /notifications` y `read-all`/`clear-read` toman el `userId` del parámetro en lugar del token (riesgo IDOR); deben resolver el usuario desde el JWT y validar propiedad en `/{id}/read` y `/{id}/clear`.
+4. **~~Corregir el control de acceso de notificaciones~~ (resuelto):** `NotificationApi` toma el usuario del JWT (`CurrentUserResolver`); `userId` opcional solo si coincide (si no → 403); `/{id}/read` y `/{id}/clear` validan propiedad (si no → 404).
 5. **Migración de H2 fuera del `runtimeOnly`** general del módulo de persistencia, formalizando el fallback de desarrollo como perfil explícito (`spring.profiles.active=local`) en lugar de comportamiento implícito por ausencia de `DB_CREDENTIAL`.
 6. **Incorporación de pruebas de integración con Testcontainers** contra PostgreSQL real, para complementar las actuales pruebas unitarias con mocks en `jpa-repository`.
 7. **Activación de la etapa de calidad (`check`/Sonar) en el pipeline de CI**, siguiendo la configuración ya presente en Gradle.

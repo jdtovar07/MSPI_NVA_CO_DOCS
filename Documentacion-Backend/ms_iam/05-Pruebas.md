@@ -9,14 +9,17 @@
 
 ## 0. Inventario actualizado de pruebas (desde el código)
 
-**25 clases de prueba · 114 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+**29 clases de prueba · 130 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
 
 | Módulo | Clase de prueba | Casos | Tipo |
 |---|---|---|---|
 | `applications/app-service` | `AuthRateLimitFilterTest` | 2 | Unitaria |
 | `domain/model` | `RoleNormalizerTest` | 6 | Unitaria |
+| `domain/usecase` | `ClearNotificationUseCaseTest` | 2 | Unitaria |
 | `domain/usecase` | `GetUsersUseCaseTest` | 2 | Unitaria |
+| `domain/usecase` | `ListNotificationsUseCaseTest` | 1 | Unitaria |
 | `domain/usecase` | `LoginUseCaseTest` | 1 | Unitaria |
+| `domain/usecase` | `MarkNotificationReadUseCaseTest` | 3 | Unitaria |
 | `domain/usecase` | `TotpStatusUseCaseTest` | 4 | Unitaria |
 | `domain/usecase` | `TotpVerifyUseCaseTest` | 5 | Unitaria |
 | `infrastructure/driven-adapters/brevo-sender` | `BrevoEmailAdapterTest` | 5 | Unitaria |
@@ -29,7 +32,8 @@
 | `infrastructure/entry-points/api-rest` | `AuthApiMapperTest` | 2 | Unitaria |
 | `infrastructure/entry-points/api-rest` | `AuthApiTest` | 7 | Unitaria |
 | `infrastructure/entry-points/api-rest` | `CorsConfigTest` | 1 | Integración (Spring) |
-| `infrastructure/entry-points/api-rest` | `GlobalExceptionHandlerTest` | 17 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `GlobalExceptionHandlerTest` | 18 | Unitaria |
+| `infrastructure/entry-points/api-rest` | `NotificationApiTest` | 9 | Unitaria |
 | `infrastructure/entry-points/api-rest` | `RolesApiTest` | 2 | Unitaria |
 | `infrastructure/entry-points/api-rest` | `SecurityHeadersFilterTest` | 1 | Unitaria |
 | `infrastructure/entry-points/api-rest` | `TraceIdFilterTest` | 4 | Unitaria |
@@ -58,6 +62,9 @@ Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (re
 ```
 domain/usecase/src/test/java/co/com/mspi/usecase/
 ├── login/LoginUseCaseTest.java
+├── notification/ClearNotificationUseCaseTest.java
+├── notification/ListNotificationsUseCaseTest.java
+├── notification/MarkNotificationReadUseCaseTest.java
 ├── totp/TotpStatusUseCaseTest.java
 ├── totp/TotpVerifyUseCaseTest.java
 └── user/GetUsersUseCaseTest.java
@@ -84,6 +91,7 @@ infrastructure/entry-points/api-rest/src/test/java/co/com/mspi/api/
 ├── config/TraceIdFilterTest.java
 ├── exception/GlobalExceptionHandlerTest.java
 ├── mapper/AuthApiMapperTest.java
+├── notification/NotificationApiTest.java
 ├── roles/RolesApiTest.java
 ├── users/UsersApiTest.java
 └── users/mapper/UsersApiMapperTest.java
@@ -93,7 +101,7 @@ infrastructure/helpers/common/src/test/java/co/com/mspi/common/
 └── mapper/ApiResponseMapperTest.java
 ```
 
-En total se identificaron **25 clases de prueba** distribuidas en 7 de los 9 módulos del proyecto. Los módulos `domain/model` (`:model`) y `applications/app-service` (`:app-service`, salvo el marcador `.gitignore` en su carpeta de test) **no tienen pruebas propias** en el repositorio: `:model` por ser solo POJOs/interfaces sin lógica, y `:app-service` porque su contenido (configuración de wiring, `MainApplication`) se excluye explícitamente del análisis de cobertura (`sonar.exclusions`) y de las reglas de JaCoCo (ver §4).
+En total se identificaron **29 clases de prueba** distribuidas en 7 de los 9 módulos del proyecto. Los módulos `domain/model` (`:model`) y `applications/app-service` (`:app-service`, salvo el marcador `.gitignore` en su carpeta de test) **no tienen pruebas propias** en el repositorio: `:model` por ser solo POJOs/interfaces sin lógica, y `:app-service` porque su contenido (configuración de wiring, `MainApplication`) se excluye explícitamente del análisis de cobertura (`sonar.exclusions`) y de las reglas de JaCoCo (ver §4).
 
 ## 3. Tipos de prueba evidenciados
 

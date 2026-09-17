@@ -80,13 +80,15 @@ flowchart LR
 
 ### `NotificationApi`
 
+Sujeto **siempre** desde JWT (`CurrentUserResolver`). `userId` en query/body es opcional (compatibilidad): si no coincide con el token → **403**. Operaciones por `{id}` sin propiedad → **404**.
+
 | Método | Ruta | Acceso | Parámetros | Cuerpo | HTTP | Caso de uso / guarda |
 |---|---|---|---|---|---|---|
-| `GET` | `/notifications` | JWT (cualquier rol) | `?userId` | — | 200 | `ListNotificationsUseCase` |
-| `POST` | `/notifications/{id}/read` | JWT (cualquier rol) | `id` | — | 200 | `MarkNotificationReadUseCase` |
-| `POST` | `/notifications/read-all` | JWT (cualquier rol) | — | `ReadAllRequest` | 200 | `MarkAllNotificationsReadUseCase` |
-| `POST` | `/notifications/{id}/clear` | JWT (cualquier rol) | `id` | — | 200 | `ClearNotificationUseCase` |
-| `POST` | `/notifications/clear-read` | JWT (cualquier rol) | — | `ReadAllRequest` | 200 | `ClearAllReadNotificationsUseCase` |
+| `GET` | `/notifications` | JWT (cualquier rol) | `?userId` opcional (debe = token) | — | 200 / 403 | `ListNotificationsUseCase` |
+| `POST` | `/notifications/{id}/read` | JWT (cualquier rol) | `id` (dueño = token) | — | 200 / 404 | `MarkNotificationReadUseCase` |
+| `POST` | `/notifications/read-all` | JWT (cualquier rol) | — | `ReadAllRequest.userId` opcional | 200 / 403 | `MarkAllNotificationsReadUseCase` |
+| `POST` | `/notifications/{id}/clear` | JWT (cualquier rol) | `id` (dueño = token) | — | 200 / 404 | `ClearNotificationUseCase` |
+| `POST` | `/notifications/clear-read` | JWT (cualquier rol) | — | `ReadAllRequest.userId` opcional | 200 / 403 | `ClearAllReadNotificationsUseCase` |
 
 ### `RolesApi`
 
