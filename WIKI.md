@@ -67,5 +67,5 @@ Alternativa CI: workflow que ejecute `pip install -r requirements.txt && mkdocs 
 | `wiki/Inicio.md` | Landing de la wiki |
 | `wiki/Seguridad.md` | Postura de seguridad |
 | `Documentacion-*` | Contenido SDLC existente |
-| `legal/` | Política de privacidad |
+| `legal/` | Marco legal: privacidad, aviso, autorización, términos, cookies, seguridad, retención, confidencialidad, propiedad intelectual, licencias |
 | `Documentacion-General/assets/graphify/` | Copia publicable del grafo |

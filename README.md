@@ -31,7 +31,9 @@ Este repositorio **no contiene código fuente**. Agrupa la propuesta de grado, e
 | Flujos SOL-* / auditoría / seguridad | [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](Documentacion-General/14-Flujos-Solicitudes-Auditoria-y-Seguridad.md) |
 | API consolidada | [`08-Referencia-API.md`](Documentacion-General/08-Referencia-API.md) |
 | SDLC por microservicio / MF | `Documentacion-Backend/<ms>/` · `Documentacion-Frontend/<mf>/` |
-| Privacidad | [`legal/POLITICA-PRIVACIDAD-MSPI.md`](legal/POLITICA-PRIVACIDAD-MSPI.md) |
+| Marco legal (privacidad, términos, autorización, seguridad, licencias) | [`legal/README.md`](legal/README.md) |
+| Matriz de trazabilidad | [`18-Matriz-Trazabilidad.md`](Documentacion-General/18-Matriz-Trazabilidad.md) |
+| Revisión académica (propuesta y cartas) | [`Propuesta-grado/Revision-Propuesta-y-Cartas.md`](Propuesta-grado/Revision-Propuesta-y-Cartas.md) |
 
 ---
 
@@ -116,7 +118,7 @@ La documentación se elaboró leyendo los repositorios reales, no a partir de pl
 
 - **`ms_admin`** (:8089) posee la configuración global; **`ms_audit`** (:8088) posee la bitácora.
 - Los **6** microfrontends se componen con **iframe + `postMessage`** (`shell-iframe-bridge.ts`). Module Federation queda como **evolución futura**, no como arquitectura actual.
-- El backend define umbral JaCoCo 80 %, pero el pipeline de CI ejecuta `assemble`, no `test`/`check`. Ningún microfrontend tiene pruebas automatizadas verificadas.
+- El backend define umbral JaCoCo 80 %, pero el pipeline de CI ejecuta `assemble`, no `test`/`check`. En el frontend solo `mf_org` tiene una prueba automatizada; el backend suma 83 clases y 354 casos de prueba.
 - El instrumento fuente usa **ISO/IEC 27001:2013**; la versión vigente de la norma es **2022**.
 
 ---
@@ -143,10 +145,12 @@ MSPI_NVA_CO_DOCS/
 ├── WIKI.md                         # Cómo servir / publicar la wiki
 ├── docs/                           # Symlinks al contenido (docs_dir de MkDocs)
 ├── wiki/                           # Landing e índice de seguridad
-├── legal/                          # Política de privacidad
+├── legal/                          # Marco legal (11 documentos)
+├── CartasVoBo/                     # Cartas de aval (estudiantes y director)
+├── Propuesta-grado/                # Propuesta de grado y su revisión
 ├── Documentacion-General/          # Arquitectura, dominio y objetivos
-├── Documentacion-Backend/          # 8 microservicios × 7 fases SDLC
-├── Documentacion-Frontend/         # 6 microfrontends × 7 fases SDLC
+├── Documentacion-Backend/          # 8 microservicios × (7 fases SDLC + referencia de API)
+├── Documentacion-Frontend/         # 6 microfrontends × (7 fases SDLC + mapa de rutas)
 ├── Documentacion-investigacion/    # Componente investigativo extendido
 ├── Propuesta-grado/                # Documento formal (plantilla CORHUILA)
 ├── CartasVoBo/                     # Cartas de solicitud de aval
@@ -173,7 +177,7 @@ Punto de entrada recomendado para el asesor. En menos de 30 minutos da una visi�
 
 ### Backend
 
-Ocho microservicios, cada uno con los 7 documentos del ciclo de vida. El enlace abre la carpeta del componente.
+Ocho microservicios, cada uno con los 7 documentos del ciclo de vida más `08-Referencia-API.md` generado desde el código. El enlace abre la carpeta del componente.
 
 | Microservicio | Rol | Puerto | Estado |
 |---|---|---|---|
@@ -182,13 +186,13 @@ Ocho microservicios, cada uno con los 7 documentos del ciclo de vida. El enlace 
 | [`ms_catalog`](Documentacion-Backend/ms_catalog/) | Catálogo versionado de controles, escalas, PHVA, madurez, NIST | 8085 | Activo |
 | [`ms_assessment`](Documentacion-Backend/ms_assessment/) | Ciclo de vida de evaluaciones y motor de cálculo | 8084 | Activo |
 | [`ms_evidence`](Documentacion-Backend/ms_evidence/) | Contexto organizacional y evidencias documentales | 8086 | Activo |
-| [`ms_reporting`](Documentacion-Backend/ms_reporting/) | Generación asíncrona de reportes PDF/Excel | 8087 | Activo (con limitaciones) |
+| [`ms_reporting`](Documentacion-Backend/ms_reporting/) | Generación asíncrona de reportes PDF/Excel | 8087 | Activo |
 | [`ms_admin`](Documentacion-Backend/ms_admin/) | Configuración global (`admin.system_config`) | 8089 | Activo |
 | [`ms_audit`](Documentacion-Backend/ms_audit/) | Auditoría central (`audit.audit_log`) | 8088 | Activo |
 
 ### Frontend
 
-Seis microfrontends, misma estructura de 7 documentos por componente.
+Seis microfrontends, misma estructura de 7 documentos más `08-Mapa-Rutas-y-Endpoints.md` por componente.
 
 | Microfrontend | Rol | Puerto |
 |---|---|---|

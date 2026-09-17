@@ -37,7 +37,7 @@ La política de tratamiento de datos (Ley 1581/2012) está publicada en la aplic
 ## Hallazgos / residuales (TODO)
 
 !!! todo "Revisión jurídica de la política"
-    El documento en `legal/` es **borrador** con marcadores `[[ ... ]]`. Debe completarlos el área jurídica antes de publicación oficial.
+    Los documentos de `legal/` cubren el prototipo académico y la adopción por una entidad. Solo quedan entre `[[ ... ]]` los datos propios de la entidad que adopte la plataforma; deben revisarse con su área jurídica antes de usar datos reales.
 
 !!! todo "SCA en CI con NVD_API_KEY"
     Dependency-Check sin `NVD_API_KEY` es muy lento. Configurar la variable en Bitbucket/GitHub y, si aplica, `DEPENDENCY_CHECK_FAIL_CVSS=7` en pipelines.
