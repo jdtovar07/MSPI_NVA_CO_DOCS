@@ -434,15 +434,11 @@ Esta sección documenta con honestidad las brechas encontradas al consolidar los
 3. **Cobertura de pruebas automatizadas heterogénea entre backend y frontend.** El backend tiene 83 clases y 354 casos de prueba (JUnit 5, Mockito; inventario en cada `05-Pruebas.md`); en el frontend solo `mf_org` tiene una prueba unitaria. El pipeline de CI compila pero no ejecuta las pruebas. Detalle y brechas priorizadas en [`18-Matriz-Trazabilidad.md`](18-Matriz-Trazabilidad.md).
 
 4. **Código residual de plantillas previas.** Los árboles de una plantilla React + Vite que convivían con Angular en `mf_shell`, `mf_auth` y `mf_org` ya se retiraron; solo queda un `pnpm-workspace.yaml` sin uso en `mf_auth`.
-5. **Despliegue fuera de localhost.** Varias URL `http://localhost:42xx` y la CSP de nginx están fijas para el entorno local; deben parametrizarse por entorno antes de un despliegue productivo.
+5. **Despliegue fuera de localhost.** Las URL `http://localhost:42xx` del frontend, la lista blanca de orígenes del puente `postMessage` y la CSP de nginx están fijas para el entorno local; deben parametrizarse por entorno antes de un despliegue productivo.
 
-5. **Ausencia de *route guards* de autoridad en varios microfrontends.** `mf_reports` no verifica en código la autoridad `REPORT_EXPORT` (solo texto informativo, sin bloqueo real de UI); ni `mf_org` ni `mf_evidence` implementan `CanActivate` guards que validen sesión/rol antes de renderizar sus rutas (`Documentacion-Frontend/mf_reports/03-Diseno.md`, `Documentacion-Frontend/mf_org/03-Diseno.md`).
+6. **Riesgos ya cerrados (verificados en el código).** Los 6 microfrontends protegen sus rutas con `authGuard` y `roleGuard` (mapa en cada `08-Mapa-Rutas-y-Endpoints.md`); `mf_assessment` ya no tiene modo de datos simulados; y la correspondencia rol → permiso está en el código (`ROLE_AUTHORITIES` en `mf_shell/src/app/domain/dashboard/authority.ts`, replicada en cada microfrontend) y la valida el backend en `SecurityConfig` y en las guardas de dominio.
 
-6. **Build de producción de `mf_assessment` puede quedar en modo mock si no se usa el flag correcto.** El `ng build` por defecto usa `environment.ts` con `useMocks: true`; el `Dockerfile` lo corrige forzando `--configuration=api`, pero un build manual sin ese flag generaría un artefacto que no llama a los backends reales (`Documentacion-Frontend/mf_assessment/03-Diseno.md`).
-
-7. **Modelo de seguridad de mensajería atado a orígenes de desarrollo local.** La lista blanca de orígenes del bridge `postMessage` (`http://(localhost|127.0.0.1):420[1-5]`) no tiene ninguna variable de entorno o configuración que la parametrice para un despliegue en dominios de producción distintos — documentado como limitación explícita en el propio `07-Mantenimiento.md` de `mf_shell` y referenciado en su `03-Diseno.md`.
-
-8. **Tabla de autoridades RBAC verificada solo en el prototipo Figma Make, no en código Spring de `ms_iam`.** El detalle fino de autoridades por rol (`RBAC-GUIDE.md`) proviene de `MSPI_NVA_CO_MR_FRONT/Mspijdbs`, un prototipo de exploración UI/UX generado con Figma Make (`Documento-Investigacion.md` secc. 10.4), no del código de producción; el modelo de datos de roles sí está confirmado en `DB-MER.txt`, pero la correspondencia exacta rol→autoridad debe tratarse como consistente con el diseño, no como verificación de código.
+7. **Control de propiedad en notificaciones.** `GET /notifications` y las operaciones masivas de `ms_iam` toman el usuario del parámetro y no del token; debe corregirse antes de producción (ver `Documentacion-Backend/ms_iam/07-Mantenimiento.md`).
 
 ---
 
