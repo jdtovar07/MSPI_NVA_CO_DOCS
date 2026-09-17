@@ -1,6 +1,6 @@
 # 08 · Mapa de rutas, permisos y endpoints — `mf_auth`
 
-Puerto local `:4201` · **8 rutas** · **13 llamadas HTTP distintas** a 2 microservicio(s).
+Puerto local `:4201` · **9 rutas** · **15 llamadas HTTP distintas** a 2 microservicio(s).
 
 > Generado desde `src/app/app.routes.ts` y las llamadas `HttpClient` del código. La UI oculta lo que el rol no puede hacer, pero la autorización real siempre la valida el backend.
 
@@ -13,6 +13,7 @@ Puerto local `:4201` · **8 rutas** · **13 llamadas HTTP distintas** a 2 micros
 | `/setup-2fa` | `Setup2FAPageComponent` | Configurar 2FA | No | — |
 | `/verify-2fa` | `Verify2FAPageComponent` | Verificar código | No | — |
 | `/change-password` | `ChangePasswordPageComponent` | Cambiar contraseña | No | — |
+| `/consent` | `ConsentPageComponent` | Aviso de privacidad | Sí (sesión en curso) | — |
 | `/users` | `UserListPageComponent` | Usuarios | Sí | Gestión de usuarios |
 | `/users/new` | `UserFormPageComponent` | — | Sí | Gestión de usuarios |
 | `/users/:id` | `UserFormPageComponent` | — | Sí | Gestión de usuarios |
@@ -39,6 +40,8 @@ Fuente: `ROLE_AUTHORITIES` (`mf_shell/src/app/domain/dashboard/authority.ts`), r
 | `ms_iam` | `GET` | `/users` | `infrastructure/users/api-user.repository.ts` |
 | `ms_iam` | `GET` | `/users/{id}` | `infrastructure/users/api-user.repository.ts` |
 | `ms_iam` | `PATCH` | `/users/{id}/status` | `infrastructure/users/api-user.repository.ts` |
+| `ms_iam` | `GET` | `/auth/consent/status` | `infrastructure/auth/api-auth.repository.ts` |
+| `ms_iam` | `POST` | `/auth/consent` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `POST` | `/auth/change-password` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `POST` | `/auth/login` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `POST` | `/auth/totp/setup` | `infrastructure/auth/api-auth.repository.ts` |
@@ -51,7 +54,7 @@ Fuente: `ROLE_AUTHORITIES` (`mf_shell/src/app/domain/dashboard/authority.ts`), r
 ```mermaid
 flowchart LR
   MF["mf_auth :4201"]
-  MF -- "12 llamadas" --> ms_iam["ms_iam"]
+  MF -- "14 llamadas" --> ms_iam["ms_iam"]
   MF -- "1 llamadas" --> ms_org["ms_org"]
 ```
 

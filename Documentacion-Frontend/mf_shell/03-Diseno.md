@@ -241,7 +241,7 @@ flowchart LR
     Root --> R5["/login"]
 ```
 
-**Rutas:** `/dashboard`, `/audit`, `/audit/requests/:requestNumber`, `/system-settings`, `/evaluations (iframe)`, `/login`, `/privacidad`.
+**Rutas:** `/dashboard`, `/audit`, `/audit/requests/:requestNumber`, `/system-settings`, `/evaluations (iframe)`, `/login`, `/privacidad`, `/terminos`. El `authGuard` redirige a `/consent` en mf_auth si faltan aceptaciones vigentes.
 
 ### I.3 Secuencia — Montar iframe y retransmitir sesión
 

@@ -9,7 +9,7 @@
 
 ## 0. Inventario actualizado de pruebas (desde el código)
 
-**29 clases de prueba · 130 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+**31 clases de prueba · 137 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
 
 | Módulo | Clase de prueba | Casos | Tipo |
 |---|---|---|---|
@@ -18,6 +18,8 @@
 | `domain/usecase` | `ClearNotificationUseCaseTest` | 2 | Unitaria |
 | `domain/usecase` | `GetUsersUseCaseTest` | 2 | Unitaria |
 | `domain/usecase` | `ListNotificationsUseCaseTest` | 1 | Unitaria |
+| `domain/usecase` | `AcceptConsentUseCaseTest` | 4 | Unitaria |
+| `domain/usecase` | `GetConsentStatusUseCaseTest` | 3 | Unitaria |
 | `domain/usecase` | `LoginUseCaseTest` | 1 | Unitaria |
 | `domain/usecase` | `MarkNotificationReadUseCaseTest` | 3 | Unitaria |
 | `domain/usecase` | `TotpStatusUseCaseTest` | 4 | Unitaria |
@@ -61,6 +63,8 @@ Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (re
 
 ```
 domain/usecase/src/test/java/co/com/mspi/usecase/
+├── consent/AcceptConsentUseCaseTest.java
+├── consent/GetConsentStatusUseCaseTest.java
 ├── login/LoginUseCaseTest.java
 ├── notification/ClearNotificationUseCaseTest.java
 ├── notification/ListNotificationsUseCaseTest.java

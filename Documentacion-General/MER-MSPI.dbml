@@ -1478,6 +1478,22 @@ Table "iam"."user_totp" {
   Note: 'Implementado en ms_iam. Keycloak no almacena el secreto TOTP de la app.'
 }
 
+Table "iam"."user_consent" {
+  "id" uuid [pk, not null]
+  "user_id" uuid [not null]
+  "document_type" "character varying(40)" [not null, note: 'PRIVACY_POLICY | TERMS']
+  "document_version" "character varying(20)" [not null, note: 'Versión aceptada; debe coincidir con legalDocumentsVersion vigente.']
+  "accepted_at" timestamp [not null, default: `now()`]
+  "ip" "character varying(64)"
+  "user_agent" "character varying(400)"
+
+  Indexes {
+    (user_id, document_type, document_version) [type: btree, unique, name: "user_consent_user_type_version_uidx"]
+    (user_id, accepted_at) [type: btree, name: "user_consent_user_id_idx"]
+  }
+  Note: 'Aceptaciones de documentos legales. Append-only; prueba Ley 1581 art. 9.'
+}
+
 Table "org"."organization" {
   "id" uuid [pk, not null]
   "name" "character varying(220)" [not null, note: 'Nombre legal de la entidad. Cabecera UI: assessment.organization_name_snapshot.']
@@ -2054,6 +2070,8 @@ Ref "password_reset_request_decision_by_fkey":"iam"."user"."id" > "iam"."passwor
 Ref "password_reset_request_requested_by_fkey":"iam"."user"."id" > "iam"."password_reset_request"."requested_by"
 
 Ref "password_reset_request_target_user_id_fkey":"iam"."user"."id" > "iam"."password_reset_request"."target_user_id"
+
+Ref "user_consent_user_id_fkey":"iam"."user"."id" > "iam"."user_consent"."user_id"
 
 Ref "user_organization_id_fkey":"org"."organization"."id" > "iam"."user"."organization_id"
 

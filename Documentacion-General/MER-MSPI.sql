@@ -1659,6 +1659,22 @@ COMMENT ON COLUMN iam.user_totp.secret IS 'Secreto Base32; se persiste en setup 
 
 COMMENT ON COLUMN iam.user_totp.enabled_at IS 'NULL hasta verificar el primer código TOTP válido.';
 
+CREATE TABLE iam.user_consent (
+    id uuid NOT NULL,
+    user_id uuid NOT NULL,
+    document_type character varying(40) NOT NULL,
+    document_version character varying(20) NOT NULL,
+    accepted_at timestamp with time zone DEFAULT now() NOT NULL,
+    ip character varying(64),
+    user_agent character varying(400)
+);
+
+COMMENT ON TABLE iam.user_consent IS 'Aceptaciones de documentos legales (PRIVACY_POLICY | TERMS). Append-only; prueba Ley 1581 art. 9.';
+
+COMMENT ON COLUMN iam.user_consent.document_type IS 'PRIVACY_POLICY | TERMS';
+
+COMMENT ON COLUMN iam.user_consent.document_version IS 'Versión aceptada; debe coincidir con legalDocumentsVersion vigente.';
+
 CREATE TABLE org.organization (
     id uuid NOT NULL,
     name character varying(220) NOT NULL,
@@ -2254,6 +2270,9 @@ ALTER TABLE ONLY iam."user"
 ALTER TABLE ONLY iam.user_totp
     ADD CONSTRAINT user_totp_pkey PRIMARY KEY (keycloak_sub);
 
+ALTER TABLE ONLY iam.user_consent
+    ADD CONSTRAINT user_consent_pkey PRIMARY KEY (id);
+
 ALTER TABLE ONLY org.organization_area_base
     ADD CONSTRAINT organization_area_base_pkey PRIMARY KEY (id);
 
@@ -2604,6 +2623,10 @@ CREATE INDEX user_organization_id_idx ON iam."user" USING btree (organization_id
 CREATE INDEX user_role_role_id_idx ON iam.user_role USING btree (role_id);
 
 CREATE UNIQUE INDEX user_role_user_id_role_id_idx ON iam.user_role USING btree (user_id, role_id);
+
+CREATE UNIQUE INDEX user_consent_user_type_version_uidx ON iam.user_consent USING btree (user_id, document_type, document_version);
+
+CREATE INDEX user_consent_user_id_idx ON iam.user_consent USING btree (user_id, accepted_at DESC);
 
 CREATE UNIQUE INDEX organization_area_base_organization_id_area_name_idx ON org.organization_area_base USING btree (organization_id, area_name);
 
@@ -2997,6 +3020,9 @@ ALTER TABLE ONLY iam.password_reset_request
 
 ALTER TABLE ONLY iam.password_reset_request
     ADD CONSTRAINT password_reset_request_target_user_id_fkey FOREIGN KEY (target_user_id) REFERENCES iam."user"(id) DEFERRABLE;
+
+ALTER TABLE ONLY iam.user_consent
+    ADD CONSTRAINT user_consent_user_id_fkey FOREIGN KEY (user_id) REFERENCES iam."user"(id) DEFERRABLE;
 
 ALTER TABLE ONLY iam."user"
     ADD CONSTRAINT user_organization_id_fkey FOREIGN KEY (organization_id) REFERENCES org.organization(id) DEFERRABLE;

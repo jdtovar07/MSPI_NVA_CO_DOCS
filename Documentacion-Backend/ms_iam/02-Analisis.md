@@ -34,6 +34,8 @@ Extraídos de los controladores REST (`infrastructure/entry-points/api-rest/src/
 | RF-05 | Consultar si el usuario autenticado tiene TOTP habilitado | `GET /auth/totp/status` → `TotpStatusUseCase` | Usuario autenticado (JWT) |
 | RF-06 | Generar secreto TOTP y URL de aprovisionamiento QR (`otpauth://`) | `POST /auth/totp/setup` → `TotpSetupUseCase` | Usuario autenticado |
 | RF-07 | Verificar código TOTP de 6 dígitos y habilitar 2FA | `POST /auth/totp/verify` → `TotpVerifyUseCase` | Usuario autenticado |
+| RF-07b | Consultar si faltan aceptaciones vigentes de política/términos | `GET /auth/consent/status` → `GetConsentStatusUseCase` | Usuario autenticado |
+| RF-07c | Registrar aceptación de política y términos (append-only + auditoría) | `POST /auth/consent` → `AcceptConsentUseCase` → evento `CONSENT_ACCEPTED` | Usuario autenticado |
 | RF-08 | Crear usuario en Keycloak + BD local con roles asignados | `POST /users` → `CreateUserUseCase` → `UserManagementService.createUser` | AdminSistema |
 | RF-09 | Validar que la organización exista en `ms_org` cuando el usuario tiene roles distintos de solo `Lector` y trae `organizationId` | `UserManagementService.createUser` → `OrganizationGateway.existsById` | Sistema |
 | RF-10 | Rechazar creación si el correo ya existe | `UserManagementService.createUser` → `DuplicateEmailException` (409) | Sistema |
@@ -73,7 +75,8 @@ Extraídos de los controladores REST (`infrastructure/entry-points/api-rest/src/
 12b. **Reenvío de contraseña con aprobación**: no se ejecuta al solicitar; queda `PENDING` (`SOL-PWD-######`). Al aprobar se genera temporal, se envía correo y se llama `TotpGateway.resetTotp` (borra secreto / deshabilita) para forzar reconfiguración en el próximo acceso. Fallo de correo no revierte el reset (`email_sent=false`, reintentable).
 13. **API interna protegida por clave compartida, no por JWT**: `/internal/**` está `permitAll` a nivel de Spring Security, pero `InternalApiKeyFilter` intercepta antes que el filtro de Bearer Token y exige el header `X-Internal-Api-Key` igual a `INTERNAL_API_KEY` con comparación *constant-time* (`MessageDigest.isEqual`); si la propiedad no está configurada en el servidor, responde 503 (falla segura, no permite pasar sin protección). Rotar la clave periódicamente vía Infisical/env.
 14. **Rate limit por IP en autenticación pública**: `AuthRateLimitFilter` limita `POST /auth/login` y `POST /auth/change-password` a **20 solicitudes/minuto/IP** por defecto (`AUTH_RATE_LIMIT_PER_MINUTE` / `auth.rate-limit.per-minute`); al exceder responde **429** con cuerpo `RATE_LIMITED` y cabecera `Retry-After`. Independiente del lockout de cuenta por intentos fallidos.
-15. **El microservicio no gestiona su propio esquema**: `spring.sql.init.mode: never` y `hibernate.ddl-auto: none` — las tablas deben preexistir (aplicadas por scripts SQL versionados), lo que constituye una regla operativa más que de negocio, pero condiciona el arranque correcto del servicio.
+15. **Consentimiento legal append-only (Ley 1581 art. 9)**: `iam.user_consent` solo inserta filas (política y términos por versión). Las versiones vigentes vienen de `ms_admin` (`legalDocumentsVersion`). `POST /auth/consent` rechaza (400) versiones distintas a las vigentes. El login incluye `consentRequired`. Al aceptar se emite `CONSENT_ACCEPTED` a `ms_audit`.
+16. **El microservicio no gestiona su propio esquema**: `spring.sql.init.mode: never` y `hibernate.ddl-auto: none` — las tablas deben preexistir (aplicadas por scripts SQL versionados), lo que constituye una regla operativa más que de negocio, pero condiciona el arranque correcto del servicio.
 
 ## 4. Requerimientos no funcionales (RNF) inferidos
 

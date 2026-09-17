@@ -58,7 +58,7 @@ flowchart LR
 
 | Controlador | Endpoints | Raíz común |
 |---|---|---|
-| `AuthApi` | 5 | `/auth` |
+| `AuthApi` | 7 | `/auth` |
 | `NotificationApi` | 5 | `/notifications` |
 | `InternalNotificationApi` | 1 | `/internal/notifications` |
 | `InternalRequestAuditApi` | 1 | `/internal/requests/{requestNumber}` |
@@ -72,8 +72,10 @@ flowchart LR
 
 | Método | Ruta | Acceso | Parámetros | Cuerpo | HTTP | Caso de uso / guarda |
 |---|---|---|---|---|---|---|
-| `POST` | `/auth/login` | Público | — | `LoginRequestBody` | 200 | `LoginUseCase` |
+| `POST` | `/auth/login` | Público | — | `LoginRequestBody` | 200 | `LoginUseCase` (incluye `consentRequired`) |
 | `POST` | `/auth/change-password` | Público | — | `ChangePasswordRequest` | 200 | `ChangePasswordUseCase` |
+| `GET` | `/auth/consent/status` | JWT (cualquier rol) | — | — | 200 | `GetConsentStatusUseCase` |
+| `POST` | `/auth/consent` | JWT (cualquier rol) | — | `AcceptConsentRequest` | 200 / 400 | `AcceptConsentUseCase` |
 | `GET` | `/auth/totp/status` | JWT (cualquier rol) | — | — | 200 | `TotpStatusUseCase` |
 | `POST` | `/auth/totp/setup` | JWT (cualquier rol) | — | — | 200 | `TotpSetupUseCase` |
 | `POST` | `/auth/totp/verify` | JWT (cualquier rol) | — | `Map<String, String>` | 200 | `TotpVerifyUseCase` |

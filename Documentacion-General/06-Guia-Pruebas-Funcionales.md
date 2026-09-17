@@ -37,11 +37,14 @@ evaluación o un catálogo.
 | ID | Rol | Pasos | Resultado esperado |
 |---|---|---|---|
 | CP-01 | Cualquiera | Iniciar sesión con usuario y contraseña válidos | Ingresa al tablero; el menú muestra solo las secciones de su rol |
-| CP-02 | Usuario nuevo | Ingresar con la contraseña temporal recibida por correo | El sistema obliga a configurar el segundo factor (escanear QR y validar un código) y después a cambiar la contraseña temporal; recién entonces entra al tablero |
+| CP-02 | Usuario nuevo | Ingresar con la contraseña temporal recibida por correo | El sistema obliga a configurar el segundo factor (escanear QR y validar un código), cambiar la contraseña temporal y aceptar política/términos; recién entonces entra al tablero |
+| CP-02b | Usuario con aceptación vigente | Cerrar sesión e iniciar de nuevo | No vuelve a pedir aceptación de política/términos |
+| CP-02c | AdminSistema → usuario | En Parámetros del sistema subir la versión de la política o de los términos; el usuario inicia sesión | Se vuelve a mostrar la pantalla de aceptación; tras aceptar, aparece el evento en Auditoría |
 | CP-03 | Cualquiera | Equivocarse 3 veces seguidas en la contraseña | El cuarto intento informa que la cuenta está bloqueada temporalmente (15 minutos) |
 | CP-04 | Cualquiera | Iniciar sesión (el 2FA es obligatorio para todos) | Pide el código de 6 dígitos; un código incorrecto no da acceso |
 | CP-05 | Cualquiera | Abrir directamente una ruta para la que no se tiene permiso | Se redirige al tablero; el backend responde 403 si se llama la API |
 | CP-06 | Cualquiera | Abrir el enlace «Política de privacidad» del pie de página | Muestra la política en `/privacidad` sin pedir sesión |
+| CP-06b | Cualquiera | Abrir el enlace «Términos y condiciones» del pie de página | Muestra los términos en `/terminos` sin pedir sesión |
 
 ## 2. Administración (AdminSistema)
 

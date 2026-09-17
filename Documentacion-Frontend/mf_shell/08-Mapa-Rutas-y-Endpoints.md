@@ -1,6 +1,6 @@
 # 08 · Mapa de rutas, permisos y endpoints — `mf_shell`
 
-Puerto local `:4200` · **17 rutas** · **20 llamadas HTTP distintas** a 6 microservicio(s).
+Puerto local `:4200` · **18 rutas** · **21 llamadas HTTP distintas** a 6 microservicio(s).
 
 > Generado desde `src/app/app.routes.ts` y las llamadas `HttpClient` del código. La UI oculta lo que el rol no puede hacer, pero la autorización real siempre la valida el backend.
 
@@ -25,6 +25,7 @@ Puerto local `:4200` · **17 rutas** · **20 llamadas HTTP distintas** a 6 micro
 | `/system-settings` | `SystemSettingsPageComponent` | Parámetros del sistema | Sí | Solo AdminSistema |
 | `/login` | `LoginPlaceholderComponent` (redirige a mf_auth) | — | No | — |
 | `/privacidad` | `PrivacyPageComponent` | — | No | — |
+| `/terminos` | `TermsPageComponent` | — | No | — |
 
 ## Matriz rol × permiso usado en este microfrontend
 

@@ -190,6 +190,7 @@ erDiagram
     "iam.user" ||--o{ "iam.user_role" : tiene
     "iam.role" ||--o{ "iam.user_role" : asignado_a
     "iam.user" ||--o| "iam.user_totp" : configura
+    "iam.user" ||--o{ "iam.user_consent" : acepta
     "iam.user" ||--o{ "iam.password_reset_request" : destino_de
     "iam.user" ||--o{ "iam.password_reset_request" : solicita
     "iam.user" ||--o{ "iam.notification" : recibe
@@ -214,6 +215,15 @@ erDiagram
         UUID user_id PK,FK
         UUID role_id PK,FK
         timestamptz assigned_at
+    }
+    "iam.user_consent" {
+        uuid id PK
+        uuid user_id FK
+        varchar document_type
+        varchar document_version
+        timestamptz accepted_at
+        varchar ip
+        varchar user_agent
     }
     "iam.user_totp" {
         varchar keycloak_sub PK "extensión ms_iam, no en MER"

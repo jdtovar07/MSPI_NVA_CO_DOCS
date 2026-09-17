@@ -40,4 +40,4 @@ Firma: ______________________________ Fecha: ____ / ____ / ________
 |---|---|
 | Texto de la política disponible en `/privacidad` | ✅ Implementado (página pública en `mf_shell`) |
 | Enlace a la política en el pie de página de todas las vistas | ✅ Implementado |
-| Casilla de aceptación en el primer ingreso y registro de la aceptación (fecha, hora, versión) | ⏳ Pendiente: debe agregarse antes de operar con datos reales |
+| Casilla de aceptación en el primer ingreso y registro de la aceptación (fecha, hora, versión) | ✅ Implementado |

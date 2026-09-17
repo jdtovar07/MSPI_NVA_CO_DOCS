@@ -11,13 +11,16 @@ flowchart LR
   B --> C["Configurar 2FA<br/>(escanear QR)"]
   C --> D["Validar código de 6 dígitos"]
   D --> E["Cambiar contraseña temporal"]
-  E --> F["Tablero"]
+  E --> F["Aceptar política<br/>y términos"]
+  F --> G["Tablero"]
 ```
 
 **Contexto.** Todo usuario lo crea un administrador; nadie se registra solo. El sistema envía por correo una
 contraseña temporal. En el primer ingreso exige, en este orden, configurar el segundo factor con una aplicación
-autenticadora y cambiar la contraseña. En los ingresos siguientes basta con usuario, contraseña y el código de 6
-dígitos.
+autenticadora, cambiar la contraseña y **aceptar la política de privacidad y los términos** (quedan registrados
+versión, fecha, IP y navegador). En los ingresos siguientes basta con usuario, contraseña y el código de 6
+dígitos, salvo que un administrador suba la versión de los documentos legales: entonces se vuelve a pedir la
+aceptación.
 
 - Tras **3 intentos fallidos seguidos** la cuenta se bloquea 15 minutos.
 - Si pierdes el acceso a tu aplicación autenticadora o a tu contraseña, pide al administrador un
@@ -28,7 +31,7 @@ dígitos.
 
 El menú lateral muestra solo las secciones permitidas para tu rol. La campana muestra notificaciones priorizadas
 (Alta, Media, Baja): asignaciones, solicitudes pendientes de decisión y decisiones sobre tus solicitudes. Puedes
-marcarlas como leídas o limpiarlas. El pie de página enlaza la **política de privacidad**.
+marcarlas como leídas o limpiarlas. El pie de página enlaza la **política de privacidad** y los **términos y condiciones**.
 
 ## 3. Qué puede hacer cada rol
 

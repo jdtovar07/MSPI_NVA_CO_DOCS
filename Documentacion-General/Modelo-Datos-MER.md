@@ -41,11 +41,11 @@ Migraciones de extracción (código): `patch-audit-schema.sql` (`iam.audit_log` 
 
 ## Dimensión del modelo
 
-**73 tablas · 684 columnas · 135 llaves foráneas** (77 dentro del mismo esquema, 58 entre esquemas).
+**74 tablas · 691 columnas · 136 llaves foráneas** (78 dentro del mismo esquema, 58 entre esquemas).
 
 | Esquema | Microservicio | Tablas | Columnas | FK internas | FK hacia otros esquemas |
 |---|---|---|---|---|---|
-| `iam` | ms_iam :8082 | 7 | 55 | 6 | 1 |
+| `iam` | ms_iam :8082 | 8 | 62 | 7 | 1 |
 | `org` | ms_org :8083 | 4 | 37 | 3 | 1 |
 | `catalog` | ms_catalog :8085 | 25 | 210 | 30 | 3 |
 | `assessment` | ms_assessment :8084 | 23 | 255 | 34 | 34 |
@@ -58,7 +58,7 @@ Migraciones de extracción (código): `patch-audit-schema.sql` (`iam.audit_log` 
 
 ```mermaid
 flowchart LR
-  iam[("iam · 7 tablas")]
+  iam[("iam · 8 tablas")]
   org[("org · 4 tablas")]
   catalog[("catalog · 25 tablas")]
   assessment[("assessment · 23 tablas")]
@@ -103,9 +103,9 @@ Los diagramas incluyen **todas las tablas y todas las columnas** del DDL consoli
 
 ## 1. Esquema `iam` (ms_iam :8082)
 
-**Contexto.** Identidad local ligada a Keycloak, roles, segundo factor TOTP, intentos de inicio de sesión, notificaciones y solicitudes de reenvío de contraseña (`SOL-PWD`). La bitácora y la configuración global ya no viven aquí.
+**Contexto.** Identidad local ligada a Keycloak, roles, segundo factor TOTP, intentos de inicio de sesión, notificaciones, solicitudes de reenvío de contraseña (`SOL-PWD`) y prueba de aceptación de documentos legales (Ley 1581 art. 9). La bitácora y la configuración global ya no viven aquí.
 
-**7 tablas · 55 columnas · 6 FK internas · 1 FK a otros esquemas.**
+**8 tablas · 62 columnas · 7 FK internas · 1 FK a otros esquemas.**
 
 | Tabla | Propósito |
 |---|---|
@@ -114,6 +114,7 @@ Los diagramas incluyen **todas las tablas y todas las columnas** del DDL consoli
 | `iam.password_reset_request` | Solicitudes de reenvío de contraseña temporal + reinicio de 2FA (SOL-PWD). |
 | `iam.role` | Roles de negocio (espejo de los roles de Keycloak). |
 | `iam.user` | Usuario local vinculado a Keycloak (sub), organización y estado. |
+| `iam.user_consent` | Aceptaciones append-only de Política de privacidad y Términos (versión, IP, user-agent). |
 | `iam.user_role` | Asignación usuario ↔ rol. |
 | `iam.user_totp` | Secreto TOTP del segundo factor por usuario. |
 
@@ -122,6 +123,7 @@ erDiagram
   iam_user ||--o{ iam_password_reset_request : "decision_by"
   iam_user ||--o{ iam_password_reset_request : "requested_by"
   iam_user ||--o{ iam_password_reset_request : "target_user_id"
+  iam_user ||--o{ iam_user_consent : "user_id"
   iam_role ||--o{ iam_user_role : "role_id"
   iam_user ||--o{ iam_user_role : "user_id"
   iam_user ||--o| iam_user_totp : "keycloak_sub"
@@ -193,6 +195,15 @@ erDiagram
     varchar keycloak_sub PK,FK
     varchar secret
     timestamptz enabled_at
+  }
+  iam_user_consent {
+    uuid id PK
+    uuid user_id FK
+    varchar document_type
+    varchar document_version
+    timestamptz accepted_at
+    varchar ip
+    varchar user_agent
   }
 ```
 

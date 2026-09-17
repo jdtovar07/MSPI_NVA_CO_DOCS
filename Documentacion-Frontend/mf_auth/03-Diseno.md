@@ -344,7 +344,7 @@ flowchart LR
     Root --> R5["/users/:id"]
 ```
 
-**Rutas:** `/login`, `/setup-2fa`, `/verify-2fa`, `/change-password`, `/users`, `/users/:id`.
+**Rutas:** `/login`, `/setup-2fa`, `/verify-2fa`, `/change-password`, `/consent`, `/users`, `/users/:id`.
 
 ### I.3 Secuencia — Login y publicación de sesión al shell
 
