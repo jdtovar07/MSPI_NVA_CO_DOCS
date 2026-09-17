@@ -35,7 +35,7 @@ los secretos de configuración, en todos sus entornos.
 
 | Riesgo | Nivel | Tratamiento |
 |---|---|---|
-| Notificaciones: el listado y la limpieza masiva usan el `userId` enviado por el cliente | Alto | Corregir para usar el usuario del token y validar propiedad (tarea registrada) |
+| ~~Notificaciones: el listado y la limpieza masiva usan el `userId` enviado por el cliente~~ | ~~Alto~~ | **Resuelto:** sujeto desde JWT; `userId` opcional solo si coincide (403); propiedad en `/{id}/*` (404) |
 | URLs `localhost` fijas en el frontend | Medio (operación) | Pasarlas a configuración por entorno antes de desplegar (tarea registrada) |
 | Token de sesión en almacenamiento accesible por JavaScript | Medio | Mitigado con CSP estricta y tokens de 1 hora; migrar a cookie `HttpOnly` en producción |
 | El pipeline de integración solo compila (no ejecuta pruebas) | Medio | Agregar `test`/`check` al pipeline |

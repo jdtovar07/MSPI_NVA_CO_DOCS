@@ -438,7 +438,7 @@ Esta sección documenta con honestidad las brechas encontradas al consolidar los
 
 6. **Riesgos ya cerrados (verificados en el código).** Los 6 microfrontends protegen sus rutas con `authGuard` y `roleGuard` (mapa en cada `08-Mapa-Rutas-y-Endpoints.md`); `mf_assessment` ya no tiene modo de datos simulados; y la correspondencia rol → permiso está en el código (`ROLE_AUTHORITIES` en `mf_shell/src/app/domain/dashboard/authority.ts`, replicada en cada microfrontend) y la valida el backend en `SecurityConfig` y en las guardas de dominio.
 
-7. **Control de propiedad en notificaciones.** `GET /notifications` y las operaciones masivas de `ms_iam` toman el usuario del parámetro y no del token; debe corregirse antes de producción (ver `Documentacion-Backend/ms_iam/07-Mantenimiento.md`).
+7. **~~Control de propiedad en notificaciones~~ (resuelto).** `NotificationApi` usa el JWT (`CurrentUserResolver`); `userId` ajeno → 403; operaciones por id sin propiedad → 404. Ver `Documentacion-Backend/ms_iam/03-Diseno.md` / `07-Mantenimiento.md`.
 
 ---
 
