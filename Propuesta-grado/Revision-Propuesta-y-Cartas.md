@@ -31,7 +31,7 @@ archivo queda en el historial de Git.
 | Tabla de contenido | «Accedentes de la investigación» | «Antecedentes de la investigación» |
 | Referencias | 1 referencia y 4 marcadores pendientes | 15 referencias en APA 7 en orden alfabético |
 
-### Marcadores cerrados (de 19 a 7)
+### Marcadores cerrados en la primera revisión
 
 | Marcador | Cómo se cerró |
 |---|---|
@@ -46,16 +46,20 @@ archivo queda en el historial de Git.
 | Anexos | Anexos A–D apuntando a la documentación técnica, trazabilidad, pruebas y marco legal |
 | Referencias pendientes (4) | Reemplazadas por las referencias reales |
 
-### Marcadores que dependen de ustedes (7)
+### Marcadores cerrados con decisión de los autores
 
-| Marcador | Qué falta |
+| Marcador | Decisión |
 |---|---|
-| Grupo y semillero de investigación | Nombre y código institucional |
-| Repositorio institucional | URL del repositorio de CORHUILA |
-| Justificación cuantitativa | Tiempo de diligenciamiento manual frente al asistido o número de entidades beneficiadas, con fuente |
-| Técnicas de recolección | Indicar si hubo entrevistas con quien originó el instrumento en Excel |
-| Cronograma | Fechas reales de inicio y cierre de cada sprint |
-| Conclusiones finales | Redactarlas y validarlas tras su propia evaluación crítica |
+| Grupo y semillero de investigación | Los autores no pertenecen a ninguno: se retiraron esas líneas |
+| Repositorio institucional | https://dspace.corhuila.edu.co (repositorio DSpace de CORHUILA) |
+| Justificación cuantitativa | Se plantea como trabajo futuro con una entidad piloto (ver recomendaciones) |
+| Técnicas adicionales de recolección | Se retiró el marcador; las técnicas descritas son análisis documental, historias de usuario y pruebas sobre el código |
+| Cronograma | 8 sprints de dos semanas en el semestre 2026-2 (3 de agosto a 20 de noviembre), descontando festivos; entrega y sustentación del 23 al 27 de noviembre. Ajustable al calendario académico oficial |
+| Conclusiones finales | Redactadas a partir de lo verificado en el sistema (respuesta a la pregunta de investigación, seguridad aplicada, trazabilidad y 377 pruebas automatizadas), para revisión de los autores |
+
+**La propuesta ya no tiene marcadores `[PENDIENTE]`.** También se actualizaron dos recomendaciones y un párrafo de
+resultados que quedaron resueltos con los últimos ajustes de código (direcciones por entorno, control de propiedad
+en notificaciones y pruebas en el pipeline).
 
 ## 2. Cartas de solicitud de aval (`CartasVoBo/`)
 
