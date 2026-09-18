@@ -22,11 +22,11 @@ archivo queda en el historial de Git.
 | Sección | Decía | Ahora dice |
 |---|---|---|
 | Título | «gestion», «informacion» | Con tildes: «gestión», «información» |
-| Resumen / Abstract | 8 microservicios, «seis activos»; administración y auditoría pendientes | Los 8 activos (incluye `ms_audit` y `ms_admin`), 156 servicios REST y 73 tablas |
+| Resumen / Abstract | 8 microservicios, «seis activos»; administración y auditoría pendientes | Los 8 activos (incluye `ms_audit` y `ms_admin`), 158 servicios REST y 74 tablas |
 | Objetivo específico NIST | NIST CSF con cinco funciones | NIST CSF 2.0 con seis funciones (incluye «gobernar»), como implementa el catálogo |
 | Antecedentes / marco teórico | Solo ISO/IEC 27001:2013 | Soporta 2013 (catálogo v1) y 2022 (catálogo v2, 93 controles) |
 | Marco teórico | Sin citas | Citas APA: ISO (2022a, 2022b), NIST (2024), Lewis & Fowler (2014), Newman (2021), Cockburn (2005), Martin (2017), Geers (2020), Richardson (2018) |
-| Resultados | `ms_admin` y `ms_audit` sin funcionalidad; frontend sin pruebas; discrepancia con Module Federation | Los 8 servicios descritos; 83 clases y 354 casos de prueba en backend; composición iframe + `postMessage` justificada como decisión de arquitectura; ajustes previos a producción |
+| Resultados | `ms_admin` y `ms_audit` sin funcionalidad; frontend sin pruebas; discrepancia con Module Federation | Los 8 servicios descritos; 89 clases y 377 casos de prueba en backend; composición iframe + `postMessage` justificada como decisión de arquitectura; ajustes previos a producción |
 | Conclusiones y recomendaciones | Pedían implementar `ms_admin`/`ms_audit` y unificar Module Federation | Reflejan lo implementado y recomiendan lo que sí falta (parametrizar URLs, control de propiedad en notificaciones, pruebas en el pipeline) |
 | Tabla de contenido | «Accedentes de la investigación» | «Antecedentes de la investigación» |
 | Referencias | 1 referencia y 4 marcadores pendientes | 15 referencias en APA 7 en orden alfabético |

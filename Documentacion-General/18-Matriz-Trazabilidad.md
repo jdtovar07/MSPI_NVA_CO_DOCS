@@ -49,7 +49,7 @@ cubren la verificación manual extremo a extremo.
 | Escalas y bancos de preguntas | `mf_assessment` `/scales`, `/security-baseline` | `ms_catalog` `ScaleAdminApi`, `QuestionBankApi` | `catalog.scale*`, `catalog.question_bank*` | — | CP-11…CP-13 |
 | Organizaciones y geografía | `mf_org` `/organizations`, `/my-organization` | `ms_org` `OrganizationApi`, `LocationApi` | `org.organization`, `org.organization_contact` | `CreateOrganizationUseCaseTest`, `UpdateOrganizationUseCaseTest`, `GetMyOrganizationUseCaseTest`, `OrganizationApiTest`, `LocationApiTest` y 5 más | CP-09 |
 | Parámetros globales | `mf_shell` `/system-settings` | `ms_admin` `SystemAdminApi`, `InternalSystemConfigApi` | `admin.system_config`, `admin.system_config_history` | `GetSystemConfigUseCaseTest`, `UpdateSystemConfigUseCaseTest`, `GetSystemConfigHistoryUseCaseTest` | CP-10 |
-| Notificaciones | `mf_shell` (campana) | `ms_iam` `NotificationApi`, `InternalNotificationApi` | `iam.notification` | — | CP-15 |
+| Notificaciones | `mf_shell` (campana) | `ms_iam` `NotificationApi`, `InternalNotificationApi` | `iam.notification` | `NotificationApiTest`, `MarkNotificationReadUseCaseTest` (propiedad y aislamiento por usuario) | CP-15 |
 | Correo transaccional | — | `ms_iam` (adaptador Brevo) | — | `BrevoEmailAdapterTest` | CP-07, CP-27 |
 | Seguridad transversal | Todas | Filtros de cada ms | — | `SecurityHeadersFilterTest`, `LogSanitizerTest`, `CorsConfigTest` y `TraceIdFilterTest` (en los 8 ms) | CP-05, CP-22 |
 
@@ -62,8 +62,7 @@ Funcionalidades verificadas solo con pruebas funcionales (sin prueba unitaria pr
 2. **Reenvío de contraseña con reinicio de 2FA** (`ms_iam`, `ApprovePasswordResetUseCase`).
 3. **Carga de evidencias** (`ms_evidence`, `UploadEvidenceFileUseCase`): solo el validador de contenido tiene prueba.
 4. **Eliminación de catálogo, escalas y bancos de preguntas** (`ms_catalog`).
-5. **Notificaciones** (`ms_iam`), incluido el control de propiedad pendiente de corregir.
-6. **Microfrontends**: solo `mf_org` tiene una prueba unitaria; los demás no tienen suite automatizada.
+5. **Microfrontends**: solo `mf_org` tiene una prueba unitaria; los demás no tienen suite automatizada.
 
 ## CI backend — pruebas y cobertura
 

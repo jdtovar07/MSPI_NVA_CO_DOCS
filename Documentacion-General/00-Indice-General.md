@@ -37,7 +37,7 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`05-Manual-Despliegue.md`](05-Manual-Despliegue.md) | Cómo levantar el stack completo en Docker paso a paso |
 | [`06-Guia-Pruebas-Funcionales.md`](06-Guia-Pruebas-Funcionales.md) | 33 casos de prueba funcionales (CP-01…CP-33) con rol, pasos y resultado esperado, y registro de ejecución |
 | [`07-Manual-Usuario.md`](07-Manual-Usuario.md) | Primer ingreso con 2FA, matriz de capacidades por rol, ciclo de la evaluación, solicitudes y radicados, preguntas frecuentes |
-| [`08-Referencia-API.md`](08-Referencia-API.md) | Inventario de los 156 endpoints, grafo de llamadas entre servicios y contraste frontend ↔ backend; enlaza la referencia detallada de cada microservicio |
+| [`08-Referencia-API.md`](08-Referencia-API.md) | Inventario de los 158 endpoints, grafo de llamadas entre servicios y contraste frontend ↔ backend; enlaza la referencia detallada de cada microservicio |
 | [`14-Flujos-Solicitudes-Auditoria-y-Seguridad.md`](14-Flujos-Solicitudes-Auditoria-y-Seguridad.md) | Radicados SOL-*, auditoría central, reenvío de contraseña, soft-delete, postura de seguridad y privacidad |
 | [`15-Diagramas-C4-y-Secuencias.md`](15-Diagramas-C4-y-Secuencias.md) | C4 contexto/contenedores (8 MS + 6 MF), ER conceptual, secuencias evaluación / SOL-* / reporte / login+2FA (Mermaid) |
 | [`16-Glosario.md`](16-Glosario.md) | Vocabulario de dominio (PHVA, radicado, borrado lógico, gracia, sweeper, iframe bridge, …) |
@@ -101,7 +101,7 @@ Toda la documentación técnica detallada (sección 4) y la documentación gener
 - **`ms_admin`** es microservicio activo (puerto 8089, esquema `admin`, SystemConfig); **`ms_audit`** es microservicio activo (puerto 8088, esquema `audit`).
 - **Solo `mf_org`** tiene una prueba automatizada (`organization-form.validation.spec.ts`); los demás microfrontends no tienen suite de pruebas.
 - Los **6** microfrontends se componen con **iframe + `postMessage`** (`shell-iframe-bridge`). Module Federation = **evolución futura** — confirmado en los 6 MF.
-- El backend define pruebas y umbrales de cobertura (JaCoCo 80 %) en Gradle, pero el pipeline de CI (`bitbucket-pipelines.yml`) solo ejecuta `assemble`, nunca `test`/`check`.
+- El backend define pruebas y umbrales de cobertura (JaCoCo 80 %) en Gradle, y el pipeline de CI (`bitbucket-pipelines.yml`) ejecuta las pruebas en cada build; la verificación del umbral de cobertura todavía no es compuerta obligatoria.
 - El instrumento fuente usa ISO/IEC 27001:**2013**, mientras la versión vigente de la norma es **2022**.
 
 Estos hallazgos están documentados con detalle y trazabilidad en cada componente afectado (sección 4) y consolidados en [`01-Arquitectura-General-del-Sistema.md`](01-Arquitectura-General-del-Sistema.md) (sección de deuda técnica) y en las conclusiones del [Documento de Investigación](../Documentacion-investigacion/Documento-Investigacion.md).

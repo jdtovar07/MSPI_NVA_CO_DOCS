@@ -118,7 +118,7 @@ La documentación se elaboró leyendo los repositorios reales, no a partir de pl
 
 - **`ms_admin`** (:8089) posee la configuración global; **`ms_audit`** (:8088) posee la bitácora.
 - Los **6** microfrontends se componen con **iframe + `postMessage`** (`shell-iframe-bridge.ts`). Module Federation queda como **evolución futura**, no como arquitectura actual.
-- El backend define umbral JaCoCo 80 %, pero el pipeline de CI ejecuta `assemble`, no `test`/`check`. En el frontend solo `mf_org` tiene una prueba automatizada; el backend suma 83 clases y 354 casos de prueba.
+- El pipeline de CI ejecuta las pruebas del backend en cada build (`test` + JaCoCo); el umbral de cobertura del 80 % aún no es compuerta obligatoria. En el frontend solo `mf_org` tiene una prueba automatizada; el backend suma 89 clases y 377 casos de prueba.
 - El instrumento fuente usa **ISO/IEC 27001:2013**; la versión vigente de la norma es **2022**.
 
 ---
