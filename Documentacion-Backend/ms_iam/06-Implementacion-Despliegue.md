@@ -218,6 +218,8 @@ docker compose -f docker-compose.apps.yml --env-file env-mspi-docker.env up -d -
 
 Tras el arranque, la base de datos PostgreSQL debe tener aplicado `schema-iam-mvp.sql` (o `schema-iam-patch.sql` sobre una BD preexistente); el propio `docs/README.md` documenta el síntoma típico de omitir este paso: `POST /auth/login` devuelve 500 con `relation "iam.audit_log" does not exist`. El script `apply-all-schemas.ps1` en `docker-config/docker/postgres/scripts` automatiza la aplicación de los esquemas de todos los microservicios.
 
+En una base ya existente, después de desplegar una versión que traiga parches nuevos (por ejemplo `patch-iam-password-reset-request.sql` o `patch-iam-user-consent.sql`), ejecutar `docker-config/docker/postgres/scripts/apply-schema-patches.sh` (o `.ps1`). Sin `iam.user_consent` el inicio de sesión falla con HTTP 500.
+
 ## 7. Resumen de puertos y endpoints técnicos
 
 | Elemento | Valor |

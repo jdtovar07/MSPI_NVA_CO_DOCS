@@ -54,7 +54,43 @@ cd MSPI_NVA_CO_MR_BACK\docker-config
 .\levantar-todo.ps1 -Reset
 ```
 
-El DDL real de la base de datos vive en `docker-config/docker/postgres/init/MER-MSPI.sql` y solo se ejecuta al **crear** el volumen de Postgres — un reset es necesario para aplicar cambios de esquema. Los seeds (`MER-SEED-*.sql`, incluido `MER-SEED-TESTGUIDANCE.sql` con el texto completo de PRUEBA) siguen la misma regla: en un volumen ya existente hay que reaplicarlos a mano o hacer `-Reset`.
+El DDL real de la base de datos vive en `docker-config/docker/postgres/init/MER-MSPI.sql` y solo se ejecuta al **crear** el volumen de Postgres. Para cambios de esquema sobre una base existente no hace falta reset: ver la sección 5.1. Los seeds (`MER-SEED-*.sql`, incluido `MER-SEED-TESTGUIDANCE.sql` con el texto completo de PRUEBA) siguen la misma regla: en un volumen ya existente hay que reaplicarlos a mano o hacer `-Reset`.
+
+## 5.1 Aplicar cambios de esquema sin perder datos
+
+Cada cambio de esquema se entrega como un `patch-*.sql` **idempotente** en `docker-config/docker/postgres/init/`. Esos
+archivos solo corren solos cuando se crea el volumen; **en una base ya existente hay que aplicarlos** después de
+actualizar el código, o los servicios fallarán con `relation "…" does not exist`.
+
+```bash
+# macOS / Linux
+cd MSPI_NVA_CO_MR_BACK/docker-config/docker/postgres/scripts
+./apply-schema-patches.sh
+```
+
+```powershell
+# Windows
+cd MSPI_NVA_CO_MR_BACK\docker-config\docker\postgres\scripts
+.\apply-schema-patches.ps1
+```
+
+El script aplica en orden alfabético todos los `patch-*.sql` (puede ejecutarse varias veces sin efectos secundarios).
+Para comprobar una tabla concreta:
+
+```bash
+docker exec postgres_mspi_local psql -U admin -d MSPI -tAc "select to_regclass('iam.user_consent')"
+```
+
+| Patch | Qué agrega |
+|---|---|
+| `patch-admin-schema.sql` | Esquema `admin` (configuración global) |
+| `patch-audit-schema.sql` | Esquema `audit` (bitácora central) |
+| `patch-assessment-*.sql` | Plazos, prioridad, tipo de entidad «otra», radicados y borrado lógico de evaluaciones |
+| `patch-catalog-*.sql` | Radicados y borrado lógico de escalas y bancos |
+| `patch-iam-evaluador-revisor-role.sql` | Rol EvaluadorRevisor |
+| `patch-iam-notification-clear.sql` | Limpieza lógica de notificaciones |
+| `patch-iam-password-reset-request.sql` | Solicitudes de reenvío de contraseña (`SOL-PWD`) |
+| `patch-iam-user-consent.sql` | Aceptación de política y términos (`iam.user_consent`) |
 
 ## 6. Verificación
 
@@ -62,7 +98,7 @@ El DDL real de la base de datos vive en `docker-config/docker/postgres/init/MER-
 docker ps
 ```
 
-Contenedores esperados: `postgres_mspi_local`, `keycloak`, `ms_iam`, `ms_org`, `ms_catalog`, `ms_evidence`, `ms_assessment`, `ms_reporting`, `mf_shell`, `mf_auth`, `mf_org`, `mf_assessment`, `mf_evidence`, `mf_reports`.
+Contenedores esperados: `postgres_mspi_local`, `keycloak`, `ms_iam`, `ms_org`, `ms_catalog`, `ms_evidence`, `ms_assessment`, `ms_reporting`, `ms_audit`, `ms_admin`, `mf_shell`, `mf_auth`, `mf_org`, `mf_assessment`, `mf_evidence`, `mf_reports`.
 
 Punto de entrada: **http://localhost:4200**
 

@@ -24,6 +24,13 @@
 | 2026-09-16 | SDLC alineado al código | `ms_iam` sin bitácora/config; inventario de pruebas generado en cada `05-Pruebas.md`. |
 | 2026-09-16 | Mapas de microfrontends | `08-Mapa-Rutas-y-Endpoints.md` en los 6 mf; contraste de 148 llamadas frontend ↔ backend. |
 | 2026-09-16 | Documentos generales | Guía de pruebas (CP-01…CP-33), manual de usuario, glosario, objetivos, ADR y matriz de trazabilidad (`18`). |
+| 2026-09-17 | Licencia y riesgos aceptados | Todos los derechos reservados (CORHUILA, autores y director); repositorio público con cartas académicas como riesgo aceptado. |
+| 2026-09-17 | IDOR de notificaciones (código) | `ms_iam` usa el usuario del JWT y valida propiedad; documentado en SDLC y política de seguridad. |
+| 2026-09-17 | Aceptación de datos (código) | `iam.user_consent`, `/auth/consent`, pantalla `/consent`, página `/terminos`; MER a 74 tablas. |
+| 2026-09-18 | Despliegue por entorno (código) | `config.json` y CSP de nginx desde variables `MSPI_*`; manual de despliegue en dominio real. |
+| 2026-09-18 | Pruebas en CI y LICENSE (código) | Pipelines con `test` + JaCoCo; `LICENSE` en BACK y FRONT; 89 clases y 377 casos de prueba. |
+| 2026-09-18 | Propuesta sin marcadores | Cronograma del semestre 2026-2, repositorio institucional y conclusiones. |
+| 2026-09-18 | Parches de esquema | Procedimiento para aplicar `patch-*.sql` en bases existentes (`apply-schema-patches`). |
 | — | Extracción `ms_audit` / `ms_admin` (código) | Auditoría → `:8088` esquema `audit`; config → `:8089` esquema `admin` (patches SQL). Ver BACK. |
 | — | Features de solicitudes (código) | Radicados `SOL-*`, soft-delete + gracia + sweeper; bandeja en `mf_shell`. |
 | — | SEG-A (código) | Rate limit, cabeceras, magic bytes, constant-time API-key, log sanitizer — `wiki/Seguridad.md`. |
