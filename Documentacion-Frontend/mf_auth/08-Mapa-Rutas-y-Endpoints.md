@@ -13,7 +13,7 @@ Puerto local `:4201` · **9 rutas** · **15 llamadas HTTP distintas** a 2 micros
 | `/setup-2fa` | `Setup2FAPageComponent` | Configurar 2FA | No | — |
 | `/verify-2fa` | `Verify2FAPageComponent` | Verificar código | No | — |
 | `/change-password` | `ChangePasswordPageComponent` | Cambiar contraseña | No | — |
-| `/consent` | `ConsentPageComponent` | Aviso de privacidad | Sí (sesión en curso) | — |
+| `/consent` | `ConsentPageComponent` | Aviso de privacidad | No | — |
 | `/users` | `UserListPageComponent` | Usuarios | Sí | Gestión de usuarios |
 | `/users/new` | `UserFormPageComponent` | — | Sí | Gestión de usuarios |
 | `/users/:id` | `UserFormPageComponent` | — | Sí | Gestión de usuarios |
@@ -35,14 +35,14 @@ Fuente: `ROLE_AUTHORITIES` (`mf_shell/src/app/domain/dashboard/authority.ts`), r
 
 | Microservicio | Método | Ruta | Archivo(s) |
 |---|---|---|---|
+| `ms_iam` | `GET` | `/auth/consent/status` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `GET` | `/auth/totp/status` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `GET` | `/roles` | `infrastructure/roles/api-roles.repository.ts` |
 | `ms_iam` | `GET` | `/users` | `infrastructure/users/api-user.repository.ts` |
 | `ms_iam` | `GET` | `/users/{id}` | `infrastructure/users/api-user.repository.ts` |
 | `ms_iam` | `PATCH` | `/users/{id}/status` | `infrastructure/users/api-user.repository.ts` |
-| `ms_iam` | `GET` | `/auth/consent/status` | `infrastructure/auth/api-auth.repository.ts` |
-| `ms_iam` | `POST` | `/auth/consent` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `POST` | `/auth/change-password` | `infrastructure/auth/api-auth.repository.ts` |
+| `ms_iam` | `POST` | `/auth/consent` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `POST` | `/auth/login` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `POST` | `/auth/totp/setup` | `infrastructure/auth/api-auth.repository.ts` |
 | `ms_iam` | `POST` | `/auth/totp/verify` | `infrastructure/auth/api-auth.repository.ts` |

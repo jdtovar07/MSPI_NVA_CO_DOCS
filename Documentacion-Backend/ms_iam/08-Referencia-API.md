@@ -1,6 +1,6 @@
 # 08 · Referencia de API — `ms_iam`
 
-**Identidad, acceso y notificaciones** · puerto local `:8082` · 26 endpoints (24 de negocio, 2 internos).
+**Identidad, acceso y notificaciones** · puerto local `:8082` · 28 endpoints (26 de negocio, 2 internos).
 
 > Generada a partir del código fuente (controladores `@RestController` y `SecurityConfig`). Si un endpoint cambia en el código, esta referencia debe regenerarse.
 
@@ -35,7 +35,7 @@ Se evalúan en orden; la primera regla que coincide decide. La autorización fin
 ```mermaid
 flowchart LR
   C(["Cliente / mf"]) --> MS["ms_iam :8082"]
-  MS --> AuthApi["AuthApi<br/>5 endpoints"]
+  MS --> AuthApi["AuthApi<br/>7 endpoints"]
   AuthApi --> AuthApiauth("/auth")
   MS --> NotificationApi["NotificationApi<br/>5 endpoints"]
   NotificationApi --> NotificationApinotifications("/notifications")
@@ -72,25 +72,23 @@ flowchart LR
 
 | Método | Ruta | Acceso | Parámetros | Cuerpo | HTTP | Caso de uso / guarda |
 |---|---|---|---|---|---|---|
-| `POST` | `/auth/login` | Público | — | `LoginRequestBody` | 200 | `LoginUseCase` (incluye `consentRequired`) |
-| `POST` | `/auth/change-password` | Público | — | `ChangePasswordRequest` | 200 | `ChangePasswordUseCase` |
+| `POST` | `/auth/login` | Público | — | `LoginRequestBody` | 200 | `LoginUseCase` |
 | `GET` | `/auth/consent/status` | JWT (cualquier rol) | — | — | 200 | `GetConsentStatusUseCase` |
-| `POST` | `/auth/consent` | JWT (cualquier rol) | — | `AcceptConsentRequest` | 200 / 400 | `AcceptConsentUseCase` |
+| `POST` | `/auth/consent` | JWT (cualquier rol) | — | `AcceptConsentRequest` | 200 | `AcceptConsentUseCase` |
+| `POST` | `/auth/change-password` | Público | — | `ChangePasswordRequest` | 200 | `ChangePasswordUseCase` |
 | `GET` | `/auth/totp/status` | JWT (cualquier rol) | — | — | 200 | `TotpStatusUseCase` |
 | `POST` | `/auth/totp/setup` | JWT (cualquier rol) | — | — | 200 | `TotpSetupUseCase` |
 | `POST` | `/auth/totp/verify` | JWT (cualquier rol) | — | `Map<String, String>` | 200 | `TotpVerifyUseCase` |
 
 ### `NotificationApi`
 
-Sujeto **siempre** desde JWT (`CurrentUserResolver`). `userId` en query/body es opcional (compatibilidad): si no coincide con el token → **403**. Operaciones por `{id}` sin propiedad → **404**.
-
 | Método | Ruta | Acceso | Parámetros | Cuerpo | HTTP | Caso de uso / guarda |
 |---|---|---|---|---|---|---|
-| `GET` | `/notifications` | JWT (cualquier rol) | `?userId` opcional (debe = token) | — | 200 / 403 | `ListNotificationsUseCase` |
-| `POST` | `/notifications/{id}/read` | JWT (cualquier rol) | `id` (dueño = token) | — | 200 / 404 | `MarkNotificationReadUseCase` |
-| `POST` | `/notifications/read-all` | JWT (cualquier rol) | — | `ReadAllRequest.userId` opcional | 200 / 403 | `MarkAllNotificationsReadUseCase` |
-| `POST` | `/notifications/{id}/clear` | JWT (cualquier rol) | `id` (dueño = token) | — | 200 / 404 | `ClearNotificationUseCase` |
-| `POST` | `/notifications/clear-read` | JWT (cualquier rol) | — | `ReadAllRequest.userId` opcional | 200 / 403 | `ClearAllReadNotificationsUseCase` |
+| `GET` | `/notifications` | JWT (cualquier rol) | `?userId?` | — | 200 | `ListNotificationsUseCase` |
+| `POST` | `/notifications/{id}/read` | JWT (cualquier rol) | `id` | — | 200 | `MarkNotificationReadUseCase` |
+| `POST` | `/notifications/read-all` | JWT (cualquier rol) | — | `ReadAllRequest` | 200 | `MarkAllNotificationsReadUseCase` |
+| `POST` | `/notifications/{id}/clear` | JWT (cualquier rol) | `id` | — | 200 | `ClearNotificationUseCase` |
+| `POST` | `/notifications/clear-read` | JWT (cualquier rol) | — | `ReadAllRequest` | 200 | `ClearAllReadNotificationsUseCase` |
 
 ### `RolesApi`
 

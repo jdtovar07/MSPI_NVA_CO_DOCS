@@ -125,7 +125,7 @@ pipelines:
 
 **Etapas reales** (idéntico patrón a `ms_iam`):
 
-1. **`Build App`** — imagen base `amazoncorretto:21`; instala herramientas (`unzip git findutils which tar gzip`), da permisos de ejecución a `gradlew`, ejecuta `./gradlew clean test jacocoTestReport assemble`. Publica como artefactos `build/libs/**`, `build/reports/**` y `applications/**/build/libs/**`. **No ejecuta `test` ni `check`.**
+1. **`Build App`** — imagen base `amazoncorretto:21`; instala herramientas (`unzip git findutils which tar gzip`), da permisos de ejecución a `gradlew`, ejecuta `./gradlew clean test jacocoTestReport assemble`. Publica como artefactos `build/libs/**`, `build/reports/**` y `applications/**/build/libs/**`. Ejecuta las pruebas unitarias en cada build; la verificación del umbral de cobertura (`check`) no es todavía una compuerta obligatoria (ver `05-Pruebas.md`).
 2. **`Deploy to Railway`** — instala la CLI de Railway, valida `RAILWAY_TOKEN` y `RAILWAY_SERVICE` (aborta con mensaje explícito si faltan), despliega con `railway up --service "$RAILWAY_SERVICE" --ci`.
 3. **Disparo**: la pipeline **solo está definida para la rama `dev`**; no hay pipeline para `main`/`master` ni para *pull requests*. Único *cache* configurado: el estándar de Gradle (`~/.gradle/caches`).
 

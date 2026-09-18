@@ -9,7 +9,7 @@
 
 ## 0. Inventario actualizado de pruebas (desde el código)
 
-**8 clases de prueba · 25 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+**8 clases de prueba · 25 casos (`@Test`/`@ParameterizedTest`).** Todas pasan (`./gradlew clean test`). Este inventario prevalece sobre cualquier conteo anterior de este documento.
 
 | Módulo | Clase de prueba | Casos | Tipo |
 |---|---|---|---|
@@ -22,7 +22,7 @@
 | `domain/usecase` | `ProcessReportJobOfficialGuardTest` | 1 | Unitaria |
 | `domain/usecase` | `WorkbookFullProtectionTest` | 2 | Unitaria |
 
-Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`).
+Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`). El pipeline de Bitbucket ejecuta lo mismo en cada build.
 
 ## 1. Frameworks configurados (a nivel de build)
 

@@ -9,7 +9,7 @@
 
 ## 0. Inventario actualizado de pruebas (desde el código)
 
-**14 clases de prueba · 44 casos (`@Test`/`@ParameterizedTest`).** Este inventario prevalece sobre cualquier conteo anterior de este documento.
+**14 clases de prueba · 44 casos (`@Test`/`@ParameterizedTest`).** Todas pasan (`./gradlew clean test`). Este inventario prevalece sobre cualquier conteo anterior de este documento.
 
 | Módulo | Clase de prueba | Casos | Tipo |
 |---|---|---|---|
@@ -28,7 +28,7 @@
 | `infrastructure/entry-points/api-rest` | `OrganizationApiTest` | 10 | Unitaria |
 | `infrastructure/entry-points/api-rest` | `TraceIdFilterTest` | 4 | Unitaria |
 
-Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`).
+Ejecutar: `./gradlew test jacocoTestReport` desde la raíz del microservicio (reporte en `build/reports/jacoco`). El pipeline de Bitbucket ejecuta lo mismo en cada build.
 
 ## 1. Frameworks de prueba (verificados en `build.gradle`)
 

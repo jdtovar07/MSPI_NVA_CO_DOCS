@@ -9,10 +9,10 @@ Puerto local `:4200` · **18 rutas** · **21 llamadas HTTP distintas** a 6 micro
 | Ruta | Pantalla (componente) | Título visible | Requiere sesión | Permiso |
 |---|---|---|---|---|
 | `/` | `ShellLayoutComponent` | — | Sí | Sesión |
-| `/dashboard` | `DashboardPageComponent` | — | Sí | Sesión |
+| `/dashboard` | `DashboardPageComponent` | — | Sí | — |
 | `/users` | `UsersRedirectComponent` | — | Sí | Gestión de usuarios |
 | `/organizations` | `OrganizationsRedirectComponent` | — | Sí | Gestión de organizaciones |
-| `/my-organization` | `MyOrganizationRedirectComponent` | — | Sí | Sesión |
+| `/my-organization` | `MyOrganizationRedirectComponent` | — | Sí | — |
 | `/evaluations` | `EvaluationsRedirectComponent` | — | Sí | Ver evaluaciones |
 | `/evaluations/my-assigned` | `MyAssignedRedirectComponent` | — | Sí | Ver evaluaciones |
 | `/evidence` | `EvidenceRedirectComponent` | — | Sí | Ver evaluaciones |
@@ -23,9 +23,9 @@ Puerto local `:4200` · **18 rutas** · **21 llamadas HTTP distintas** a 6 micro
 | `/audit/requests` | `AuditRequestsPageComponent` | Solicitudes | Sí | Ver auditoría |
 | `/audit/requests/:requestNumber` | `AuditRequestDetailPageComponent` | Detalle de solicitud | Sí | Ver auditoría |
 | `/system-settings` | `SystemSettingsPageComponent` | Parámetros del sistema | Sí | Solo AdminSistema |
-| `/login` | `LoginPlaceholderComponent` (redirige a mf_auth) | — | No | — |
+| `/login` | `` | — | No | — |
 | `/privacidad` | `PrivacyPageComponent` | — | No | — |
-| `/terminos` | `TermsPageComponent` | — | No | — |
+| `/terminos` | `TermsPageComponent` | — | Sí | — |
 
 ## Matriz rol × permiso usado en este microfrontend
 
@@ -56,6 +56,7 @@ Fuente: `ROLE_AUTHORITIES` (`mf_shell/src/app/domain/dashboard/authority.ts`), r
 | `ms_evidence` | `GET` | `/assessments/{id}/files` | `infrastructure/dashboard/dashboard-stats.service.ts` |
 | `ms_evidence` | `GET` | `/assessments/{id}/lifting-document-deliveries` | `infrastructure/dashboard/dashboard-stats.service.ts` |
 | `ms_evidence` | `GET` | `/files/{id}/download` | `application/admin/download-request-attachment.use-case.ts` |
+| `ms_iam` | `GET` | `/auth/consent/status` | `presentation/guards/auth.guard.ts` |
 | `ms_iam` | `GET` | `/notifications` | `infrastructure/notifications/api-notification.repository.ts` |
 | `ms_iam` | `GET` | `/password-reset-requests` | `infrastructure/admin/api-request-tray.repository.ts` |
 | `ms_iam` | `POST` | `/notifications/clear-read` | `infrastructure/notifications/api-notification.repository.ts` |
@@ -73,7 +74,7 @@ flowchart LR
   MF -- "2 llamadas" --> ms_audit["ms_audit"]
   MF -- "1 llamadas" --> ms_catalog["ms_catalog"]
   MF -- "3 llamadas" --> ms_evidence["ms_evidence"]
-  MF -- "8 llamadas" --> ms_iam["ms_iam"]
+  MF -- "9 llamadas" --> ms_iam["ms_iam"]
 ```
 
 **Contexto.** Cada flecha resume cuántas operaciones distintas de ese microservicio usa esta interfaz. Todas viajan con el token JWT de la sesión, que el shell comparte con el iframe por `postMessage`.

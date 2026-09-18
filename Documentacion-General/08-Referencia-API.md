@@ -8,7 +8,7 @@ Detalle endpoint por endpoint (método, ruta, acceso, parámetros, cuerpo, códi
 
 | Microservicio | Puerto | Endpoints | Internos | Referencia detallada |
 |---|---|---|---|---|
-| `ms_iam` | 8082 | 26 | 2 | [08-Referencia-API](../Documentacion-Backend/ms_iam/08-Referencia-API.md) |
+| `ms_iam` | 8082 | 28 | 2 | [08-Referencia-API](../Documentacion-Backend/ms_iam/08-Referencia-API.md) |
 | `ms_org` | 8083 | 10 | 0 | [08-Referencia-API](../Documentacion-Backend/ms_org/08-Referencia-API.md) |
 | `ms_assessment` | 8084 | 52 | 3 | [08-Referencia-API](../Documentacion-Backend/ms_assessment/08-Referencia-API.md) |
 | `ms_catalog` | 8085 | 40 | 1 | [08-Referencia-API](../Documentacion-Backend/ms_catalog/08-Referencia-API.md) |
@@ -16,7 +16,7 @@ Detalle endpoint por endpoint (método, ruta, acceso, parámetros, cuerpo, códi
 | `ms_reporting` | 8087 | 4 | 0 | [08-Referencia-API](../Documentacion-Backend/ms_reporting/08-Referencia-API.md) |
 | `ms_audit` | 8088 | 3 | 1 | [08-Referencia-API](../Documentacion-Backend/ms_audit/08-Referencia-API.md) |
 | `ms_admin` | 8089 | 4 | 1 | [08-Referencia-API](../Documentacion-Backend/ms_admin/08-Referencia-API.md) |
-| **Total** | | **156** | **14** | |
+| **Total** | | **158** | **14** | |
 
 ```mermaid
 flowchart TB
@@ -24,7 +24,7 @@ flowchart TB
     MF["Microfrontends (JWT)"]
   end
   subgraph Servidores
-    IAM["ms_iam · 26"]; ORG["ms_org · 10"]; ASS["ms_assessment · 52"]; CAT["ms_catalog · 40"]
+    IAM["ms_iam · 28"]; ORG["ms_org · 10"]; ASS["ms_assessment · 52"]; CAT["ms_catalog · 40"]
     EVI["ms_evidence · 17"]; REP["ms_reporting · 4"]; AUD["ms_audit · 3"]; ADM["ms_admin · 4"]
   end
   MF --> IAM & ORG & ASS & CAT & EVI & REP & AUD & ADM
@@ -130,7 +130,7 @@ al navegador y se autentican con la clave compartida `X-Internal-Api-Key`. El n�
 
 ## Contraste frontend ↔ backend
 
-Se cruzaron las **148 llamadas HTTP** de los 6 microfrontends contra los 156 endpoints del backend:
+Se cruzaron las **151 llamadas HTTP** de los 6 microfrontends contra los 158 endpoints del backend:
 
 - **0 llamadas rotas**: toda ruta que usa la interfaz existe en el backend con el mismo método.
 - **5 endpoints de negocio sin consumidor directo en la interfaz** (todos con explicación):
