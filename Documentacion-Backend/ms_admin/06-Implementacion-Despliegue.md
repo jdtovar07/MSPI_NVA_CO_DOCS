@@ -78,3 +78,7 @@ Consumidores:
 4. Configurar `MS_ADMIN_URL` / `msAdminUrl`.
 5. Levantar servicio `ms-admin` y verificar `/actuator/health`.
 6. Probar `GET/PUT /system/config` (AdminSistema) y `GET /internal/system/config` (API key).
+
+### Pruebas en CI
+
+El pipeline de Bitbucket ejecuta `./gradlew clean test jacocoTestReport assemble` y publica XML de resultados y reportes JaCoCo. Detalle de cobertura: `05-Pruebas.md`.

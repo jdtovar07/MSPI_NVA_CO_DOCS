@@ -174,6 +174,8 @@ flowchart TB
 
 **Volúmenes típicos:** evidencias (`mspi_evidence_data`), salidas de reporte (`mspi_report_outputs`). Detalle de arranque: `05-Manual-Despliegue.md`.
 
+**CI backend:** Bitbucket Pipelines ejecuta `./gradlew clean test jacocoTestReport assemble` (pruebas obligatorias + reportes JaCoCo).
+
 **Runtime front:** cada contenedor MF genera `/assets/config.json` y la CSP nginx desde `MSPI_*` al arrancar (misma imagen local/dominio real). Ver `05-Manual-Despliegue.md` §8.
 
 

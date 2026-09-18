@@ -163,3 +163,26 @@ Se observa que el pipeline de CI (`bitbucket-pipelines.yml`) solo ejecuta `./gra
 2. Publicar los artefactos de `build/reports/**` (ya declarados en el `step` `Build App`) hacia SonarQube en un paso dedicado, dado que la configuración de `sonar.gradle`/`build.gradle` ya está lista para ello pero no se invoca en el pipeline actual.
 3. Incorporar pruebas de integración reales (p. ej. con Testcontainers + PostgreSQL) para los adaptadores JPA, dado que actualmente la verificación contra base de datos real no está evidenciada.
 4. Completar o remover la dependencia declarada de ArchUnit, añadiendo al menos una prueba que verifique la regla de dependencia entre capas descrita en `03-Diseno.md` (dominio no depende de infraestructura), formalizando así una regla que hoy solo se cumple por convención/estructura de módulos.
+
+
+## CI y cobertura (Bitbucket Pipelines)
+
+El paso principal del pipeline ejecuta:
+
+```bash
+./gradlew clean test jacocoTestReport assemble
+```
+
+- **Pruebas unitarias**: obligatorias (el build de CI falla si hay tests en rojo).
+- **Reportes**: se publican `**/build/test-results/**/*.xml` y reportes JaCoCo (`**/build/reports/jacoco*/**`).
+- **Empaquetado**: se conserva `assemble` (artefactos en `build/libs/**` / `applications/**/build/libs/**`).
+- **Umbral JaCoCo** (`jacocoTestCoverageVerification`, mínimo 0.90 INSTRUCTION sobre clases con tests asociados): **no se bajó**. El pipeline publica el reporte; la verificación local/gate de `check` puede fallar en servicios con deuda (ver abajo).
+
+### Inventario local (este microservicio)
+
+| Métrica | Valor |
+|---|---|
+| Suites / casos (JUnit XML) | 31 / 137 |
+| Cobertura instrucciones (reporte merged / agregado) | 37.3% |
+| `jacocoTestCoverageVerification` | OK (≥90% en clases con pruebas unitarias asociadas) |
+

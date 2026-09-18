@@ -122,7 +122,7 @@ ms-reporting:
 
 **No existe `bitbucket-pipelines.yml` en la raíz de `ms_reporting`.** Se verificó explícitamente la ausencia de este archivo (a diferencia de `ms_assessment`, `ms_catalog`, `ms_evidence`, `ms_iam` y `ms_org`, que sí lo tienen en el mismo repositorio contenedor `MSPI_NVA_CO_MR_BACK`). Esto significa que, con la evidencia disponible en el repositorio:
 
-- No hay evidencia de compilación automática (`./gradlew clean assemble`) en ningún sistema de integración continua para este microservicio.
+- No hay evidencia de compilación automática (`./gradlew clean test jacocoTestReport assemble`) en ningún sistema de integración continua para este microservicio.
 - No hay evidencia de despliegue automatizado (p. ej. a Railway, como sí ocurre para `ms_iam` mediante `railway up --service $RAILWAY_SERVICE --ci`).
 - La construcción de la imagen Docker y su despliegue, de existir en producción, dependerían de un proceso manual o de un pipeline externo no versionado en este repositorio.
 
@@ -176,3 +176,7 @@ Requisitos adicionales documentados en el `README.md`:
 | Volumen de datos | `mspi_report_outputs` → `/data/report-outputs` |
 | Esquema de base de datos | `reporting` (PostgreSQL) |
 | Pipeline CI/CD | **No existe** (`bitbucket-pipelines.yml` ausente en este microservicio) |
+
+### Pruebas en CI
+
+El pipeline de Bitbucket ejecuta `./gradlew clean test jacocoTestReport assemble` y publica XML de resultados y reportes JaCoCo. Detalle de cobertura: `05-Pruebas.md`.

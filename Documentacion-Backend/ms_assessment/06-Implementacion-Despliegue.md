@@ -16,7 +16,7 @@ Gradle Wrapper **9.3.0** (`main.gradle`: `tasks.named('wrapper') { gradleVersion
 ./gradlew clean check
 
 # Compilar sin pruebas (usado en CI y en el Dockerfile)
-./gradlew clean assemble
+./gradlew clean test jacocoTestReport assemble
 
 # Generar el jar ejecutable únicamente del módulo de aplicación
 ./gradlew :app-service:bootJar
@@ -105,13 +105,13 @@ image: amazoncorretto:21
 pipelines:
   branches:
     dev:
-      - step: *build_app       # ./gradlew clean assemble
+      - step: *build_app       # ./gradlew clean test jacocoTestReport assemble
       - step: *deploy_railway  # railway up --service $RAILWAY_SERVICE --ci
 ```
 
 Estructura **idéntica** a la de `ms_iam` (mismas dos etapas, misma imagen base, mismo *caching* de `~/.gradle/caches`, mismo mecanismo de despliegue):
 
-1. **`Build App`** — instala herramientas (`unzip git findutils which tar gzip`), ejecuta `./gradlew clean assemble` (sin `test` ni `check`), publica `build/libs/**`, `build/reports/**`, `applications/**/build/libs/**` como artefactos.
+1. **`Build App`** — instala herramientas (`unzip git findutils which tar gzip`), ejecuta `./gradlew clean test jacocoTestReport assemble` (sin `test` ni `check`), publica `build/libs/**`, `build/reports/**`, `applications/**/build/libs/**` como artefactos.
 2. **`Deploy to Railway`** — instala CLI de Railway, valida `RAILWAY_TOKEN`/`RAILWAY_SERVICE` (aborta si faltan), despliega con `railway up --service "$RAILWAY_SERVICE" --ci`.
 3. **Disparo**: solo definida para la rama `dev`; sin pipeline para `main`/`master` ni pull requests.
 
@@ -205,3 +205,7 @@ Requiere, además de PostgreSQL/Keycloak levantados, que `ms-org`, `ms-catalog`,
 ## SEG-B — Dependency-Check
 
 Plugin OWASP en `build.gradle`. Local: `./gradlew dependencyCheckAnalyze` (ver `MSPI_NVA_CO_MR_BACK/docs/SEG-B-Dependency-Check.md`). Spring Boot **4.0.8** + pins Tomcat/Jackson seguros.
+
+### Pruebas en CI
+
+El pipeline de Bitbucket ejecuta `./gradlew clean test jacocoTestReport assemble` y publica XML de resultados y reportes JaCoCo. Detalle de cobertura: `05-Pruebas.md`.

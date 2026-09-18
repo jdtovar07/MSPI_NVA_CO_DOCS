@@ -76,3 +76,26 @@ Ejecución local desde la raíz de `ms_audit/`:
 ```bash
 ./gradlew test
 ```
+
+
+## CI y cobertura (Bitbucket Pipelines)
+
+El paso principal del pipeline ejecuta:
+
+```bash
+./gradlew clean test jacocoTestReport assemble
+```
+
+- **Pruebas unitarias**: obligatorias (el build de CI falla si hay tests en rojo).
+- **Reportes**: se publican `**/build/test-results/**/*.xml` y reportes JaCoCo (`**/build/reports/jacoco*/**`).
+- **Empaquetado**: se conserva `assemble` (artefactos en `build/libs/**` / `applications/**/build/libs/**`).
+- **Umbral JaCoCo** (`jacocoTestCoverageVerification`, mínimo 0.90 INSTRUCTION sobre clases con tests asociados): **no se bajó**. El pipeline publica el reporte; la verificación local/gate de `check` puede fallar en servicios con deuda (ver abajo).
+
+### Inventario local (este microservicio)
+
+| Métrica | Valor |
+|---|---|
+| Suites / casos (JUnit XML) | 5 / 24 |
+| Cobertura instrucciones (reporte merged / agregado) | 100% (módulos con reporte; conjunto acotado) |
+| `jacocoTestCoverageVerification` | OK (≥90% en clases con pruebas unitarias asociadas) |
+

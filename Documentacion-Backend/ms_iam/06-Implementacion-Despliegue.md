@@ -16,7 +16,7 @@ El proyecto usa **Gradle Wrapper 9.3.0** (`gradlew` / `gradlew.bat`, definido en
 ./gradlew clean check
 
 # Compilar sin pruebas (usado en CI y en el Dockerfile)
-./gradlew clean assemble
+./gradlew clean test jacocoTestReport assemble
 
 # Generar el jar ejecutable únicamente del módulo de aplicación
 ./gradlew :app-service:bootJar
@@ -138,13 +138,13 @@ image: amazoncorretto:21
 pipelines:
   branches:
     dev:
-      - step: *build_app       # ./gradlew clean assemble
+      - step: *build_app       # ./gradlew clean test jacocoTestReport assemble
       - step: *deploy_railway  # railway up --service $RAILWAY_SERVICE --ci
 ```
 
 **Etapas reales:**
 
-1. **`Build App`** — imagen base `amazoncorretto:21`; instala herramientas (`unzip git findutils which tar gzip`), da permisos de ejecución a `gradlew`, y ejecuta `./gradlew clean assemble`. Publica como artefactos `build/libs/**`, `build/reports/**` y `applications/**/build/libs/**`. **No ejecuta `test` ni `check`** — es decir, el pipeline actual no corre las 21 clases de prueba ni valida el umbral de cobertura del 80% antes de desplegar (ver observación en `05-Pruebas.md`).
+1. **`Build App`** — imagen base `amazoncorretto:21`; instala herramientas (`unzip git findutils which tar gzip`), da permisos de ejecución a `gradlew`, y ejecuta `./gradlew clean test jacocoTestReport assemble`. Publica como artefactos `build/libs/**`, `build/reports/**` y `applications/**/build/libs/**`. **No ejecuta `test` ni `check`** — es decir, el pipeline actual no corre las 21 clases de prueba ni valida el umbral de cobertura del 80% antes de desplegar (ver observación en `05-Pruebas.md`).
 2. **`OWASP Dependency-Check (SEG-B)`** — ejecuta `./gradlew dependencyCheckAnalyze` y publica `build/reports/dependency-check/**`. Requiere `NVD_API_KEY` (variable de repositorio) para tiempos razonables. Por defecto no falla el build (`DEPENDENCY_CHECK_FAIL_CVSS`, default 11); usar `7` para fallar en alto/crítico. Guía: `MSPI_NVA_CO_MR_BACK/docs/SEG-B-Dependency-Check.md`.
 3. **`Deploy to Railway`** — instala la CLI de Railway (`curl -fsSL https://railway.app/install.sh | sh`), valida que existan las variables de pipeline `RAILWAY_TOKEN` y `RAILWAY_SERVICE` (aborta con mensaje explícito si faltan), y despliega con `railway up --service "$RAILWAY_SERVICE" --ci`.
 4. **Disparo**: la pipeline **solo está definida para la rama `dev`** (`pipelines.branches.dev`); no hay pipeline configurada para `main`/`master` ni para *pull requests* en el archivo revisado, y no hay *caching* de nada salvo el caché estándar de Gradle (`~/.gradle/caches`).
@@ -228,3 +228,7 @@ Tras el arranque, la base de datos PostgreSQL debe tener aplicado `schema-iam-mv
 | Nombre de imagen local | `mspi/ms-iam:dev` |
 | Nombre del contenedor | `ms_iam` |
 | Nombre del jar | `MsIam.jar` |
+
+### Pruebas en CI
+
+El pipeline de Bitbucket ejecuta `./gradlew clean test jacocoTestReport assemble` y publica XML de resultados y reportes JaCoCo. Detalle de cobertura: `05-Pruebas.md`.

@@ -64,3 +64,9 @@ Funcionalidades verificadas solo con pruebas funcionales (sin prueba unitaria pr
 4. **Eliminación de catálogo, escalas y bancos de preguntas** (`ms_catalog`).
 5. **Notificaciones** (`ms_iam`), incluido el control de propiedad pendiente de corregir.
 6. **Microfrontends**: solo `mf_org` tiene una prueba unitaria; los demás no tienen suite automatizada.
+
+## CI backend — pruebas y cobertura
+
+Los 8 `bitbucket-pipelines.yml` ejecutan `./gradlew clean test jacocoTestReport assemble` y publican `build/test-results/**/*.xml` y reportes JaCoCo.
+
+Deuda (umbral 0.90 INSTRUCTION en clases asociadas a tests, **sin bajar**): `ms_evidence` usecase ≈0.88, `ms_reporting` usecase ≈0.86, `ms_admin` usecase ≈0.69. El resto cumple la verificación local de cobertura sobre ese subconjunto.

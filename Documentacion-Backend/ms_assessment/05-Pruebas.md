@@ -113,3 +113,26 @@ Dado que el pipeline actual solo ejecuta `./gradlew clean assemble` (sin `test` 
 4. **Añadir pruebas de los 21 casos de uso sin cobertura**, priorizando `CreateAssessmentUseCase`, `PublishAssessmentUseCase` y `CloneAssessmentUseCase` por concentrar las reglas de negocio de ciclo de vida (estado, concurrencia optimista, clonación) descritas en `02-Analisis.md`.
 5. **Añadir pruebas MockMvc de al menos los controladores con lógica de mapeo no trivial** (`AssessmentControlApi`, `AssessmentMaturityApi`) siguiendo el patrón *standalone* usado en `ms_iam` (`UsersApiTest`).
 6. **Completar o remover la dependencia ArchUnit** declarada sin uso, formalizando la regla de dependencia entre capas descrita en `03-Diseno.md` §1.
+
+
+## CI y cobertura (Bitbucket Pipelines)
+
+El paso principal del pipeline ejecuta:
+
+```bash
+./gradlew clean test jacocoTestReport assemble
+```
+
+- **Pruebas unitarias**: obligatorias (el build de CI falla si hay tests en rojo).
+- **Reportes**: se publican `**/build/test-results/**/*.xml` y reportes JaCoCo (`**/build/reports/jacoco*/**`).
+- **Empaquetado**: se conserva `assemble` (artefactos en `build/libs/**` / `applications/**/build/libs/**`).
+- **Umbral JaCoCo** (`jacocoTestCoverageVerification`, mínimo 0.90 INSTRUCTION sobre clases con tests asociados): **no se bajó**. El pipeline publica el reporte; la verificación local/gate de `check` puede fallar en servicios con deuda (ver abajo).
+
+### Inventario local (este microservicio)
+
+| Métrica | Valor |
+|---|---|
+| Suites / casos (JUnit XML) | 17 / 92 |
+| Cobertura instrucciones (reporte merged / agregado) | 18.5% |
+| `jacocoTestCoverageVerification` | OK (≥90% en clases con pruebas unitarias asociadas) |
+

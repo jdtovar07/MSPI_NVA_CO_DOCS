@@ -93,3 +93,26 @@ El pipeline de CI (`bitbucket-pipelines.yml`) solo ejecuta `./gradlew clean asse
 3. Pruebas de `EvidenceJpaAdapter.initLifting`/`.cloneLifting` (idealmente con Testcontainers + PostgreSQL, dado que el proyecto no usa H2), verificando atomicidad transaccional.
 4. Pruebas `MockMvc` de los controladores REST (públicos e internos), en particular la validación del header `X-Internal-Api-Key` en `InternalApiKeyFilter`.
 5. Agregar `./gradlew check` como etapa explícita en `bitbucket-pipelines.yml` antes del despliegue, para que el pipeline falle si el umbral de cobertura del 80% no se cumple.
+
+
+## CI y cobertura (Bitbucket Pipelines)
+
+El paso principal del pipeline ejecuta:
+
+```bash
+./gradlew clean test jacocoTestReport assemble
+```
+
+- **Pruebas unitarias**: obligatorias (el build de CI falla si hay tests en rojo).
+- **Reportes**: se publican `**/build/test-results/**/*.xml` y reportes JaCoCo (`**/build/reports/jacoco*/**`).
+- **Empaquetado**: se conserva `assemble` (artefactos en `build/libs/**` / `applications/**/build/libs/**`).
+- **Umbral JaCoCo** (`jacocoTestCoverageVerification`, mínimo 0.90 INSTRUCTION sobre clases con tests asociados): **no se bajó**. El pipeline publica el reporte; la verificación local/gate de `check` puede fallar en servicios con deuda (ver abajo).
+
+### Inventario local (este microservicio)
+
+| Métrica | Valor |
+|---|---|
+| Suites / casos (JUnit XML) | 4 / 18 |
+| Cobertura instrucciones (reporte merged / agregado) | 11.3% |
+| `jacocoTestCoverageVerification` | FALLA — usecase INSTRUCTION 0.88 < 0.90 |
+| Deuda de cobertura | jacocoTestCoverageVerification en `:usecase` (0.88). Umbral 0.90 sin bajar; ampliar pruebas de UploadEvidenceFileUseCase / casos de borde. |

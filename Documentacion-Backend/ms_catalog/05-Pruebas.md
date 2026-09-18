@@ -104,3 +104,26 @@ El pipeline de CI (`bitbucket-pipelines.yml`) solo ejecuta `./gradlew clean asse
 4. **Agregar una etapa `./gradlew check`** en `bitbucket-pipelines.yml` antes del despliegue a Railway, para que el pipeline falle si la cobertura mínima no se cumple — actualmente no aplicaría dado el estado real de cobertura, por lo que este paso debería ir acompañado de los puntos 1–3.
 5. **Probar `InternalApiKeyFilter` y la extracción de roles de `SecurityConfig`**, dado que son la superficie de autenticación/autorización completa del microservicio y no tienen ninguna prueba.
 6. Completar o remover la dependencia declarada de ArchUnit y de `object-mapper`, ambas sin uso real, para reducir superficie de dependencias no ejercitadas.
+
+
+## CI y cobertura (Bitbucket Pipelines)
+
+El paso principal del pipeline ejecuta:
+
+```bash
+./gradlew clean test jacocoTestReport assemble
+```
+
+- **Pruebas unitarias**: obligatorias (el build de CI falla si hay tests en rojo).
+- **Reportes**: se publican `**/build/test-results/**/*.xml` y reportes JaCoCo (`**/build/reports/jacoco*/**`).
+- **Empaquetado**: se conserva `assemble` (artefactos en `build/libs/**` / `applications/**/build/libs/**`).
+- **Umbral JaCoCo** (`jacocoTestCoverageVerification`, mínimo 0.90 INSTRUCTION sobre clases con tests asociados): **no se bajó**. El pipeline publica el reporte; la verificación local/gate de `check` puede fallar en servicios con deuda (ver abajo).
+
+### Inventario local (este microservicio)
+
+| Métrica | Valor |
+|---|---|
+| Suites / casos (JUnit XML) | 4 / 17 |
+| Cobertura instrucciones (reporte merged / agregado) | 6.0% |
+| `jacocoTestCoverageVerification` | OK (≥90% en clases con pruebas unitarias asociadas) |
+

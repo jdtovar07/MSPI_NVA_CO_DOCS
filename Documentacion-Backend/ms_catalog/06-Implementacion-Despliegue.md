@@ -87,12 +87,12 @@ image: amazoncorretto:21
 pipelines:
   branches:
     dev:
-      - step: *build_app       # ./gradlew clean assemble
+      - step: *build_app       # ./gradlew clean test jacocoTestReport assemble
       - step: *deploy_railway  # railway up --service "$RAILWAY_SERVICE" --ci
 ```
 
 - **Imagen de CI**: `amazoncorretto:21` (distinta de la imagen de runtime del Dockerfile, que es `eclipse-temurin`; ambas son JDK 21 pero de distribuciones distintas — Amazon Corretto en CI vs. Eclipse Temurin en el contenedor final).
-- **Único paso de build**: `./gradlew clean assemble` — **no ejecuta `test` ni `check`**, por lo que el pipeline actual **no falla ante pruebas rotas ni ante cobertura insuficiente** (coherente con el hallazgo de `05-Pruebas.md` de que el módulo `:usecase`, sin exclusiones de JaCoCo, no tiene pruebas propias: si `check` se ejecutara, probablemente fallaría).
+- **Único paso de build**: `./gradlew clean test jacocoTestReport assemble` — **no ejecuta `test` ni `check`**, por lo que el pipeline actual **no falla ante pruebas rotas ni ante cobertura insuficiente** (coherente con el hallazgo de `05-Pruebas.md` de que el módulo `:usecase`, sin exclusiones de JaCoCo, no tiene pruebas propias: si `check` se ejecutara, probablemente fallaría).
 - **Caché de Gradle** declarada (`~/.gradle/caches`) para acelerar builds sucesivos.
 - **Despliegue a Railway**: instala la CLI de Railway (`curl -fsSL https://railway.app/install.sh | sh`) y ejecuta `railway up --service "$RAILWAY_SERVICE" --ci`, validando previamente la presencia de `RAILWAY_TOKEN` y `RAILWAY_SERVICE` como variables de pipeline (falla explícitamente con mensaje si faltan).
 - **Único ambiente de pipeline definido**: rama `dev` → build + deploy. No hay pipeline para `main`/`master` ni para *pull requests* en el archivo actual.
@@ -103,7 +103,7 @@ pipelines:
 ```mermaid
 flowchart LR
   Dev[Rama dev] -->|push| BB[Bitbucket Pipelines]
-  BB -->|"./gradlew clean assemble"| Build[Build App]
+  BB -->|"./gradlew clean test jacocoTestReport assemble"| Build[Build App]
   Build -->|"railway up --service"| RW[Railway]
   RW --> Container["Contenedor ms_catalog<br/>eclipse-temurin:21-jre-alpine<br/>puerto 8085"]
   Container --> PG[(PostgreSQL<br/>schema catalog)]
@@ -121,3 +121,7 @@ flowchart LR
 - No hay ejecución de pruebas (`test`/`check`) ni de análisis SonarQube dentro del pipeline actual, pese a que ambos están configurados a nivel de Gradle.
 - No se encontró documentación de *rollback* o estrategia de *blue-green*/canary para el despliegue en Railway.
 - No hay `docker-compose.yml` propio dentro de `ms_catalog/`; la orquestación local depende del `docker-config/` del repositorio raíz, fuera del alcance de este análisis específico de microservicio.
+
+### Pruebas en CI
+
+El pipeline de Bitbucket ejecuta `./gradlew clean test jacocoTestReport assemble` y publica XML de resultados y reportes JaCoCo. Detalle de cobertura: `05-Pruebas.md`.

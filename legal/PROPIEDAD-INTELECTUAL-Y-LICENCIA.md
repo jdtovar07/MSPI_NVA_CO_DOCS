@@ -59,3 +59,8 @@ titulares, como prueba de autoría y fecha.
 ## 6. Marcas
 «AUDITCYBER» es el nombre de la plataforma elegido por los autores. «MinTIC», «ISO», «IEC» y «NIST» son nombres de
 sus respectivos titulares; se citan solo para identificar los marcos de referencia.
+
+
+## Repositorios de código (BACK y FRONT)
+
+Los repositorios `MSPI_NVA_CO_MR_BACK` y `MSPI_NVA_CO_MR_FRONT` incluyen un archivo `LICENSE` en la raíz con **todos los derechos reservados** (CORHUILA y autores). Los `package.json` de los microfrontends declaran `"license": "UNLICENSED"` y `"private": true`. No se publica bajo licencia de código abierto.

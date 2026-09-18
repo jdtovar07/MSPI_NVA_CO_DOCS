@@ -78,3 +78,7 @@ En productores: `MS_AUDIT_URL` (local `http://localhost:8088`, Docker `http://ms
 4. Configurar `MS_AUDIT_URL` en productores.
 5. Levantar servicio Compose `ms-audit` (o Railway/equivalente) y verificar `/actuator/health`.
 6. Probar `POST /internal/audit/events` (202) y `GET /audit/events` con JWT AdminSistema.
+
+### Pruebas en CI
+
+El pipeline de Bitbucket ejecuta `./gradlew clean test jacocoTestReport assemble` y publica XML de resultados y reportes JaCoCo. Detalle de cobertura: `05-Pruebas.md`.

@@ -98,3 +98,26 @@ A diferencia de otros microservicios del repositorio contenedor (`ms_iam`, `ms_o
 - Agregar pruebas para `CreateComparativeReportJobUseCase` cubriendo las 3 reglas de negocio explícitas (`#116`).
 - Agregar al menos una prueba de *slice* MVC (`@WebMvcTest` con `@AutoConfigureMockMvc` y JWT simulado vía `spring-security-test`, ya declarado como dependencia de test en `api-rest/build.gradle` pero sin uso actual) para verificar los códigos de estado HTTP de `ReportJobApi`.
 - Crear (o replicar desde otro microservicio del repositorio) un `bitbucket-pipelines.yml` que al menos ejecute `./gradlew clean assemble` en CI, y evaluar si conviene incorporar `test`/`check` dado el estado actual de cobertura.
+
+
+## CI y cobertura (Bitbucket Pipelines)
+
+El paso principal del pipeline ejecuta:
+
+```bash
+./gradlew clean test jacocoTestReport assemble
+```
+
+- **Pruebas unitarias**: obligatorias (el build de CI falla si hay tests en rojo).
+- **Reportes**: se publican `**/build/test-results/**/*.xml` y reportes JaCoCo (`**/build/reports/jacoco*/**`).
+- **Empaquetado**: se conserva `assemble` (artefactos en `build/libs/**` / `applications/**/build/libs/**`).
+- **Umbral JaCoCo** (`jacocoTestCoverageVerification`, mínimo 0.90 INSTRUCTION sobre clases con tests asociados): **no se bajó**. El pipeline publica el reporte; la verificación local/gate de `check` puede fallar en servicios con deuda (ver abajo).
+
+### Inventario local (este microservicio)
+
+| Métrica | Valor |
+|---|---|
+| Suites / casos (JUnit XML) | 8 / 25 |
+| Cobertura instrucciones (reporte merged / agregado) | 20.4% |
+| `jacocoTestCoverageVerification` | FALLA — usecase INSTRUCTION 0.86 < 0.90 |
+| Deuda de cobertura | jacocoTestCoverageVerification en `:usecase` (0.86). Umbral 0.90 sin bajar; ampliar cobertura de casos de reporte. |

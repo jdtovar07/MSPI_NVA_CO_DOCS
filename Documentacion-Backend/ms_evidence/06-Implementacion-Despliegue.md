@@ -132,13 +132,13 @@ image: amazoncorretto:21
 pipelines:
   branches:
     dev:
-      - step: *build_app       # ./gradlew clean assemble
+      - step: *build_app       # ./gradlew clean test jacocoTestReport assemble
       - step: *deploy_railway  # railway up --service $RAILWAY_SERVICE --ci
 ```
 
 **Etapas reales** (idéntico patrón al de `ms_iam` y `ms_org` en el mismo repositorio):
 
-1. **`Build App`** — imagen `amazoncorretto:21`; instala herramientas (`unzip git findutils which tar gzip`), da permisos a `gradlew`, ejecuta `./gradlew clean assemble`. Publica `build/libs/**`, `build/reports/**`, `applications/**/build/libs/**` como artefactos. **No ejecuta `test` ni `check`** antes del despliegue.
+1. **`Build App`** — imagen `amazoncorretto:21`; instala herramientas (`unzip git findutils which tar gzip`), da permisos a `gradlew`, ejecuta `./gradlew clean test jacocoTestReport assemble`. Publica `build/libs/**`, `build/reports/**`, `applications/**/build/libs/**` como artefactos. **No ejecuta `test` ni `check`** antes del despliegue.
 2. **`Deploy to Railway`** — instala la CLI de Railway, valida `RAILWAY_TOKEN` y `RAILWAY_SERVICE` (aborta si faltan), despliega con `railway up --service "$RAILWAY_SERVICE" --ci`.
 3. **Disparo**: pipeline definida **solo para la rama `dev`**; sin pipeline para `main`/`master` ni *pull requests*; solo caché estándar de Gradle (`~/.gradle/caches`).
 
@@ -204,3 +204,7 @@ Requiere PostgreSQL levantado con el esquema `evidence` aplicado (script `apply-
 ## SEG-B — Dependency-Check
 
 Plugin OWASP en `build.gradle`. Local: `./gradlew dependencyCheckAnalyze` (ver `MSPI_NVA_CO_MR_BACK/docs/SEG-B-Dependency-Check.md`). Spring Boot **4.0.8** + pins Tomcat/Jackson seguros.
+
+### Pruebas en CI
+
+El pipeline de Bitbucket ejecuta `./gradlew clean test jacocoTestReport assemble` y publica XML de resultados y reportes JaCoCo. Detalle de cobertura: `05-Pruebas.md`.
