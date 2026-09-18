@@ -146,7 +146,7 @@ flowchart TB
             AUD["ms_audit :8088"]
             ADM["ms_admin :8089"]
         end
-        subgraph Front["mspi-front — 6 MF"]
+        subgraph Front["mspi-front — 6 MF (runtime MSPI_* → config.json + CSP)"]
             S["mf_shell :4200"]
             A["mf_auth :4201"]
             O["mf_org :4202"]
@@ -156,6 +156,8 @@ flowchart TB
         end
     end
     Browser([Navegador]) --> S
+    Browser -.fetch /assets/config.json.-> S
+    Browser -.fetch /assets/config.json.-> A
     IAM --> PG
     ORG --> PG
     ASM --> PG
@@ -171,6 +173,9 @@ flowchart TB
 ```
 
 **Volúmenes típicos:** evidencias (`mspi_evidence_data`), salidas de reporte (`mspi_report_outputs`). Detalle de arranque: `05-Manual-Despliegue.md`.
+
+**Runtime front:** cada contenedor MF genera `/assets/config.json` y la CSP nginx desde `MSPI_*` al arrancar (misma imagen local/dominio real). Ver `05-Manual-Despliegue.md` §8.
+
 
 ---
 

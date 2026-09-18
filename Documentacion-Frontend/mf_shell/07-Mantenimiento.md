@@ -22,7 +22,7 @@ La UI orientada al usuario final **no** debe exponer nombres internos de microse
 
 ## 3. Mantenimiento del protocolo de sesión compartida
 
-Dado que la sesión se propaga por `postMessage` con lista blanca de orígenes `localhost:420[1-5]` (`isShellChildOrigin` en `shell-iframe-bridge.ts`, y la lista explícita `localhost:4201`/`127.0.0.1:4201` en `shell-layout.component.ts`), cualquier cambio de infraestructura que modifique los puertos o dominios de los microfrontends hijos **requiere actualizar estos valores en el código del shell**, ya que no son configurables por variable de entorno. Esto se identifica como deuda técnica prioritaria para un despliegue fuera de `localhost`.
+Dado que la sesión se propaga por `postMessage` con lista blanca de orígenes `localhost:420[1-5]` (`isShellChildOrigin` en `shell-iframe-bridge.ts`, y la lista explícita `localhost:4201`/`127.0.0.1:4201` en `shell-layout.component.ts`), los orígenes se leen de `/assets/config.json` (`allowedOrigins` / `AppConfigService`). En Docker se parametrizan con `MSPI_*`; en `ng serve` siguen los defaults de `environment.ts`.
 
 ## 4. Guía real: cómo integrar un nuevo microfrontend en `mf_shell`
 
@@ -127,3 +127,15 @@ Dado que no hay pruebas automatizadas (ver `05-Pruebas.md`), verificar manualmen
 - Cualquier evolución hacia Module Federation real (Webpack Module Federation o `@angular-architects/native-federation`, la vía recomendada para Angular moderno) implicaría reemplazar íntegramente `shell-iframe-bridge.ts` y los componentes `*-redirect`, y coordinar el cambio con los 5 microfrontends hijos simultáneamente — no es un cambio incremental aislado al shell.
 - Mientras se mantenga el modelo iframe, cualquier ampliación de funcionalidad de sincronización (por ejemplo, temas visuales compartidos, notificaciones cross-MF) debería extender el protocolo `MSPI_*` existente en `shell-iframe-bridge.ts` en lugar de introducir un mecanismo paralelo, para mantener un único punto de auditoría de la comunicación entre orígenes.
 - Se recomienda, antes de cualquier despliegue fuera de entornos de desarrollo local, resolver la limitación de `environment.ts` único (sin `environment.prod.ts` ni *file replacements*) para permitir apuntar a hosts de backend distintos de `localhost`.
+
+
+## Variables de entorno de runtime (front)
+
+Al cambiar de dominio o puertos **no** hace falta reconstruir la imagen Angular: basta reiniciar los contenedores con nuevas `MSPI_*` (compose `--env-file`).
+
+Checklist al añadir un nuevo origen (MF o API):
+
+1. Incluirlo en `MSPI_*_URL` / `MSPI_API_URLS` / `MSPI_FRAME_SRC` según corresponda.
+2. Actualizar `MSPI_ALLOWED_ORIGINS_JSON` (o dejar que el entrypoint lo derive de las URLs de MF).
+3. Verificar en el navegador que no hay violaciones CSP ni rechazos de origen en consola.
+4. En desarrollo local, si se usan puertos distintos, actualizar también `environment.ts` (defaults de `ng serve`).

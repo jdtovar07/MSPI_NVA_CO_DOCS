@@ -77,3 +77,15 @@ Cualquier cambio en `mf_reports` debe considerar su impacto en:
 ## Changelog operativo — excluir evaluaciones en eliminación
 
 - El selector de reportes usa `excludePendingDeletion=true` y filtra `pendingDeletion`.
+
+
+## Variables de entorno de runtime (front)
+
+Al cambiar de dominio o puertos **no** hace falta reconstruir la imagen Angular: basta reiniciar los contenedores con nuevas `MSPI_*` (compose `--env-file`).
+
+Checklist al añadir un nuevo origen (MF o API):
+
+1. Incluirlo en `MSPI_*_URL` / `MSPI_API_URLS` / `MSPI_FRAME_SRC` según corresponda.
+2. Actualizar `MSPI_ALLOWED_ORIGINS_JSON` (o dejar que el entrypoint lo derive de las URLs de MF).
+3. Verificar en el navegador que no hay violaciones CSP ni rechazos de origen en consola.
+4. En desarrollo local, si se usan puertos distintos, actualizar también `environment.ts` (defaults de `ng serve`).

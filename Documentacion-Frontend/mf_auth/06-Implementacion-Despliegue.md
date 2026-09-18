@@ -203,3 +203,25 @@ En este modo:
 ### 7.3 Limitación relevante para despliegues distintos a local
 
 Dado que `apiBaseUrl`, `msOrgUrl` y las URLs del shell (`http://localhost:4200`) están **hardcodeadas en el código fuente compilado**, desplegar `mf_auth` en un dominio o entorno distinto a `localhost` (por ejemplo, un ambiente de staging o producción con dominios reales) **requiere modificar `environment.api.ts` y los literales de URL del shell dispersos en `AuthSessionService`, `SessionExpiryService` y las páginas de login/2FA/cambio de contraseña, y recompilar** — no existe mecanismo de configuración externa (variables de entorno de contenedor, `config.json` servido en runtime, etc.) para estos valores.
+
+
+## Configuración en tiempo de ejecución (Docker / dominio real)
+
+Cada microfrontend carga `/assets/config.json` al iniciar (`provideAppInitializer` → `AppConfigService.load()`). Ese JSON define URLs del shell, de los 5 remotes, de los 8 microservicios y `allowedOrigins` (lista blanca de `postMessage`).
+
+- **Desarrollo (`ng serve`)**: si no hay `config.json` o falla el fetch, se usan los valores de `src/environments/environment.ts` (localhost).
+- **Docker**: el entrypoint `deployment/docker-entrypoint.d/15-mspi-runtime-config.sh` genera `config.json` con `envsubst` desde variables `MSPI_*` y la plantilla `deployment/config.json.template`.
+- **CSP**: `deployment/nginx/default.conf.template` se materializa al arrancar el contenedor (`NGINX_ENVSUBST_FILTER=MSPI_`) con `MSPI_CONNECT_SRC`, `MSPI_FRAME_SRC` (solo shell) y `MSPI_FRAME_ANCESTORS`.
+
+Variables principales (ver también `MSPI_NVA_CO_MR_BACK/docker-config/docker/.env.example` y `Documentacion-General/05-Manual-Despliegue.md`):
+
+| Variable | Uso |
+|---|---|
+| `MSPI_SHELL_URL` … `MSPI_REPORTS_URL` | Orígenes de los 6 MF |
+| `MSPI_MS_IAM_URL` … `MSPI_MS_ADMIN_URL` | Bases HTTP de los microservicios |
+| `MSPI_API_URLS` | Lista espacio-separada → `connect-src` CSP |
+| `MSPI_FRAME_SRC` | `frame-src` del shell |
+| `MSPI_FRAME_ANCESTORS` | Quién puede embeber remotes (típicamente el shell) |
+| `MSPI_ALLOWED_ORIGINS_JSON` | Array JSON para validar `event.origin` |
+
+`postMessage` valida `event.origin` contra `allowedOrigins` y envía siempre con `targetOrigin` explícito (nunca `*`).

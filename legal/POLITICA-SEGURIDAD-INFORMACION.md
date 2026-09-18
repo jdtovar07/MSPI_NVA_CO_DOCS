@@ -36,7 +36,7 @@ los secretos de configuración, en todos sus entornos.
 | Riesgo | Nivel | Tratamiento |
 |---|---|---|
 | ~~Notificaciones: el listado y la limpieza masiva usan el `userId` enviado por el cliente~~ | ~~Alto~~ | **Resuelto:** sujeto desde JWT; `userId` opcional solo si coincide (403); propiedad en `/{id}/*` (404) |
-| URLs `localhost` fijas en el frontend | Medio (operación) | Pasarlas a configuración por entorno antes de desplegar (tarea registrada) |
+| ~~URLs `localhost` fijas en el frontend~~ | ~~Medio (operación)~~ | **Resuelto:** `/assets/config.json` + variables `MSPI_*` (CSP y allowlist `postMessage` en runtime) |
 | Token de sesión en almacenamiento accesible por JavaScript | Medio | Mitigado con CSP estricta y tokens de 1 hora; migrar a cookie `HttpOnly` en producción |
 | El pipeline de integración solo compila (no ejecuta pruebas) | Medio | Agregar `test`/`check` al pipeline |
 | Repositorio de documentación público con datos personales en cartas académicas | Medio | **Riesgo aceptado por los autores**: el repositorio sigue público y se mantiene en seguimiento; retirar los datos si el repositorio se difunde fuera del ámbito académico |

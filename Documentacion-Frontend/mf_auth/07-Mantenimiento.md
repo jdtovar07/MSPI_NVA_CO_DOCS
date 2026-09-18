@@ -31,7 +31,7 @@ Lineamientos derivados de los hallazgos de código documentados en `03-Diseno.md
 
 - **Actualizaciones de Angular**: el proyecto fija dependencias con caret (`^19.0.0`), por lo que recibirá automáticamente parches y *minors* de Angular 19 en instalaciones limpias de `npm install`; se recomienda revisar periódicamente las notas de versión de Angular (especialmente cambios en `HttpInterceptorFn`, Signals y el builder `application`, todos usados activamente) y ejecutar `ng update` de forma controlada.
 - **Auditoría de dependencias**: no se encontró evidencia de `npm audit` automatizado ni de Dependabot/Renovate configurado en el repositorio; dado que `mf_auth` maneja credenciales y tokens, se recomienda incorporar auditoría de dependencias como parte del mantenimiento preventivo.
-- **Revisión de URLs hardcodeadas**: como se documenta en `06-Implementacion-Despliegue.md`, las URLs del shell (`http://localhost:4200`) y de los backends están embebidas en múltiples archivos (`AuthSessionService`, `SessionExpiryService`, páginas de login/2FA/cambio de contraseña, `environment.api.ts`). Cualquier cambio de dominio en un ambiente distinto a local obliga a una revisión coordinada de todos estos puntos; se recomienda centralizarlas en `environment.*.ts` únicamente (hoy `SessionExpiryService` y varias páginas usan el literal `'http://localhost:4200/dashboard'` directamente en vez de leer `environment`).
+- **Revisión de URLs de runtime**: las URLs de shell/remotes/APIs y la allowlist de `postMessage` salen de `AppConfigService` (`/assets/config.json`). Los literales `localhost:42xx` quedan solo como defaults en `environment*.ts`.
 - **Revisión de la política de expiración de sesión**: el valor `expiresIn` por defecto (300s reales / 3600s en mock) y el aviso de 60s están hardcodeados en `SessionExpiryService`; si `ms_iam` cambia su TTL de token, este valor debe revisarse manualmente ya que no se deriva dinámicamente salvo por el propio `expiresIn` recibido en la respuesta de login (que sí se usa correctamente para calcular `expiresAt`).
 
 ## 4. Mantenimiento evolutivo — mejoras futuras evidenciadas en la documentación del repositorio
@@ -78,3 +78,15 @@ No se identificó un **error boundary global** de Angular (`ErrorHandler` person
 - [ ] Evaluar debounce en la búsqueda de usuarios.
 - [ ] Definir estrategia de versionado semántico y `CHANGELOG.md`.
 - [ ] Evaluar instrumentación de logs/observabilidad centralizada acorde al contexto ISO 27001 de MSPI.
+
+
+## Variables de entorno de runtime (front)
+
+Al cambiar de dominio o puertos **no** hace falta reconstruir la imagen Angular: basta reiniciar los contenedores con nuevas `MSPI_*` (compose `--env-file`).
+
+Checklist al añadir un nuevo origen (MF o API):
+
+1. Incluirlo en `MSPI_*_URL` / `MSPI_API_URLS` / `MSPI_FRAME_SRC` según corresponda.
+2. Actualizar `MSPI_ALLOWED_ORIGINS_JSON` (o dejar que el entrypoint lo derive de las URLs de MF).
+3. Verificar en el navegador que no hay violaciones CSP ni rechazos de origen en consola.
+4. En desarrollo local, si se usan puertos distintos, actualizar también `environment.ts` (defaults de `ng serve`).

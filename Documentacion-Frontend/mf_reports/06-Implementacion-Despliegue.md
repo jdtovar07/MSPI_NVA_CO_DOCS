@@ -165,3 +165,25 @@ Aunque no se encontró un `docker-compose.yml` dentro del propio repositorio `mf
 | URLs de backend fijas a `localhost` en ambos entornos | No hay mecanismo de variables de entorno en tiempo de ejecución para reconfigurar sin recompilar |
 | Sin variante Docker en modo mock | El `Dockerfile` fija `--configuration=api`; una demo sin backend requiere `ng serve` local, no el contenedor |
 | Sin pipeline CI/CD visible | No hay `.github/workflows` ni configuración de integración continua en el repositorio |
+
+
+## Configuración en tiempo de ejecución (Docker / dominio real)
+
+Cada microfrontend carga `/assets/config.json` al iniciar (`provideAppInitializer` → `AppConfigService.load()`). Ese JSON define URLs del shell, de los 5 remotes, de los 8 microservicios y `allowedOrigins` (lista blanca de `postMessage`).
+
+- **Desarrollo (`ng serve`)**: si no hay `config.json` o falla el fetch, se usan los valores de `src/environments/environment.ts` (localhost).
+- **Docker**: el entrypoint `deployment/docker-entrypoint.d/15-mspi-runtime-config.sh` genera `config.json` con `envsubst` desde variables `MSPI_*` y la plantilla `deployment/config.json.template`.
+- **CSP**: `deployment/nginx/default.conf.template` se materializa al arrancar el contenedor (`NGINX_ENVSUBST_FILTER=MSPI_`) con `MSPI_CONNECT_SRC`, `MSPI_FRAME_SRC` (solo shell) y `MSPI_FRAME_ANCESTORS`.
+
+Variables principales (ver también `MSPI_NVA_CO_MR_BACK/docker-config/docker/.env.example` y `Documentacion-General/05-Manual-Despliegue.md`):
+
+| Variable | Uso |
+|---|---|
+| `MSPI_SHELL_URL` … `MSPI_REPORTS_URL` | Orígenes de los 6 MF |
+| `MSPI_MS_IAM_URL` … `MSPI_MS_ADMIN_URL` | Bases HTTP de los microservicios |
+| `MSPI_API_URLS` | Lista espacio-separada → `connect-src` CSP |
+| `MSPI_FRAME_SRC` | `frame-src` del shell |
+| `MSPI_FRAME_ANCESTORS` | Quién puede embeber remotes (típicamente el shell) |
+| `MSPI_ALLOWED_ORIGINS_JSON` | Array JSON para validar `event.origin` |
+
+`postMessage` valida `event.origin` contra `allowedOrigins` y envía siempre con `targetOrigin` explícito (nunca `*`).

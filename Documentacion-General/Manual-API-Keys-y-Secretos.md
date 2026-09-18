@@ -109,3 +109,9 @@ secreto. No es cifrado fuerte (es la protección nativa de Excel); no la reutili
 - Usa **valores distintos** por entorno (dev/prod).
 - Da a cada clave el **mínimo privilegio** necesario (p. ej. el cliente de Keycloak solo con los roles de
   gestión de usuarios que requiere).
+
+---
+
+## Variables de runtime del frontend (no secretos)
+
+Los microfrontends no usan claves secretas en el navegador. Para apuntar la misma imagen Docker a un dominio real se configuran URLs públicas vía entorno (`MSPI_SHELL_URL`, `MSPI_AUTH_URL`, …, `MSPI_MS_*_URL`, `MSPI_API_URLS`, `MSPI_FRAME_ANCESTORS`, `MSPI_ALLOWED_ORIGINS_JSON`). Detalle y tabla: `05-Manual-Despliegue.md` §8 y `docker-config/docker/.env.example`.

@@ -72,3 +72,35 @@ Punto de entrada: **http://localhost:4200**
 cd MSPI_NVA_CO_MR_BACK\docker-config
 .\detener-todo.ps1
 ```
+
+## 8. Despliegue del frontend en un dominio real
+
+La misma imagen Docker de cada microfrontend sirve en local y en un dominio productivo: solo cambian variables de entorno.
+
+1. Copiar `MSPI_NVA_CO_MR_BACK/docker-config/docker/.env.example` a `.env` y ajustar URLs HTTPS.
+2. Asegurar que el navegador alcanza las URLs de MF y de APIs (DNS / reverse proxy).
+3. Levantar:
+
+```bash
+cd MSPI_NVA_CO_MR_BACK/docker-config/docker
+docker compose -f docker-compose.front.yml --env-file .env up -d --build
+```
+
+### Tabla de variables (frontend)
+
+| Variable | Descripción | Ejemplo local |
+|---|---|---|
+| `MSPI_SHELL_URL` | Origen del shell | `http://localhost:4200` |
+| `MSPI_AUTH_URL` | Origen de mf_auth | `http://localhost:4201` |
+| `MSPI_ORG_URL` | Origen de mf_org | `http://localhost:4202` |
+| `MSPI_ASSESSMENT_URL` | Origen de mf_assessment | `http://localhost:4203` |
+| `MSPI_EVIDENCE_URL` | Origen de mf_evidence | `http://localhost:4204` |
+| `MSPI_REPORTS_URL` | Origen de mf_reports | `http://localhost:4205` |
+| `MSPI_MS_IAM_URL` … `MSPI_MS_ADMIN_URL` | Bases de los 8 MS | `http://localhost:8082` … `8089` |
+| `MSPI_API_URLS` | Orígenes para CSP `connect-src` (espacio-separado) | (derivado si se omite) |
+| `MSPI_FRAME_SRC` | CSP `frame-src` del shell | URLs de los 6 MF |
+| `MSPI_FRAME_ANCESTORS` | CSP de remotes (quién embebe) | `self` + URL del shell |
+| `MSPI_FRAME_ANCESTORS_SHELL` | CSP del shell | `self` |
+| `MSPI_ALLOWED_ORIGINS_JSON` | Allowlist JSON de `postMessage` | (derivado si se omite) |
+
+Al arrancar, cada contenedor escribe `/assets/config.json` y regenera la CSP de nginx. No hace falta rebuild de Angular al cambiar solo el dominio.
