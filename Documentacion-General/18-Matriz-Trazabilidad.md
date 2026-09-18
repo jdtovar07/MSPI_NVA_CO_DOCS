@@ -70,3 +70,5 @@ Funcionalidades verificadas solo con pruebas funcionales (sin prueba unitaria pr
 Los 8 `bitbucket-pipelines.yml` ejecutan `./gradlew clean test jacocoTestReport assemble` y publican `build/test-results/**/*.xml` y reportes JaCoCo.
 
 Deuda (umbral 0.90 INSTRUCTION en clases asociadas a tests, **sin bajar**): `ms_evidence` usecase ≈0.88, `ms_reporting` usecase ≈0.86, `ms_admin` usecase ≈0.69. El resto cumple la verificación local de cobertura sobre ese subconjunto.
+
+Nota: el paso de CI no ejecuta `jacocoTestCoverageVerification` (para no bloquear el empaquetado mientras exista deuda); las pruebas unitarias sí son obligatorias. La verificación de umbral se documenta y se corre en local/`check`.
