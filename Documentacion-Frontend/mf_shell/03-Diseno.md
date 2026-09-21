@@ -239,9 +239,13 @@ flowchart LR
     Root --> R3["/system-settings"]
     Root --> R4["/evaluations (iframe)"]
     Root --> R5["/login"]
+    Root --> R6["/privacidad"]
+    Root --> R7["/terminos"]
 ```
 
-**Rutas:** `/dashboard`, `/audit`, `/audit/requests/:requestNumber`, `/system-settings`, `/evaluations (iframe)`, `/login`, `/privacidad`, `/terminos`. El `authGuard` redirige a `/consent` en mf_auth si faltan aceptaciones vigentes.
+**Rutas:** `/dashboard`, `/audit`, `/audit/requests/:requestNumber`, `/system-settings`, `/evaluations (iframe)`, `/login`, `/privacidad`, `/terminos`.
+
+**Documentos legales.** `/privacidad` y `/terminos` comparten `LegalDocumentPageComponent` (Markdown con `marked`). Sin sesión: chrome público (fondo y logo como el login, botón «Iniciar sesión»). Con sesión: mismas rutas dentro de `ShellLayoutComponent` (barra superior + grupo «Legal» al final del menú). Las rutas siguen siendo alcanzables sin exigir login (`guestOnlyMatch` para el chrome público; el layout autenticado las reutiliza embebidas). El `authGuard` redirige a `/consent` en mf_auth si faltan aceptaciones vigentes.
 
 ### I.3 Secuencia — Montar iframe y retransmitir sesión
 
@@ -272,4 +276,4 @@ sequenceDiagram
 | `AuditRequestsPageComponent` |
 | `SystemSettingsPageComponent` |
 | `EvaluationsRedirectComponent` |
-| `PrivacyPageComponent` |
+| `LegalDocumentPageComponent` |

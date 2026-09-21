@@ -24,8 +24,8 @@ Puerto local `:4200` · **18 rutas** · **21 llamadas HTTP distintas** a 6 micro
 | `/audit/requests/:requestNumber` | `AuditRequestDetailPageComponent` | Detalle de solicitud | Sí | Ver auditoría |
 | `/system-settings` | `SystemSettingsPageComponent` | Parámetros del sistema | Sí | Solo AdminSistema |
 | `/login` | `` | — | No | — |
-| `/privacidad` | `PrivacyPageComponent` | — | No | — |
-| `/terminos` | `TermsPageComponent` | — | Sí | — |
+| `/privacidad` | `LegalDocumentPageComponent` | Política de privacidad | No (público) / Sí (en layout) | — |
+| `/terminos` | `LegalDocumentPageComponent` | Términos y condiciones | No (público) / Sí (en layout) | — |
 
 ## Matriz rol × permiso usado en este microfrontend
 

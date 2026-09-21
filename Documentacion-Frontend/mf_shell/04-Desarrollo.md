@@ -159,6 +159,16 @@ Rutas protegidas con `AUDIT_VIEW`:
 | Componente genérico parametrizado por datos de ruta | `FeaturePlaceholderPageComponent` |
 | Lazy loading por ruta (`loadComponent`) | `app.routes.ts` |
 | Degradación controlada ante fallos de API (`safeCount`) | `DashboardStatsService` |
+| `canMatch` para chrome público vs layout autenticado | `guest-only.match.ts` + rutas duales `/privacidad` `/terminos` |
+| Markdown con `marked` + `[innerHTML]` (sin `bypassSecurityTrustHtml`) | `legal-markdown.ts` / `LegalDocumentPageComponent` |
+
+## 10.1 Documentos legales (`/privacidad`, `/terminos`)
+
+- Fuente de verdad: `MSPI_NVA_CO_DOCS/legal/`. En el shell viven copias en `public/legal/`.
+- Sincronización: `npm run sync:legal` (documentado en el README de `mf_shell`).
+- Un solo componente `LegalDocumentPageComponent` sirve ambos documentos (`data.legalDoc`: `privacy` | `terms`).
+- `parseLegalMarkdown` usa la librería `marked` (GFM): une saltos blandos de párrafo, respeta listas/tablas y convierte enlaces relativos `.md` en texto (consulta en el repositorio de documentación).
+- UI: chip de versión leído del Markdown, índice desde H2, ancho de lectura ~720 px, enlaces cruzados y `AppFooterComponent` en modo público.
 
 ## 11. Convenciones de código observadas
 
