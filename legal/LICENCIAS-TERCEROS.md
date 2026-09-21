@@ -33,6 +33,7 @@ confirmar en el repositorio de cada proyecto.
 | zone.js | Detección de cambios | MIT |
 | tslib | Utilidades de TypeScript | 0BSD |
 | qrcode | QR de configuración del segundo factor (`mf_auth`) | MIT |
+| marked | Renderizado Markdown de política y términos (`mf_shell`) | MIT |
 
 ## Infraestructura y herramientas de ejecución
 

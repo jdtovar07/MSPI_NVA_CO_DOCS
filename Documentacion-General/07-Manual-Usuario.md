@@ -29,9 +29,12 @@ aceptación.
 
 ## 2. Navegación
 
-El menú lateral muestra solo las secciones permitidas para tu rol. La campana muestra notificaciones priorizadas
-(Alta, Media, Baja): asignaciones, solicitudes pendientes de decisión y decisiones sobre tus solicitudes. Puedes
-marcarlas como leídas o limpiarlas. El pie de página enlaza la **política de privacidad** y los **términos y condiciones**.
+El menú muestra solo las secciones permitidas para tu rol. Al final hay un grupo **Legal** con **Política de
+privacidad** y **Términos y condiciones** (mismas pantallas que sin sesión, pero dentro del layout de la app). La
+campana muestra notificaciones priorizadas (Alta, Media, Baja): asignaciones, solicitudes pendientes de decisión y
+decisiones sobre tus solicitudes. Puedes marcarlas como leídas o limpiarlas. El pie de página también enlaza la
+política y los términos. Sin haber iniciado sesión puedes abrirlos en `/privacidad` y `/terminos` (fondo y logo
+como la pantalla de acceso, con botón «Iniciar sesión»).
 
 ## 3. Qué puede hacer cada rol
 

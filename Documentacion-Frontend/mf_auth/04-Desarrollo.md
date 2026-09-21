@@ -41,7 +41,7 @@ Todos los casos de uso siguen el mismo patrón: reciben el repositorio abstracto
 
 ## 3. Componentes (páginas)
 
-Las 7 páginas de presentación son **standalone components** con plantilla y estilos en archivos separados (`.html` / `.scss`), salvo `WelcomePageComponent` que usa template y estilos inline por su simplicidad. Todas siguen el mismo patrón interno:
+Las páginas de presentación son **standalone components** con plantilla y estilos en archivos separados (`.html` / `.scss`), salvo `WelcomePageComponent` que usa template y estilos inline por su simplicidad. Todas siguen el mismo patrón interno:
 
 1. Inyección de casos de uso / servicios de dominio por constructor.
 2. Estado de UI en `signal()`.
@@ -58,6 +58,15 @@ if (!result.ok) {
   return;
 }
 ```
+
+### 3.1 Pantalla `/consent`
+
+`ConsentPageComponent` comparte el estilo visual de `setup-2fa` (clases `setup-shell` / `setup-card`, logo AuditCyber). Tras 2FA y cambio de contraseña, si el backend indica aceptación pendiente:
+
+1. Carga versiones vigentes con `getConsentStatus()`.
+2. Muestra aviso breve y enlaces «Leer la Política…» / «Leer los Términos…» hacia `getAppConfig().shellUrl` + `/privacidad` o `/terminos` (pestaña nueva).
+3. Exige dos casillas; «Continuar» permanece deshabilitado hasta marcar ambas.
+4. Persiste con `acceptConsent` y limpia `consentRequired` en la sesión antes de ir al tablero. Si falla el guardado, muestra mensaje de error en la tarjeta.
 
 ## 4. Patrones aplicados
 

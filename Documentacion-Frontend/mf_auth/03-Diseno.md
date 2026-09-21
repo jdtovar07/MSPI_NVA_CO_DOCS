@@ -170,10 +170,12 @@ flowchart LR
   Login -->|OK sin 2FA| Setup2FA["/setup-2fa"]
   Login -->|OK con 2FA| Verify2FA["/verify-2fa"]
   Login -->|REQUIRED_CHANGE_PASSWORD| ChangePwd["/change-password"]
-  Setup2FA -->|verificado, sin cambio pendiente| ShellDash[["4200/dashboard (fuera de mf_auth)"]]
+  Setup2FA -->|verificado, sin cambio pendiente| Consent["/consent"]
   Setup2FA -->|verificado, cambio pendiente| ChangePwd
-  Verify2FA -->|verificado, sin cambio pendiente| ShellDash
+  Verify2FA -->|verificado, sin cambio pendiente| Consent
   Verify2FA -->|verificado, cambio pendiente| ChangePwd
+  ChangePwd -->|aceptación pendiente| Consent
+  Consent -->|aceptado| ShellDash[["4200/dashboard (fuera de mf_auth)"]]
   ChangePwd -->|forzado| Login
   ChangePwd -->|voluntario| Login
   Login -.enlace manual.-> Welcome["/welcome"]
@@ -185,7 +187,7 @@ flowchart LR
   Wildcard["** (cualquier otra)"] -->|redirect| Login
 ```
 
-Nota: `/welcome` no forma parte del flujo automático de login/2FA (el login redirige directamente a `/setup-2fa`, `/verify-2fa`, `/change-password` o al dashboard del shell); es una pantalla de aterrizaje alcanzable manualmente, con enlaces a `/users` y al shell.
+Nota: `/welcome` no forma parte del flujo automático de login/2FA; es aterrizaje manual. Si ya hay aceptación vigente, el flujo salta `/consent` y va al tablero.
 
 ## 5. Integración con `mf_shell`
 
@@ -340,11 +342,14 @@ flowchart LR
     Root --> R1["/setup-2fa"]
     Root --> R2["/verify-2fa"]
     Root --> R3["/change-password"]
-    Root --> R4["/users"]
-    Root --> R5["/users/:id"]
+    Root --> R4["/consent"]
+    Root --> R5["/users"]
+    Root --> R6["/users/:id"]
 ```
 
 **Rutas:** `/login`, `/setup-2fa`, `/verify-2fa`, `/change-password`, `/consent`, `/users`, `/users/:id`.
+
+**Consentimiento.** `/consent` reutiliza el mismo chrome visual que `/setup-2fa` (fondo azul profundo, tarjeta blanca, logo). Título «Antes de continuar», aviso breve, enlaces a `/privacidad` y `/terminos` del shell (`getAppConfig().shellUrl`, pestaña nueva), dos casillas obligatorias y botón «Continuar» deshabilitado hasta marcar ambas.
 
 ### I.3 Secuencia — Login y publicación de sesión al shell
 
