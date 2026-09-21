@@ -13,7 +13,7 @@ Puerto local `:4201` · **9 rutas** · **15 llamadas HTTP distintas** a 2 micros
 | `/setup-2fa` | `Setup2FAPageComponent` | Configurar 2FA | No | — |
 | `/verify-2fa` | `Verify2FAPageComponent` | Verificar código | No | — |
 | `/change-password` | `ChangePasswordPageComponent` | Cambiar contraseña | No | — |
-| `/consent` | `ConsentPageComponent` | Aviso de privacidad | No | — |
+| `/consent` | `ConsentPageComponent` | Antes de continuar | No | — |
 | `/users` | `UserListPageComponent` | Usuarios | Sí | Gestión de usuarios |
 | `/users/new` | `UserFormPageComponent` | — | Sí | Gestión de usuarios |
 | `/users/:id` | `UserFormPageComponent` | — | Sí | Gestión de usuarios |
