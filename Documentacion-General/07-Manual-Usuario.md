@@ -26,6 +26,7 @@ aceptación.
 - Si pierdes el acceso a tu aplicación autenticadora o a tu contraseña, pide al administrador un
   **reenvío de contraseña**: al aprobarse recibes una contraseña temporal nueva y debes configurar el 2FA otra vez.
 - La sesión vence por inactividad; el sistema avisa antes de cerrarla.
+- Si se pierde la conexión a internet aparece una banda amarilla «Sin conexión a internet» en la parte superior; al recuperar la red desaparece sola. Si un servicio no responde, verás una tarjeta con el logo AuditCyber, el título «No pudimos conectar con el servidor» y el botón **Reintentar** (nunca mensajes técnicos como «Failed to fetch»).
 
 ## 2. Navegación
 

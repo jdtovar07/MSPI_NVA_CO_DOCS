@@ -42,7 +42,7 @@
 | `CreateOrganizationUseCase` | application | Alta de organización |
 | `UpdateOrganizationUseCase` | application | Edición de organización |
 | `GetMyOrganizationUseCase` | application | Organización asociada a la sesión del rol `Lector` |
-| `apiInterceptor` | infrastructure | Interceptor funcional: autenticación saliente, normalización de respuesta, manejo de 401 |
+| `apiInterceptor` | infrastructure | Interceptor funcional: autenticación saliente, normalización de respuesta, manejo de 401; status 0/502–504 → `ConnectionStateService` |
 
 Todos los casos de uso siguen el mismo patrón de una sola responsabilidad: reciben `OrganizationRepository` por inyección de constructor y exponen un único método `execute(...)`, delegando completamente en la interfaz de dominio sin conocer si la implementación activa es mock o HTTP real. `GetOrganizationsPageUseCase` es el único que **transforma** ligeramente la respuesta del repositorio, devolviendo solo `{ content, totalElements }` en vez del `PageResponse<Organization>` completo.
 
@@ -85,7 +85,7 @@ try {
 
 - **Repository Pattern / Ports & Adapters**: `OrganizationRepository` y `LocationRepository` son puertos abstractos, cada uno con dos adaptadores (`Api*Repository` / `Mock*Repository`).
 - **Strategy vía DI**: la elección de adaptador (mock/API) se centraliza en `app.config.ts`, no dispersa en los componentes.
-- **Interceptor / Middleware HTTP**: `apiInterceptor` centraliza autenticación saliente y manejo de errores entrantes.
+- **Interceptor / Middleware HTTP**: `apiInterceptor` centraliza autenticación saliente y manejo de errores entrantes. Fallas de conexión muestran `ConnectionStateComponent` (mismo diseño y textos que en el shell); errores de negocio conservan el mensaje del backend.
 - **Adapter de formato de API + vocabulario**: además de traducir la forma del DTO (`toOrganization()` en `api-organization.repository.ts`, que mapea `department` → `state`), `organization-api.mapper.ts` traduce el **vocabulario** del tipo de organización entre la UI en español y el contrato en inglés de `ms_org`.
 - **Result implícito vía `try/catch`**: a diferencia de `mf_auth` (que usa un tipo `Result<T,E>` explícito `{ok, value|error}` en varios flujos), `mf_org` **no define** un tipo `Result` propio dentro de `src/app` — el manejo de fallos se resuelve con `throw`/`try-catch` estándar de TypeScript en los casos de uso y componentes. (El tipo `Result<T,E>` sí existe en `src/common/domain/errors/Result.ts`, pero pertenece al árbol de la plantilla React/Vite no compilado — ver `03-Diseno.md`).
 - **Degradación silenciosa en catálogos de apoyo**: `ApiLocationRepository` retorna `[]` ante cualquier error HTTP en sus tres métodos (`getCountries`, `getStates`, `getCities`), priorizando que el formulario siga siendo usable (aunque sin opciones) frente a interrumpir el flujo con un error.

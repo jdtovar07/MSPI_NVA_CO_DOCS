@@ -242,7 +242,7 @@ sequenceDiagram
 | `WelcomePageComponent` | Página | Landing simple con enlaces |
 | `AuthSessionService` | Servicio (`providedIn: 'root'`) | Estado de sesión reactivo (Angular `signal`), persistencia, notificación al shell |
 | `SessionExpiryService` | Servicio (`providedIn: 'root'`) | Temporizador de aviso de expiración de sesión |
-| `apiInterceptor` | Interceptor funcional (`HttpInterceptorFn`) | Adjunta `Authorization: Bearer`, desenvuelve `{data, meta}`, traduce errores a `ApiError`, limpia sesión en 401 |
+| `apiInterceptor` | Interceptor funcional (`HttpInterceptorFn`) | Adjunta `Authorization: Bearer`, desenvuelve `{data, meta}`, traduce errores a `ApiError`, limpia sesión en 401; status 0/502/503/504 → `ConnectionStateService` (pantalla amable) |
 
 ## 7. Decisiones técnicas observadas
 

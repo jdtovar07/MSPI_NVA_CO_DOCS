@@ -210,7 +210,7 @@ sequenceDiagram
 | `OrganizationFormPageComponent` | Página | Alta/edición de organización, cascada geográfica, validación de formulario |
 | `MyOrganizationPageComponent` | Página | Vista de solo lectura de la organización asociada a la sesión |
 | `AuthSessionService` | Servicio (`providedIn: 'root'`) | Lectura de sesión (token/roles) persistida por `mf_auth`; no emite sesión propia |
-| `apiInterceptor` | Interceptor funcional (`HttpInterceptorFn`) | Adjunta `Authorization: Bearer`, desenvuelve `{data, meta}`, traduce errores a `ApiError`, limpia sesión en 401 |
+| `apiInterceptor` | Interceptor funcional (`HttpInterceptorFn`) | Adjunta `Authorization: Bearer`, desenvuelve `{data, meta}`, traduce errores a `ApiError`, limpia sesión en 401; status 0/502/503/504 → pantalla de conexión amable |
 | `organization-api.mapper.ts` | Funciones puras | Traduce el tipo de organización entre el vocabulario de UI y el contrato de `ms_org` |
 
 ## 7. Decisiones técnicas observadas

@@ -188,7 +188,7 @@ sequenceDiagram
 | `FileUploaderComponent` | Componente reutilizable | Zona de arrastrar-y-soltar / selector de archivo, emite `File` seleccionado |
 | `AuthSessionService` | Servicio (`providedIn: 'root'`) | Estado de sesión reactivo (Angular `signal`), lectura desde `localStorage`/cookie |
 | `FileDownloadService` | Servicio (`providedIn: 'root'`) | Descarga de blobs vía enlace temporal `<a download>` |
-| `apiInterceptor` | Interceptor funcional (`HttpInterceptorFn`) | Adjunta `Authorization: Bearer`, desenvuelve `{data, meta}`, traduce errores a `ApiError`, recarga sesión en 401 |
+| `apiInterceptor` | Interceptor funcional (`HttpInterceptorFn`) | Adjunta `Authorization: Bearer`, desenvuelve `{data, meta}`, traduce errores a `ApiError`, recarga sesión en 401; status 0/502–504 → pantalla de conexión |
 | `installAuthParentBridge` | Función de infraestructura | Escucha y solicita la sesión JWT al shell vía `postMessage` |
 | `openShellRoute` | Función de infraestructura | Navega o notifica al shell la ruta y evaluación activa |
 

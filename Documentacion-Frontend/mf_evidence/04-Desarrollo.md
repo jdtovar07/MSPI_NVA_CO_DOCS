@@ -38,7 +38,7 @@
 | `GetLiftingDeliveriesUseCase`, `PatchLiftingDeliveryUseCase` | application | Lectura/actualización de las 43 entregas de levantamiento |
 | `UploadEvidenceFileUseCase`, `ListEvidenceFilesUseCase` | application | Subida y listado de archivos, parametrizados por `relationType`/`relationId`/`contextField` |
 | `FileDownloadService` | application | Descarga de archivos vía blob y enlace temporal |
-| `apiInterceptor` | infrastructure | Interceptor funcional: autenticación saliente, normalización de respuesta, manejo de 401 |
+| `apiInterceptor` | infrastructure | Interceptor funcional: autenticación saliente, normalización de respuesta, manejo de 401; status 0/502–504 → `ConnectionStateService` |
 | `installAuthParentBridge` | infrastructure | Recepción de sesión JWT desde el shell vía `postMessage` |
 | `openShellRoute` | infrastructure | Envío de navegación/evaluación activa hacia el shell |
 
@@ -71,7 +71,7 @@ async updateDeliveredName(item: LiftingDelivery, name: string): Promise<void> {
 
 - **Repository Pattern / Ports & Adapters**: un único puerto abstracto (`EvidenceRepository`) con dos adaptadores, `ApiEvidenceRepository` y `MockEvidenceRepository`.
 - **Strategy vía DI**: la elección de adaptador (mock/API) es una decisión de configuración centralizada en `app.config.ts`.
-- **Interceptor / Middleware HTTP**: `apiInterceptor` centraliza autenticación saliente, desenvolvimiento del sobre `{data, meta}` y normalización de errores a `ApiError`, evitando repetir esta lógica en cada método de `ApiEvidenceRepository`.
+- **Interceptor / Middleware HTTP**: `apiInterceptor` centraliza autenticación saliente, desenvolvimiento del sobre `{data, meta}` y normalización de errores a `ApiError`, evitando repetir esta lógica en cada método de `ApiEvidenceRepository`. Status 0/502/503/504 activan la pantalla de conexión amable (`ConnectionStateComponent`); 400/403/404/409 siguen con el mensaje de negocio.
 - **Adapter de manejo de error uniforme**: la función `toApiError()` (privada, en `api-evidence.repository.ts`) se reutiliza con `.catch(toApiError)` encadenado en los 10 métodos HTTP del repositorio, evitando duplicar el bloque `try/catch` en cada uno.
 - **Command/Query separados por caso de uso**: cada operación de lectura (`Get*UseCase`) y de escritura (`Patch*UseCase`/`Upload*UseCase`) es una clase independiente de responsabilidad única, en vez de un único servicio con múltiples métodos.
 - **Emisión de eventos desacoplada en componentes reutilizables**: `FileUploaderComponent` no conoce el destino del archivo (contexto o levantamiento); solo emite `@Output() fileSelected = new EventEmitter<File>()`, delegando la decisión de qué caso de uso invocar al componente padre — patrón de "componente tonto" (*dumb component*) clásico.

@@ -187,7 +187,7 @@ Decisiones de diseño verificadas en código:
 
 ## 9. Manejo de errores y concurrencia
 
-`ApiError` (`infrastructure/api/api-response.model.ts`) normaliza los errores HTTP capturados por `apiInterceptor`. El caso particular de **conflicto de versión (HTTP 409)** tiene un flujo de diseño explícito:
+`ApiError` (`infrastructure/api/api-response.model.ts`) normaliza los errores HTTP capturados por `apiInterceptor`. Ante status 0 / 502 / 503 / 504 el interceptor activa `ConnectionStateService` y muestra `ConnectionStateComponent` (mensaje amable + «Reintentar»), sin exponer «Failed to fetch». El caso particular de **conflicto de versión (HTTP 409)** tiene un flujo de diseño explícito:
 
 ```mermaid
 flowchart TD

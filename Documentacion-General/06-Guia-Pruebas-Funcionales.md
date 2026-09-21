@@ -113,6 +113,14 @@ evaluación o un catálogo.
 Cualquier error de validación o de servidor debe mostrarse como un mensaje específico en español dentro de la
 interfaz, sin identificadores internos (UUID, nombres de clases o códigos de enumeración).
 
+## 10. Conexión y disponibilidad
+
+| ID | Rol | Pasos | Resultado esperado |
+|---|---|---|---|
+| CP-34 | Cualquiera | Abrir `/privacidad` o `/terminos` (con y sin sesión). Pulsar cada ítem del índice de secciones en escritorio y a 375 px | El contenido salta a la sección; no hay bloque duplicado «Política · Términos» al final del artículo; el pie global sí enlaza ambos |
+| CP-35 | Cualquiera | Desconectar la red del navegador (o modo avión) con la app abierta | Banda «Sin conexión a internet»; al reconectar desaparece. Si una carga falla, pantalla «No pudimos conectar…» con **Reintentar** |
+| CP-36 | AdminSistema | Con sesión activa, `docker stop ms_assessment` y abrir Evaluaciones | El módulo muestra la pantalla de conexión (logo, título amable, Reintentar), no el texto «Failed to fetch». Tras `docker start ms_assessment`, Reintentar recupera |
+
 ## Registro de ejecución
 
 | ID | Fecha de ejecución | Ejecutado por | Resultado (OK / Falla) | Observación |
