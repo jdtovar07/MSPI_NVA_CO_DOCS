@@ -55,7 +55,8 @@ Función de interceptor (`HttpInterceptorFn`, API funcional de Angular 19) que:
 
 1. Inyecta `AuthSessionService` y adjunta `Authorization: Bearer {token}` si existe token.
 2. Desenvuelve automáticamente respuestas con forma `{ data, meta }` (patrón de paginación/envelope de las APIs backend MSPI), exponiendo solo `data` al código consumidor — excepto si el cuerpo es un `Blob` (descargas de archivo).
-3. Ante un `401`, limpia la sesión (`authSession.clearSession()`), redirige a `/login` y relanza `ApiError` con mensaje «Tu sesión expiró, vuelve a iniciar sesión» (no el texto crudo de Angular).
+3. Ante fallas de conexión (`status` 0, 502, 503, 504) activa `ConnectionStateService` y relanza `ApiError` con mensaje amable (nunca «Failed to fetch» ni códigos técnicos). Los errores de negocio (400/403/404/409) conservan el mensaje del backend en español.
+4. Ante un `401`, limpia la sesión (`authSession.clearSession()`), redirige a `/login` y relanza `ApiError` con mensaje «Tu sesión expiró, vuelve a iniciar sesión» (no el texto crudo de Angular).
 
 ### 3.4 Puente de sesión entre iframes (`shell-iframe-bridge.ts`)
 
@@ -168,7 +169,8 @@ Rutas protegidas con `AUDIT_VIEW`:
 - Sincronización: `npm run sync:legal` (documentado en el README de `mf_shell`).
 - Un solo componente `LegalDocumentPageComponent` sirve ambos documentos (`data.legalDoc`: `privacy` | `terms`).
 - `parseLegalMarkdown` usa la librería `marked` (GFM): une saltos blandos de párrafo, respeta listas/tablas y convierte enlaces relativos `.md` en texto (consulta en el repositorio de documentación).
-- UI: chip de versión leído del Markdown, índice desde H2, ancho de lectura ~720 px, enlaces cruzados y `AppFooterComponent` en modo público.
+- UI: chip de versión leído del Markdown, índice desde H2 (ids asignados en DOM tras sanitizar; scroll suave + `IntersectionObserver` + hash `#sección`), ancho de lectura ~720 px y `AppFooterComponent` en modo público (sin bloque de enlaces duplicado al final del artículo).
+- Falla de carga del `.md`: `ConnectionStateComponent` con «Reintentar».
 
 ## 11. Convenciones de código observadas
 

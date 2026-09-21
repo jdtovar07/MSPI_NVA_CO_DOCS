@@ -245,7 +245,9 @@ flowchart LR
 
 **Rutas:** `/dashboard`, `/audit`, `/audit/requests/:requestNumber`, `/system-settings`, `/evaluations (iframe)`, `/login`, `/privacidad`, `/terminos`.
 
-**Documentos legales.** `/privacidad` y `/terminos` comparten `LegalDocumentPageComponent` (Markdown con `marked`). Sin sesión: chrome público (fondo y logo como el login, botón «Iniciar sesión»). Con sesión: mismas rutas dentro de `ShellLayoutComponent` (barra superior + grupo «Legal» al final del menú). Las rutas siguen siendo alcanzables sin exigir login (`guestOnlyMatch` para el chrome público; el layout autenticado las reutiliza embebidas). El `authGuard` redirige a `/consent` en mf_auth si faltan aceptaciones vigentes.
+**Documentos legales.** `/privacidad` y `/terminos` comparten `LegalDocumentPageComponent` (Markdown con `marked`). Sin sesión: chrome público (fondo y logo como el login, botón «Iniciar sesión»). Con sesión: mismas rutas dentro de `ShellLayoutComponent` (barra superior + grupo «Legal» al final del menú). Índice de secciones (H2): los `id` se asignan en el DOM tras pintar `[innerHTML]` (el sanitizador de Angular elimina `id` del HTML inyectado); el scroll usa `scrollIntoView` sobre el contenedor `main` cuando hay sesión. El pie global `app-footer` enlaza política y términos; no hay bloque de enlaces duplicado al final del artículo. Si falla la carga del `.md`, se muestra `ConnectionStateComponent` con «Reintentar».
+
+**Estado de conexión.** `ConnectionStateComponent` + `ConnectionStateService`: el `apiInterceptor` convierte status `0` / `502` / `503` / `504` en pantalla amable (sin «Failed to fetch»). `OfflineBannerComponent` muestra una banda «Sin conexión a internet» mientras `navigator.onLine` es falso.
 
 ### I.3 Secuencia — Montar iframe y retransmitir sesión
 
@@ -277,3 +279,5 @@ sequenceDiagram
 | `SystemSettingsPageComponent` |
 | `EvaluationsRedirectComponent` |
 | `LegalDocumentPageComponent` |
+| `ConnectionStateComponent` |
+| `OfflineBannerComponent` |
