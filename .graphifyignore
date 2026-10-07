@@ -1,0 +1,11 @@
+**/node_modules/
+**/dist/
+**/build/
+**/target/
+**/.gradle/
+**/.angular/
+**/.pnpm-store/
+**/coverage/
+**/.DS_Store
+**/*.zip
+**/graphify-out/
