@@ -22,9 +22,9 @@ MSPI es un sistema de gestión de seguridad de la información construido como u
 - **Ciclo de vida de la evaluación** (Módulo M1): creación en estado `BORRADOR` con materialización de snapshots desde `ms_catalog`, edición de metadatos, asignación de tipo de orden territorial (`entity_order_type_code`), publicación (`BORRADOR` → `CERRADA`) y clonación.
 - **Áreas y temas organizacionales** (M2): áreas evaluativas (snapshot de presets de `ms_catalog`) y temas/procesos con responsable (steward) por defecto.
 - **Controles administrativos y técnicos** (M3/M4): snapshot del árbol de controles del Anexo A, calificación (`score_status`, `score_value`), evidencia textual, brecha, recomendación, estado del control y resolución de responsable (steward) por control (heredado del área o `CUSTOM`).
-- **Ciclo PHVA** (M5): requisitos Planear-Hacer-Verificar-Actuar, con calificación manual o heredada de un control/rollup.
+- **Ciclo PHVA** (M5): requisitos Planear-Hacer-Verificar-Actuar, con calificación manual o heredada de un control/rollup. Con plantilla **v2** el snapshot trae **7 cláusulas** (`C.4`–`C.10`) y el avance usa pesos/caps **56/16/14/14**.
 - **Madurez MSPI** (M6): requisitos de madurez por nivel (1–5), con matriz de cumplimiento, nivel alcanzado y bloqueos hacia el siguiente nivel (CMMI-like).
-- **NIST CSF / Ciber** (M7): filas del marco NIST Cybersecurity Framework mapeadas a funciones y subcategorías, con resumen por función.
+- **NIST CSF / Ciber** (M7): filas del marco NIST Cybersecurity Framework mapeadas a funciones y subcategorías, con resumen por función **dinámico** (deriva las funciones presentes en el snapshot; CSF 2.0 incluye **GV/Gobernar** + 5 restantes = 6 ejes).
 - **Diagnóstico y brechas** (M8): efectividad por dominio ISO, tablero diagnóstico agregado (PHVA + madurez + NIST + auto-percepción) y listado de brechas priorizadas (score < umbral, HU-REP-03).
 - **API interna de reporting** (M9, consumida por `ms_reporting`): bundle de exportación agregado y listado de brechas vía `X-Internal-Api-Key`.
 

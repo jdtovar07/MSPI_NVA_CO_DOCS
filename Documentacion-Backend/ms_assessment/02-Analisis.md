@@ -117,7 +117,7 @@ Algoritmo documentado en el propio código (`ComputeAssessmentRollupUseCase`), d
 
 ### 4.6 Ítems NIST Ciber (HU-CIB-01..03)
 
-`NistCiberScoreResolver` es más simple: solo soporta `MANUAL` o `INHERITED`+`CONTROL_SCORE` (no soporta rollup ni PHVA como madurez/PHVA). El resumen por función (`ComputeNistSummaryUseCase`) compara el promedio contra un objetivo y calcula estado `ALCANZA`/`NO ALCANZA` con brecha (`target - average`, nunca negativa).
+`NistCiberScoreResolver` es más simple: solo soporta `MANUAL` o `INHERITED`+`CONTROL_SCORE` (no soporta rollup ni PHVA como madurez/PHVA). El resumen por función (`ComputeNistSummaryUseCase`) **no fija 5 funciones**: agrupa por `functionCode` del snapshot, ordena por la posición mínima de ítems y toma el `functionName` del catálogo (p. ej. «Gobernar» para GV). Compara el promedio de categorías contra el objetivo (`nist_function_targets`) y calcula estado `ALCANZA`/`NO ALCANZA` con brecha (`target - average`, nunca negativa).
 
 ### 4.7 Brechas priorizadas (HU-REP-03)
 
