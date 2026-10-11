@@ -24,7 +24,7 @@
 |---|---|---|---|
 | 1 | Implementar el módulo de configuración y levantamiento de información (creación de evaluaciones, clasificación por tipo de entidad, registro de contexto organizacional y 43 ítems de evidencia documental). | `ms_evidence`, `mf_evidence` | ✅ Implementado |
 | 2 | Implementar el módulo de asignación de áreas y responsables, vinculando funcionarios a los ocho ejes de seguridad predefinidos. | `ms_assessment`, `mf_assessment` | ✅ Implementado |
-| 3 | Implementar el motor de calificación y cálculo automático de controles administrativos y técnicos del Anexo A de ISO/IEC 27001 (14 dominios, jerarquía de hasta cuatro niveles). | `ms_assessment` | ✅ Implementado |
+| 3 | Implementar el motor de calificación y cálculo automático de controles administrativos y técnicos del Anexo A de ISO/IEC 27001 (jerarquía de hasta cuatro niveles; v1 hasta 14 dominios 2013; v2 temas A.5–A.8 / ~93 controles 2022). | `ms_assessment` | ✅ Implementado |
 | 4 | Implementar el cálculo del avance ponderado del ciclo PHVA (planificación 56 %, implementación 16 %, evaluación de desempeño 14 %, mejora continua 14 %), alineado al Autodiagnóstico MSPI / plantilla `template_version` v2. | `ms_assessment` | ✅ Implementado |
 | 5 | Implementar el algoritmo de determinación del nivel de madurez del SGSI (progresión acumulativa de cinco niveles). | `ms_assessment` | ✅ Implementado |
 | 6 | Implementar el módulo de evaluación frente al marco NIST CSF 2.0 (seis funciones, incluyendo Gobernar / GV). | `ms_assessment`, `mf_assessment` | ✅ Implementado |
