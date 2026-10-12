@@ -139,7 +139,7 @@ Esta capa de mapeo es la responsable de absorber la heterogeneidad de nombres de
 | `AreasPageComponent` | `/evaluations/:id/areas` | Áreas y temas |
 | `StewardshipPageComponent` | `/evaluations/:id/stewardship` | Responsables por control |
 | `ControlsPageComponent` | `/evaluations/:id/controls/admin` y `/controls/tech` | Árbol + calificación, parametrizado por `controlType` |
-| `PhvaPageComponent` | `/evaluations/:id/phva` | Ítems y resumen PHVA |
+| `PhvaPageComponent` | `/evaluations/:id/phva` | Ítems y resumen PHVA; en v2 agrupa sub-numerales bajo su cláusula (`parentCode`/`nodeType`) |
 | `MaturityPageComponent` | `/evaluations/:id/maturity` | Requisitos y matriz de madurez |
 | `NistPageComponent` | `/evaluations/:id/nist` | Ítems NIST, resumen por función, botón Reportes |
 | `EvaluationsHomePageComponent` | (soporte) | Página adicional presente en `presentation/pages/` no listada explícitamente en `app.routes.ts` como ruta propia — se documenta su existencia en el código |

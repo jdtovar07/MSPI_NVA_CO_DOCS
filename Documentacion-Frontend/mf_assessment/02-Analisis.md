@@ -68,7 +68,8 @@ Extraídas del dominio (`assessment.types.ts`) y de los mappers/handlers de apli
 8. **Nivel de madurez alcanzado**: se deriva del campo `nivelAlcanzado` devuelto por el backend (p. ej. `"Nivel 1"`), del cual el frontend extrae el número (`parseInt` sobre dígitos) para uso interno (`currentLevel`); el frontend no calcula el nivel, solo lo interpreta para presentación.
 9. **Bloqueo de nivel de madurez**: el backend puede indicar requisitos bloqueantes para alcanzar el siguiente nivel (`MaturityBlockingInfo.blockingRequirements`), que el frontend lista para orientar al evaluador.
 10. **Avance PHVA capado por componente**: el resumen PHVA expresa el avance de cada componente (`PLAN`, `DO`, `CHECK`, `ACT`) como un valor "capado" (`cappedL`) y compara contra un peso esperado (`expectedWeight`) con posible `breach` (desviación) — cálculo realizado en backend, consumido tal cual por el frontend.
-11. **Sincronización de evaluación activa obligatoria para navegación cruzada**: para que los menús de Evidencias y Reportes del shell operen sobre la evaluación correcta, toda creación/selección de evaluación debe propagar su ID al shell (`syncActiveAssessmentToShell`); si el MF se ejecuta fuera de iframe (`window.parent === window`), la sincronización se limita a `localStorage` local.
+11. **Agrupación PHVA cláusula → sub-numeral (v2)**: `PhvaPageComponent` agrupa ítems con `nodeType === 'CLAUSE'` y anida bajo cada una los `ITEM` cuyo `parentCode` coincide; el mapeo API propaga `parentCode`/`nodeType` desde el snapshot.
+12. **Sincronización de evaluación activa obligatoria para navegación cruzada**: para que los menús de Evidencias y Reportes del shell operen sobre la evaluación correcta, toda creación/selección de evaluación debe propagar su ID al shell (`syncActiveAssessmentToShell`); si el MF se ejecuta fuera de iframe (`window.parent === window`), la sincronización se limita a `localStorage` local.
 
 ## 5. Casos de uso
 
