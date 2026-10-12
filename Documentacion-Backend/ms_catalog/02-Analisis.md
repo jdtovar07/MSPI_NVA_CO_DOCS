@@ -37,7 +37,7 @@ Derivados uno a uno de los 17 métodos de `CatalogApi` y sus casos de uso corres
 | RF-09 | Listar reglas de validación por control hoja (evidencia/brecha/recomendación obligatorias, tipo y umbral de recomendación) | `GetControlRulesUseCase` | `GET /catalog/control-rules` |
 | RF-10 | Obtener niveles y bandas de la escala de evaluación publicada, por `scaleVersionId` o por defecto la de la plantilla activa | `GetScalePublishedUseCase` | `GET /catalog/scales/published` |
 | RF-11 | Listar mapeos control ISO ↔ subcategoría NIST CSF, opcionalmente filtrados por `controlNodeId` | `GetNistMappingsUseCase` | `GET /catalog/nist-mappings` |
-| RF-12 | Listar requisitos del ciclo PHVA (Plan/Do/Check/Act) activos de la plantilla (v1 ≈17 ítems `P.*`/`I.*`/`E.*`/`M.*`; v2 = 7 cláusulas `C.4`–`C.10`) | `GetPhvaItemCatalogUseCase` | `GET /catalog/phva-items` |
+| RF-12 | Listar requisitos del ciclo PHVA (Plan/Do/Check/Act) activos de la plantilla (v1 ≈17 ítems planos `P.*`/`I.*`/`E.*`/`M.*`; v2 = 7 `CLAUSE` `C.4`–`C.10` + 23 `ITEM` sub-numerales con `parent_code`/`node_type`) | `GetPhvaItemCatalogUseCase` | `GET /catalog/phva-items` |
 | RF-13 | Obtener pesos y topes configurados por componente PHVA (JSON en `template_version`, con *fallback* 40/20/20/20) | `GetPhvaTemplateConfigUseCase` | `GET /catalog/phva-config` |
 | RF-14 | Listar ~50 requisitos de madurez (Rn) activos, con sus umbrales por nivel 1–5 | `GetMaturityRequirementCatalogUseCase` | `GET /catalog/maturity-requirements` |
 | RF-15 | Obtener umbrales SUFICIENTE/INTERMEDIO/CRÍTICO por nivel de madurez (JSON en `template_version`, con *fallback* embebido en código) | `GetMaturityTemplateConfigUseCase` | `GET /catalog/maturity-config` |
