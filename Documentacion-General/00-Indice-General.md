@@ -39,6 +39,7 @@ Carpeta `Documentacion-General/` (esta misma carpeta):
 | [`07-Manual-Usuario.md`](07-Manual-Usuario.md) | Qué puede hacer cada rol, en lenguaje de usuario final |
 | [`08-Referencia-API.md`](08-Referencia-API.md) | Índice consolidado de la API de los 6 microservicios (rutas verificadas contra `*Api.java`, 2026-10-07) |
 | [`09-Alineacion-AutodiagnosticoMSPI.md`](09-Alineacion-AutodiagnosticoMSPI.md) | Trazabilidad entre el instrumento oficial `AutodiagnosticoMSPI.xlsx` (ISO 27001:2022 + NIST CSF 2.0) y la plataforma: brechas detectadas, cambios aplicados en la `template_version` v2 (PHVA 56/16/14/14 de 2 niveles, NIST CSF 2.0 con Gobernar, 93 controles Anexo A 2022) y validación (101 pruebas + seed contra PostgreSQL real). Inventario de controles en [`anexo_a_2022_controls.csv`](anexo_a_2022_controls.csv). |
+| [`10-Auditoria-Catalogos.md`](10-Auditoria-Catalogos.md) | Clasificación de los datos de referencia del sistema: qué ya es catálogo en `ms_catalog`, qué está fuera por diseño (roles en Keycloak, estados como enums) y qué debería serlo (geografía, hoy vía API externa Country State City). Incluye nota operativa de la API key de geografía. |
 
 Estos documentos son el **punto de entrada recomendado para el profesor**: en menos de 30 minutos de lectura dan una visión completa de qué se construyó, cómo está arquitecturado y qué dominios de negocio cubre, sin tener que leer los 99 documentos técnicos detallados por componente.
 
