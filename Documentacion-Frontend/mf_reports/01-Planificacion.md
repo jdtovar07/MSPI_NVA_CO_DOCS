@@ -17,26 +17,26 @@ MSPI es una plataforma web compuesta por un **shell** anfitrión (`mf_shell`, pu
 | `mf_org` | 4202 | Organizaciones |
 | `mf_assessment` | 4203 | Evaluaciones |
 | `mf_evidence` | 4204 | Evidencias |
-| **`mf_reports`** | **4205** | **Diagnóstico consolidado y exportación de reportes de cumplimiento** |
+| **`mf_reports`** | **4205** | **Generación y descarga de reportes de cumplimiento (PDF/Excel)** |
 
 Esta relación está documentada en `MSPI_NVA_CO_MR_FRONT/docs/README.md`, índice general del frontend, que enlaza a la documentación propia de cada microfrontend en su carpeta `docs/`.
 
-`mf_reports` es el módulo de **cierre del ciclo de cumplimiento**: consume los resultados de una evaluación ya diligenciada en `mf_assessment` (backend `ms_assessment`, puerto 8084), los presenta como un **tablero de diagnóstico visual** (portada ISO, ciclo PHVA, madurez, NIST CSF, listado de brechas) y permite **generar y descargar** ese diagnóstico como reporte PDF o Excel mediante trabajos asíncronos (*jobs*) creados en el backend `ms_reporting` (puerto 8087).
+`mf_reports` es el módulo de **cierre del ciclo de cumplimiento** orientado a **exportación**: a partir de una evaluación ya diligenciada en `mf_assessment`, permite **generar y descargar** reportes PDF/Excel mediante trabajos asíncronos (*jobs*) en `ms_reporting` (puerto 8087). El **tablero de diagnóstico consolidado** (ISO, PHVA, madurez, NIST, brechas) ya no se duplica aquí: vive solo en el hub de la evaluación (`mf_assessment` · `evaluation-dashboard-page` → `GET /assessments/{id}/diagnostic/dashboard` de `ms_assessment`, puerto 8084).
 
 ## 2. Alcance del microfrontend
 
 ### 2.1 Incluido en el alcance de `mf_reports`
 
-- Pantalla de **inicio** (`/reports`): detecta si hay una evaluación activa (`active_assessment_id` en `localStorage`) y ofrece abrir su diagnóstico, o un modo demo (`mock-assessment-1`) si no la hay.
-- Pantalla de **diagnóstico consolidado** (`/assessments/:id/dashboard`): agrega y visualiza portada ISO (dominios A.5–A.18), ciclo PHVA (Planificar-Hacer-Verificar-Actuar), matriz de madurez, funciones NIST CSF y listado de brechas (*gaps*) por debajo de un umbral.
-- Pantalla de **exportación de reportes** (`/assessments/:id/export`): permite solicitar la generación asíncrona de 4 tipos de reporte (PDF diagnóstico, Excel instrumento, PDF de brechas, Excel de brechas), hacer *polling* del estado del *job* y descargar el archivo binario resultante al completarse.
+- Pantalla de **inicio** (`/reports`): lista evaluaciones reales y/o usa la evaluación activa (`active_assessment_id`) para abrir la exportación.
+- Pantalla de **exportación de reportes** (`/assessments/:id/export`): solicita la generación asíncrona de reportes (PDF diagnóstico, Excel instrumento, PDF/Excel de brechas), hace *polling* del *job* y descarga el archivo; enlace de vuelta al tablero de diagnóstico de la evaluación.
+- La ruta histórica `/assessments/:id/dashboard` **redirige** a `/export` (ya no renderiza un segundo tablero de diagnóstico).
 - Tipos de reporte soportados: `FULL_DIAGNOSTIC_PDF`, `EXCEL_INSTRUMENT_EXPORT`, `GAP_LIST_PDF`, `GAP_LIST_XLSX`, y los comparativos `COMPARATIVE_DIAGNOSTIC_PDF` / `COMPARATIVE_DIAGNOSTIC_XLSX` (soportados a nivel de dominio/infraestructura, sin pantalla propia — ver `03-Diseno.md`).
 - Sincronización de sesión de autenticación recibida desde el shell vía `postMessage` (`installAuthParentBridge`).
-- Modo **mock** (sin backend, con simulación de progreso de *job* por `setTimeout`) y modo **API real**, seleccionables por configuración de build de Angular.
+- Consumo **solo API real** (sin mocks).
 
 ### 2.2 Fuera del alcance de `mf_reports`
 
-- El **diligenciamiento de la evaluación** (preguntas, evidencias, puntajes por control) — responsabilidad de `mf_assessment`; `mf_reports` únicamente **lee** los resultados ya calculados vía `GET /assessments/{id}/diagnostic/dashboard` y `GET /assessments/{id}/gaps` de `ms_assessment`.
+- El **diligenciamiento de la evaluación** y el **tablero de diagnóstico consolidado** — responsabilidad de `mf_assessment` (datos vía `ms_assessment`).
 - La **generación del archivo binario** (renderizado del PDF/Excel) — ocurre en el backend `ms_reporting`; el microfrontend solo crea el *job*, hace *polling* de su estado y descarga el resultado.
 - El **archivado de evidencias** — el campo `outputFileId` del *job* indica que `ms_reporting` archiva una copia en `ms_evidence` de forma servidor-a-servidor; esto es puramente informativo para el usuario del microfrontend, que no lo usa para descargar.
 - La **autenticación** propiamente dicha (login, 2FA, emisión de token) — responsabilidad de `mf_auth`; `mf_reports` solo consume la sesión ya emitida.

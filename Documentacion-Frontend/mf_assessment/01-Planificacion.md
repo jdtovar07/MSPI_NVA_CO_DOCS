@@ -17,11 +17,11 @@ MSPI es una plataforma web compuesta por un **shell** anfitrión (`mf_shell`, pu
 | `mf_org` | 4202 | Organizaciones |
 | **`mf_assessment`** | **4203** | **Instrumento de evaluación de madurez ISO 27001 (wizard completo)** |
 | `mf_evidence` | 4204 | Evidencias documentales |
-| `mf_reports` | 4205 | Reportes / diagnóstico |
+| `mf_reports` | 4205 | Reportes (generación/descarga PDF·Excel) |
 
 Esta relación está documentada en `MSPI_NVA_CO_MR_FRONT/docs/README.md`, índice general del frontend que enlaza a la carpeta `docs/` de cada microfrontend.
 
-`mf_assessment` es el **núcleo funcional del instrumento MSPI**: implementa el diligenciamiento completo de una evaluación de madurez en seguridad de la información, desde la configuración inicial (organización, tipo de entidad, áreas) hasta la calificación de controles ISO 27001 (administrativos y técnicos), el módulo PHVA (Planificar–Hacer–Verificar–Actuar), el cálculo de nivel de madurez y el mapeo a funciones del NIST Cybersecurity Framework (NIST CSF). Es el microfrontend que produce los datos que luego consumen `mf_evidence` (evidencias) y `mf_reports` (reportes/diagnóstico).
+`mf_assessment` es el **núcleo funcional del instrumento MSPI**: implementa el diligenciamiento completo de una evaluación de madurez en seguridad de la información, desde la configuración inicial (organización, tipo de entidad, áreas) hasta la calificación de controles ISO 27001 (administrativos y técnicos), el módulo PHVA (Planificar–Hacer–Verificar–Actuar), el cálculo de nivel de madurez, el mapeo a funciones del NIST Cybersecurity Framework (NIST CSF) y el **tablero de diagnóstico consolidado único** del producto. Es el microfrontend que produce los datos que luego consumen `mf_evidence` (evidencias) y `mf_reports` (solo exportación de reportes).
 
 ## 2. Alcance del microfrontend
 

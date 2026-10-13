@@ -91,8 +91,8 @@ src/app/
 └── presentation/
     └── pages/
         ├── reports-home-page.component.ts        # /reports
-        ├── diagnostic-dashboard-page.component.ts # /assessments/:id/dashboard
-        └── reports-export-page.component.ts       # /assessments/:id/export
+        ├── diagnostic-dashboard-page.component.ts # /assessments/:id/dashboard → redirect a /export
+        └── reports-export-page.component.ts       # /assessments/:id/export (única pantalla de reportes)
 ```
 
 Un total de **17 archivos TypeScript** conforman el código fuente de la aplicación (excluyendo `main.ts` y `environments/`), todos dentro de `tsconfig.app.json` (`include: ["src/main.ts", "src/app/**/*.ts", "src/environments/**/*.ts"]`). A diferencia de otros microfrontends del ecosistema, **no se encontró código residual de otra plantilla o framework** dentro de `mf_reports`: la estructura es limpia y coherente con Angular 19 standalone.
