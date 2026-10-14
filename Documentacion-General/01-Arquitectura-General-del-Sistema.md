@@ -244,7 +244,7 @@ flowchart TB
 ```
 
 **Notas de despliegue verificadas:**
-- Backend: imagen build multi-stage `eclipse-temurin:21-jdk-alpine` → `-jre-alpine` (`Documento-Investigacion.md`, tabla marco tecnológico).
+- Backend: imagen build multi-stage `eclipse-temurin:21-jdk-alpine` → `-jre-alpine` (excepción: `ms_reporting` → `-jre-jammy` + LibreOffice; `Documento-Investigacion.md`, tabla marco tecnológico).
 - Frontend: `Node 22-alpine` (build) + `Nginx 1.27-alpine` (runtime) — cada MF corre en su propio contenedor Nginx en el puerto interno 80, mapeado a 420X en el host.
 - Todos los contenedores comparten la red externa `mspi-net`, creada manualmente antes de levantar los *compose stacks* (`docker network create mspi-net`).
 - Persistencia por volúmenes nombrados: `mspi_evidence_data` (archivos de evidencia), `mspi_report_outputs` (PDF/Excel generados), `mspi_pgdata` y `mspi_pgdata_keycloak`.
@@ -373,7 +373,7 @@ Implementado mediante el campo `row_version` en `assessment.assessment` (increme
 
 | Capa | Tecnología | Cómo se integra en la arquitectura |
 |---|---|---|
-| Lenguaje / runtime backend | Java 21 sobre `eclipse-temurin:21-jdk-alpine` (build) → `-jre-alpine` (runtime) | Cada uno de los 6 microservicios activos compila a un JAR ejecutable independiente, empaquetado en su propia imagen Docker |
+| Lenguaje / runtime backend | Java 21 sobre `eclipse-temurin:21-jdk-alpine` (build) → `-jre-alpine` (runtime); **excepción:** `ms_reporting` usa `-jre-jammy` + LibreOffice Calc | Cada uno de los 6 microservicios activos compila a un JAR ejecutable independiente, empaquetado en su propia imagen Docker |
 | Framework backend | Spring Boot 4.0.2 (Spring MVC, servlet) | Expone los `entry-points/api-rest` de cada microservicio; `SecurityConfig` en `applications/app-service` configura el filtro OAuth2 Resource Server |
 | Build multi-módulo | Gradle 9.3.0 | Materializa físicamente las capas hexagonales como subproyectos con dependencias unidireccionales verificables en tiempo de compilación |
 | Seguridad backend | Spring Security + OAuth2 Resource Server (JWT) | Cada microservicio (excepto `ms_iam`, que además hace de cliente OAuth hacia Keycloak) valida el JWT emitido por Keycloak sin estado compartido entre servicios |

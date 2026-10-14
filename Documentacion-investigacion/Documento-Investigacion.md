@@ -133,13 +133,13 @@ Derivados directamente de los ocho módulos funcionales documentados en `Histori
 | Gestión de secretos | Infisical SDK 3.0.2; alterno AWS Secrets Manager Sync (Bancolombia) | `Documentacion-Backend/ms_iam/01-Planificacion.md` |
 | Resiliencia | Resilience4j Spring Boot 3 (2.3.0) | `rest-consumer/build.gradle` |
 | Observabilidad backend | Micrometer + Prometheus registry | `api-rest/build.gradle` |
-| Contenerización backend | `eclipse-temurin:21-jdk-alpine` (build) → `-jre-alpine` (runtime), orquestado con Docker Compose | `deployment/Dockerfile`, `docker-config/` |
+| Contenerización backend | `eclipse-temurin:21-jdk-alpine` (build) → `-jre-alpine` (runtime); `ms_reporting` usa `-jre-jammy` + LibreOffice | `deployment/Dockerfile`, `docker-config/` |
 | Framework frontend | Angular ^19.0.0 (standalone components), TypeScript ~5.6.0 (modo `strict`) | `Documentacion-Frontend/mf_auth/01-Planificacion.md`, `package.json` |
 | Composición de microfrontends | Module Federation de Webpack (planificado en backend/plan v2); `mf_auth` verificado usa composición por navegador (iframe/postMessage/localStorage) en lugar de Module Federation | `PLAN_TRABAJO_MSPI_v2.md` sec. 10 vs. `01-Planificacion.md` de `mf_auth` sec. 5 |
 | UI / diseño | Angular Material + CDK, Tailwind CSS, `@ng-icons/lucide`, `ng2-charts`/Chart.js (gráficos NIST/PHVA) | `PLAN_TRABAJO_MSPI_v2.md` secciones 3.1, 5.1 |
 | Gestión de estado frontend | Angular Signals (`signal`, `computed`) para `AuthStore` y `AssessmentStateService` | `PLAN_TRABAJO_MSPI_v2.md` secciones 2.3, 5.6 |
 | Contenerización frontend | Node 22-alpine (build) + Nginx 1.27-alpine (runtime) | `Documentacion-Frontend/mf_auth/01-Planificacion.md` |
-| Reportería | Jobs asíncronos en `ms_reporting` (PDF/Excel), plantilla oficial MinTIC, generación server-side (mencionado uso de LibreOffice) | `PLAN_TRABAJO_MSPI_v2.md` sección 14 |
+| Reportería | Jobs asíncronos en `ms_reporting` (PDF/Excel), plantilla MinTIC PORTADA, XLSX→PDF con LibreOffice en la imagen Docker Jammy | `ms_reporting/deployment/Dockerfile`, `PLAN_TRABAJO_MSPI_v2.md` §14 |
 | Notificaciones | Brevo (Sendinblue) para correo transaccional | `Documentacion-Backend/ms_iam/01-Planificacion.md` |
 | Calidad / pruebas backend | JUnit 5, Mockito, MockWebServer 5.3.2, ArchUnit 1.4.1, JaCoCo 0.8.14, Pitest (mutation testing), SonarQube | `Documentacion-Backend/ms_iam/01-Planificacion.md` sección 5 |
 | CI/CD backend | Bitbucket Pipelines, despliegue a Railway | `bitbucket-pipelines.yml` (`ms_iam`) |
