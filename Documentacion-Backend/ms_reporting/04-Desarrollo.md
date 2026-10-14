@@ -37,9 +37,11 @@ Es el flujo más elaborado del microservicio y el que justifica la mayoría de l
 ### 2.2 Conversión a PDF (`LibreOfficePdfConverter`)
 
 - Resuelve el ejecutable de LibreOffice en orden de prioridad: variable de entorno `LIBREOFFICE_PATH` → `soffice` (si está en `PATH`) → rutas típicas de instalación en Windows (`C:\Program Files\LibreOffice\program\soffice.exe` y su variante `(x86)`).
-- Ejecuta `soffice --headless --nologo --nofirststartwizard --convert-to pdf --outdir <tmp> <archivo.xlsx>` con `ProcessBuilder`, redirigiendo stderr a stdout, con **timeout de 120 segundos** (`process.waitFor(120, TimeUnit.SECONDS)`); si expira, destruye el proceso forzosamente y lanza `IOException`.
-- Trabaja siempre sobre un **directorio temporal único por conversión** (`Files.createTempDirectory("mspi-portada-pdf-")`), que se limpia en un bloque `finally` (`deleteQuietly`, recorrido de árbol con `SimpleFileVisitor`) — evita acumulación de archivos temporales en el contenedor ante generaciones repetidas.
-- `isEnabled()` lee `REPORT_PDF_CONVERSION_ENABLED` en cada llamada (no cachea el valor), permitiendo en teoría cambiar el comportamiento sin reiniciar si la variable de entorno se modificara dinámicamente (aunque en un contenedor Docker las variables de entorno son fijas por el ciclo de vida del proceso, por lo que en la práctica equivale a una constante de arranque).
+- Ejecuta `soffice --headless --nologo --nofirststartwizard -env:UserInstallation=file://<perfil-tmp> --convert-to pdf --outdir <tmp> <archivo.xlsx>` con `ProcessBuilder`, con **timeout de 120 segundos** (`process.waitFor(120, TimeUnit.SECONDS)`); si expira, destruye el proceso forzosamente y lanza `IOException`.
+- **Evita deadlock de pipes:** `redirectOutput`/`redirectError` → `ProcessBuilder.Redirect.DISCARD`. Un `redirectErrorStream(true)` sin drenar `getInputStream()` antes del `waitFor` llenaba el buffer del pipe (arranque en frío / warnings `javaldx`) y dejaba `soffice` bloqueado hasta timeout.
+- **Perfil aislado por job:** `-env:UserInstallation=file://…` apunta a un directorio temporal único (`mspi-lo-profile-*`), borrado en `finally`, para que jobs concurrentes no compartan el perfil por defecto de LibreOffice.
+- Trabaja sobre un **directorio temporal único por conversión** (`Files.createTempDirectory("mspi-portada-pdf-")`), limpio en `finally` (`deleteQuietly`) — evita acumulación de XLSX/PDF temporales en el contenedor.
+- `isEnabled()` lee `REPORT_PDF_CONVERSION_ENABLED` en cada llamada (no cachea el valor); en Docker las env vars son fijas por ciclo de vida del proceso.
 
 ### 2.3 Reportes de brechas y comparativo (`ReportDocumentService`, OpenPDF)
 

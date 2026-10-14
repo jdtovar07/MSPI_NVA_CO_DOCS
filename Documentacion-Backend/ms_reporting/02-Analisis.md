@@ -53,7 +53,7 @@
 | RNF-02 | Las llamadas salientes a otros microservicios internos deben incluir la cabecera `X-Internal-Api-Key`, compartida y verificada por el microservicio receptor | `RestConsumerConfig`, README |
 | RNF-03 | El servicio no ejecuta DDL/DML automático al arrancar (`spring.sql.init.mode: never`, `hibernate.ddl-auto: none`) | `application.yaml` |
 | RNF-04 | El procesamiento de jobs debe ejecutarse en un pool de hilos acotado y nombrado, distinto del pool HTTP de Tomcat, para no bloquear peticiones entrantes | `ReportJobAsyncConfig` (`reportJobExecutor`, core 2 / max 4 / cola 25) |
-| RNF-05 | La conversión PDF debe tener un tiempo máximo de espera para no colgar indefinidamente el hilo del job | `LibreOfficePdfConverter.CONVERSION_TIMEOUT_SECONDS = 120L` |
+| RNF-05 | La conversión PDF debe tener un tiempo máximo de espera y no bloquearse por pipes sin drenar ni perfil LO compartido | `CONVERSION_TIMEOUT_SECONDS = 120L`; `Redirect.DISCARD` + `-env:UserInstallation` por conversión |
 | RNF-06 | El servicio debe exponer *health checks* HTTP consumibles por Docker/orquestador | `/actuator/health`, `/actuator/info`, `deployment/Dockerfile` `HEALTHCHECK` |
 | RNF-07 | El artefacto de compilación debe generarse sin ejecutar pruebas en la etapa de build de la imagen Docker (`-x test`), delegando la validación al pipeline de CI/pruebas locales | `deployment/Dockerfile` |
 | RNF-08 | Cobertura de pruebas mínima del 80% de instrucciones por módulo (regla configurada, ver `05-Pruebas.md` para el estado real) | `main.gradle`: `jacocoTestCoverageVerification` |
