@@ -40,7 +40,7 @@ Se localizaron **exactamente 2 clases de prueba** en todo el repositorio, ambas 
 - `CreateComparativeReportJobUseCase` (ninguna de las reglas RN-05/RN-06/RN-07/RN-08: mínimo 2 evaluaciones, misma organización, rol PRIMARY/COMPARISON).
 - `ReportOutputEvidenceArchiver` (comportamiento *best effort* ante fallo de `ms_evidence`).
 - `ReportDocumentService` (los 3 métodos que no son el relleno de plantilla: `buildGapListPdf`, `buildGapListXlsx`, `buildComparativePdf`).
-- `LibreOfficePdfConverter` (resolución de candidatos de ejecutable, timeout, limpieza de directorio temporal).
+- `LibreOfficePdfConverter` (candidatos de ejecutable, timeout, `Redirect.DISCARD`, perfil `UserInstallation` temporal, limpieza de directorios).
 - `ReportArtifactDescriptor` (nombres/MIME por tipo de reporte).
 - Todo el módulo `infrastructure/entry-points/api-rest` (controladores `ReportJobApi`/`ComparativeReportJobApi`, `GlobalExceptionHandler`, `ReportJobApiMapper`, `JwtSupport`) — sin pruebas de *slice* (`@WebMvcTest`) ni de integración.
 - Todo el módulo `infrastructure/driven-adapters/jpa-repository` (`ReportingJpaAdapter`, mapeo entidad↔dominio) — sin `@DataJpaTest` ni pruebas con `Testcontainers`/H2.

@@ -405,7 +405,7 @@ sequenceDiagram
   R->>A: GET /internal/assessments/{id}/report-export-bundle (X-Internal-Api-Key)
   A-->>R: bundle { assessment, diagnosticDashboard{...} }
   R->>R: MspiPortadaTemplateFiller.fillWorkbook(bundle)\n(rellena hoja PORTADA, elimina hojas 2-9)
-  R->>R: LibreOfficePdfConverter.convertXlsxToPdf\n(soffice --headless --convert-to pdf)
+  R->>R: LibreOfficePdfConverter.convertXlsxToPdf\n(soffice --headless, DISCARD I/O, UserInstallation tmp)
   R->>R: FileSystemReportOutputStorage.save(jobId, pdf)\nprogressPct=90
   R->>E: POST /internal/assessments/{id}/report-outputs (multipart)
   E-->>R: { id: outputFileId } (o error, capturado como best effort)
@@ -422,7 +422,7 @@ sequenceDiagram
 | # | Decisión | Justificación / evidencia |
 |---|---|---|
 | DT-01 | Procesamiento asíncrono con `CompletableFuture.runAsync` + `ThreadPoolTaskExecutor` propio, en lugar de una cola de mensajería externa (Kafka/RabbitMQ) | README explícito: "No aplica (procesamiento en memoria con `CompletableFuture`, sin cola externa)". Reduce infraestructura operativa a costa de perder durabilidad de la tarea si el proceso JVM se reinicia mientras un job está `RUNNING` (quedaría "atascado" en ese estado hasta una intervención manual, ya que no hay reconciliación al arranque) |
-| DT-02 | Generar el PDF de diagnóstico **convirtiendo el Excel ya diligenciado** con LibreOffice, en vez de dibujar el PDF directamente con OpenPDF | Preserva gráficos nativos de Excel (radar ISO, barras PHVA, radar NIST), colores condicionales y logos institucionales; el binario `soffice` va empaquetado en la imagen runtime Jammy (`libreoffice-calc` + fuentes) |
+| DT-02 | Generar el PDF de diagnóstico **convirtiendo el Excel ya diligenciado** con LibreOffice, en vez de dibujar el PDF directamente con OpenPDF | Preserva gráficos nativos de Excel (radar ISO, barras PHVA, radar NIST), colores y logos; `soffice` en imagen Jammy; `ProcessBuilder` con `Redirect.DISCARD` y perfil `UserInstallation` aislado por job (evita deadlock de pipes y contención de perfil) |
 | DT-03 | Ubicar las clases de generación de documentos (`engine/`, con dependencias directas a Apache POI/OpenPDF/`ProcessBuilder`) dentro de `domain/usecase` en lugar de un módulo de infraestructura aparte | Mantiene junta la lógica de "qué se genera" (reglas de mapeo bundle→celda, reglas de qué hoja se conserva) sin fragmentarla en un puerto adicional; compromiso consciente de pureza hexagonal a cambio de cohesión del dominio de reportes |
 | DT-04 | Retener solo la hoja PORTADA del libro de plantilla (`retainOnlyPortadaSheet`) en vez de generar un libro nuevo desde cero | Conserva el 100% del formato, merges de celdas y estilos originales del archivo `.xlsx` de referencia; eliminar hojas es más confiable que recrear el diseño con POI |
 | DT-05 | Caché local en disco (`FileSystemReportOutputStorage`, volumen Docker `mspi_report_outputs`) como primera fuente de descarga, con `ms_evidence` como respaldo | Evita una llamada de red adicional en el camino feliz de descarga inmediata tras generación; degrada con gracia si el archivado remoto falló (RN-12) |
