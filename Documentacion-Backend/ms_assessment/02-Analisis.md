@@ -105,7 +105,7 @@ Algoritmo documentado en el propio código (`ComputeAssessmentRollupUseCase`), d
   - `ANEXO_A_OVERALL` → hereda el promedio global (`overallAverage`) del rollup completo.
 - `ROLLUP` / `node_type=CLAUSE` → la cláusula **no** se califica directo; su score es el promedio *half-up* de los sub-numerales hijos (`parent_code` = código de la cláusula; N/A no cuenta).
 
-`ComputePhvaAdvanceUseCase`: en **v2**, el promedio de cada fase (PLAN/DO/CHECK/ACT) es el promedio equiponderado de las **cláusulas** de esa fase (cada una ya rollupeada); pesos/caps típicos **56/16/14/14**. En **v1**, promedio plano de todos los ítems de la fase (40/20/20/20).
+`ComputePhvaAdvanceUseCase`: en **v2**, el promedio de cada fase (PLAN/DO/CHECK/ACT) es el promedio equiponderado de las **cláusulas** de esa fase (cada una ya rollupeada); pesos/caps típicos **56/16/14/14**. En **v1**, promedio plano de todos los ítems de la fase (40/20/20/20). Además expone `clauses[]` (`clauseCode` C.4–C.10, `score`, `weight` 0.14 / C.8=0.16) para la PORTADA 2022 y el report-export-bundle consumido por `ms_reporting`.
 
 ### 4.5 Requisitos de madurez (HU-MAD-01..05)
 

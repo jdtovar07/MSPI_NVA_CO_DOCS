@@ -24,15 +24,14 @@ Es el flujo más elaborado del microservicio y el que justifica la mayoría de l
 
 ### 2.1 Relleno de plantilla (`MspiPortadaTemplateFiller`)
 
-- Carga `reports/plantilla-referencia-mspi.xlsx` desde el **classpath** del módulo `domain/usecase` (`src/main/resources/reports/plantilla-referencia-mspi.xlsx`), no desde una ruta configurable ni desde la BD, con Apache POI (`XSSFWorkbook`).
-- El mapeo celda↔dato usa **coordenadas fijas (fila/columna 1-based)** codificadas como constantes Java, no un `cell_map_json` dinámico pese a que la tabla `excel_sheet_mapping` del esquema lo contempla:
-  - `DOMAIN_ROWS`: dominios ISO `A.5`..`A.18` mapeados a filas 19–32 (`14 + i` para `i` en `[5,18]`).
-  - `PHVA_ROWS`: `PLAN`→39, `DO`→40, `CHECK`→41, `ACT`→42.
-  - `MATURITY_ROWS`: niveles 1–5 mapeados a filas 57/59/61/63/65.
-  - `NIST_CHART_ROWS` (gráfico radar): `ID`→95, `DE`→96, `RS`→97, `RC`→98, `PR`→99; y `nistTableRow` (tabla de metas) con un mapeo distinto por función: `DE`→72, `ID`→73, `PR`→74, `RC`→75, `RS`→76.
-- Normaliza fracciones PHVA a rango `[0,1]` (`setFraction`, RN-13 en `02-Analisis.md`) y bandas/categorías a mayúsculas (`normalizeBandLabel`, `normalizeCategoria` — esta última además reemplaza `Í`→`I`, cuidando compatibilidad de fuente/estilo de la celda de la plantilla).
-- Al escribir en una celda nueva (`cell(...)`), copia el estilo de la celda vecina a la izquierda (`neighbor.getCellStyle()`) para no perder el formato condicional/color de la plantilla en celdas que originalmente estaban vacías.
-- **Elimina todas las hojas excepto PORTADA** (`retainOnlyPortadaSheet`, recorrido en orden descendente de índice para no invalidar índices al remover) — es la operación que garantiza el requerimiento RN-04.
+- Carga `reports/plantilla-portada-2022.xlsx` desde el **classpath** del módulo `domain/usecase` (`src/main/resources/reports/plantilla-portada-2022.xlsx`), no desde BD, con Apache POI (`XSSFWorkbook`). La plantilla trae **solo** la hoja `PORTADA` (ISO 27001:2022).
+- El mapeo celda↔dato usa **coordenadas fijas (fila/columna 1-based)**:
+  - **Header** E10–E13: organización, fecha, contacto, evaluador.
+  - **Dominios** A.5–A.8 → filas 19–22 (cols G/H/I = score / 100 / banda); promedio fila 23.
+  - **PHVA por cláusula** C.4–C.10 → filas 30–36 col F = `(score/100)*weight` (pesos PORTADA 0.14; C.8=0.16); total fila 37. Datos desde `diagnosticDashboard.phva.clauses[]`.
+  - **NIST CSF 2.0** GV/ID/PR/DE/RS/RC → filas 53–58 cols C/D (score / 100).
+- Sobrescribe celdas recreándolas (placeholders de ejemplo de la plantilla) y conserva estilos vecinos.
+- `retainOnlyPortadaSheet` queda como no-op si la plantilla ya es de una sola hoja (compatibilidad).
 
 ### 2.2 Conversión a PDF (`LibreOfficePdfConverter`)
 

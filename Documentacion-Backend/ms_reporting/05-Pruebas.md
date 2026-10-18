@@ -30,7 +30,7 @@ Se localizaron **exactamente 2 clases de prueba** en todo el repositorio, ambas 
 |---|---|---|
 | `CreateReportJobUseCaseTest` | `createsPendingJob` | Con `ReportingPersistenceGateway` mockeado, al ejecutar un comando válido (`FULL_DIAGNOSTIC_PDF`, `pageFormat=A4`), el job devuelto tiene `status == PENDING` |
 | `CreateReportJobUseCaseTest` | `rejectsInvalidPageFormat` | Con `pageFormat="LEGAL"` (no `A4`/`LETTER`) y `reportType=FULL_DIAGNOSTIC_PDF`, se lanza `BusinessRulesOnFieldsException` |
-| `MspiPortadaTemplateFillerTest` (paquete `engine`) | `fillsPortadaCellsFromDiagnosticDashboard` | Con un *bundle* de ejemplo construido en memoria (organización, dominios ISO, PHVA, madurez, NIST), verifica que `fillWorkbook` produce un libro de **una sola hoja** llamada `PORTADA`, y valida por coordenada exacta de celda: nombre de organización (fila 10, col D), contacto (fila 12, col D), score de dominio A.5 (fila 19, col F/H), fracción PHVA normalizada (fila 39, col E = `0.18`), nivel de madurez (fila 57, cols E/F), score NIST (fila 95, col C) |
+| `MspiPortadaTemplateFillerTest` (paquete `engine`) | `fillsPortada2022CellsFromDiagnosticDashboard` | Bundle en memoria: verifica hoja única `PORTADA`; header E10–E13; dominio A.5 G/H/I fila 19; PHVA F30/F34/F37 desde `clauses[]`; NIST GV fila 53 cols C/D |
 
 **Cobertura funcional real de la suite**: valida la regla de negocio de creación de jobs (RN-01/RN-02 parcial) y la lógica más intrincada del microservicio (el mapeo celda-por-celda de la plantilla PORTADA). **No existen pruebas** para:
 

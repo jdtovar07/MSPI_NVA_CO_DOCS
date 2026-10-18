@@ -137,7 +137,7 @@ ms_reporting/
 │       └── mapper/                ApiResponseMapper.java
 └── docs/
     ├── openapi.yaml
-    └── samples/ (ejemplo-portada-mspi.xlsx, plantilla-referencia-mspi.xlsx)
+    └── samples/ (ejemplos históricos; runtime usa classpath `plantilla-portada-2022.xlsx`)
 ```
 
 Nota: `common` incluye excepciones (`IamServiceException`, `UserAlreadyExistsException`) heredadas de la plantilla base compartida entre microservicios MSPI; no tienen uso funcional dentro de `ms_reporting` (no hay `throw` de esas clases en el código de este microservicio), lo cual es coherente con que `common` es un módulo *helper* replicado desde un esqueleto común.
