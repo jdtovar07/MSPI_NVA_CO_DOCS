@@ -31,8 +31,10 @@ Se localizaron **exactamente 2 clases de prueba** en todo el repositorio, ambas 
 | `CreateReportJobUseCaseTest` | `createsPendingJob` | Con `ReportingPersistenceGateway` mockeado, al ejecutar un comando válido (`FULL_DIAGNOSTIC_PDF`, `pageFormat=A4`), el job devuelto tiene `status == PENDING` |
 | `CreateReportJobUseCaseTest` | `rejectsInvalidPageFormat` | Con `pageFormat="LEGAL"` (no `A4`/`LETTER`) y `reportType=FULL_DIAGNOSTIC_PDF`, se lanza `BusinessRulesOnFieldsException` |
 | `MspiPortadaTemplateFillerTest` (paquete `engine`) | `fillsPortada2022CellsFromDiagnosticDashboard` | Bundle en memoria: verifica hoja única `PORTADA`; header E10–E13; dominio A.5 G/H/I fila 19; PHVA F30/F34/F37 desde `clauses[]`; NIST GV fila 53 cols C/D |
+| `MspiInstrumentTemplateFillerTest` (paquete `engine`) | relleno instrumento 11 hojas | Conserva hojas del libro completo; escribe scores/evidencias controles+PHVA; no inventa datos faltantes |
+| `PdfDraftWatermarkerTest` / protección | watermark / protect | Watermark PDFBox en PDF borrador; Excel protegido con `REPORT_PROTECTION_PASSWORD` |
 
-**Cobertura funcional real de la suite**: valida la regla de negocio de creación de jobs (RN-01/RN-02 parcial) y la lógica más intrincada del microservicio (el mapeo celda-por-celda de la plantilla PORTADA). **No existen pruebas** para:
+**Cobertura funcional real de la suite**: valida creación de jobs (RN-01/RN-02 parcial), mapeo PORTADA, relleno del instrumento completo y watermark/protección. **No existen pruebas** (o cobertura parcial) para:
 
 - `ProcessReportJobUseCase` (orquestación completa del job: transición de estados, manejo de excepciones, llamada a los 3 generadores restantes).
 - `DownloadReportJobUseCase` (ninguno de sus 3 caminos: caché local, respaldo remoto, `ResourceNotFoundException`).
