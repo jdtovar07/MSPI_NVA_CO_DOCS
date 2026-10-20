@@ -15,8 +15,11 @@ src/app/
 ├── domain/              # assessment.types, repositorios abstractos (puertos)
 ├── application/         # casos de uso, assessment-state, catalog-cache
 ├── infrastructure/      # implementaciones API/mock, mappers, interceptores, shell-bridge
+├── shared/              # toast + validation (mspi-* RequiredLabel/FieldError/FormErrorSummary/CompletionStatus)
 └── presentation/        # páginas del wizard, componentes compartidos
 ```
+
+**UX de formularios / guardado:** mismo patrón que `mf_org` — `fieldErrors` + `submitAttempted`, kit `shared/validation/`, toast en guardado de calificación (`control-detail-panel`) y áreas/temas; `ErrorDetail.field` en 400. Temas de área requieren `topic` + `staffName` (funcionario; alias JSON `funcionario` en backend).
 
 Esta organización es idéntica en intención a la de `mf_auth` (mismo patrón replicado en el ecosistema MSPI), pero con un dominio funcional propio: el instrumento de evaluación de madurez.
 
