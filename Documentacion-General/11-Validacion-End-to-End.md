@@ -85,9 +85,13 @@ Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 - [ ] En `EN_REVISION` con rol revisor, guardar Validado/Requiere ajustes persiste vía revisión (toast «Revisión guardada correctamente») y el % Validado sube al marcar Validado.
 - [ ] Tras guardar calificación u revisión con éxito, el modal se cierra; si falla, permanece abierto (toast de error) y solo cierra tras 3 fallos consecutivos en el mismo control.
 
-**A3. Mis evaluaciones asignadas**
+**A3. Mis evaluaciones asignadas / plazos**
 - [ ] Sin `dueDate`, la columna Fecha límite muestra «Sin fecha límite» (no «31/12/1969» ni «Vencida»).
 - [ ] `progress` muestra un % coherente con controles calificados / total (o «—»/0% si aún no hay datos); nunca el texto «null%».
+- [ ] En Configuración → Evaluaciones → Plazos, se pueden guardar días iniciales (1–365, default 30) y días de ampliación (default 15).
+- [ ] Una evaluación nueva tiene `due_date` = creación + días iniciales.
+- [ ] Con evaluación vencida o ≤5 días, el evaluador asignado puede solicitar ampliación (motivo obligatorio); no puede haber 2 PENDING.
+- [ ] AdminSistema/AdminInstrumento o Revisor/EvaluadorRevisor aprueba (suma días a `due_date`) o rechaza (comentario obligatorio).
 
 **B. Organización (bug #1 y #2)**
 - [ ] Crear organización con **correo** → al guardar **aparece un toast de éxito** y **redirige a la lista**.

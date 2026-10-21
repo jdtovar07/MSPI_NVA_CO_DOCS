@@ -115,9 +115,13 @@ Ambas son *factories* de `CanActivateFn` (funciones que devuelven una función g
 
 `DashboardStatsService` no usa un puerto de dominio (no está detrás de una interfaz `GetDashboardStatsPort`); se inyecta y consume directamente como servicio de infraestructura desde el componente de presentación — una excepción al patrón estricto de puertos aplicado al usuario del dashboard.
 
-## 7. Módulos placeholder
+## 7. Parámetros del sistema
 
-`FeaturePlaceholderPageComponent` es un componente genérico y reutilizable, parametrizado vía `ActivatedRoute.snapshot.data` (tipado como `FeaturePlaceholderData`: `title`, `description`, `hint?`, `actionLink?`, `actionLabel?`). Cada ruta placeholder (`/scales`, `/security-baseline`, `/audit`, `/system-health`, `/system-settings`) define su propio contenido informativo directamente en `app.routes.ts`, evitando crear un componente Angular distinto por cada módulo pendiente. Es un patrón de diseño de UI pragmático para comunicar alcance futuro sin duplicar código.
+`SystemSettingsPageComponent` (`/system-settings`) consume `GET/PUT /system/config` de `ms_iam`. En la pestaña **Evaluaciones** incluye la sección **Plazos de evaluación** (`assessmentDueDays` default 30, `assessmentExtensionDays` default 15; rango 1–365).
+
+## 8. Módulos placeholder
+
+`FeaturePlaceholderPageComponent` es un componente genérico y reutilizable, parametrizado vía `ActivatedRoute.snapshot.data` (tipado como `FeaturePlaceholderData`: `title`, `description`, `hint?`, `actionLink?`, `actionLabel?`). Cada ruta placeholder (`/scales`, `/security-baseline`, `/audit`, `/system-health`) define su propio contenido informativo directamente en `app.routes.ts`, evitando crear un componente Angular distinto por cada módulo pendiente. Es un patrón de diseño de UI pragmático para comunicar alcance futuro sin duplicar código.
 
 ## 8. Patrones aplicados (resumen)
 
