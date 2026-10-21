@@ -156,29 +156,15 @@ async submit(): Promise<void> {
 
 Este componente además carga en paralelo dos dependencias antes de habilitar el formulario: el listado de organizaciones (`ListOrganizationsUseCase`) y el catálogo (`CatalogCacheService.ensureLoaded()`, del cual toma `templateVersion.id`), acumulando mensajes de error independientes si alguna de las dos cargas falla.
 
-## 7. Calificación de un control: formulario de detalle
+## 7. Calificación y revisión de un control
 
-`ControlDetailPanelComponent` es el formulario más complejo del microfrontend. Construye el `PatchControlScoreRequest` según si la calificación es un valor numérico o `N/A`:
+`ControlDetailPanelComponent` separa **diligenciamiento** y **revisión**:
 
-```typescript
-save(): void {
-  const rating = this.rating();
-  if (rating === null) {
-    this.error.set('Seleccione una calificación o N/A');
-    return;
-  }
-  const req: PatchControlScoreRequest =
-    rating === 'NA'
-      ? { scoreStatus: 'NA', evidenceText: this.evidenceText, gapText: this.gapText,
-          recommendationText: this.recommendationText, controlStatus: this.controlStatus }
-      : { scoreStatus: 'SCORED', scoreValue: rating, evidenceText: this.evidenceText,
-          gapText: this.gapText, recommendationText: this.recommendationText,
-          controlStatus: this.controlStatus };
-  this.saved.emit(req);
-}
-```
+- **Diligenciamiento** (`!reviewMode`): `controlStatus` solo admite `PENDIENTE` \| `EN_PROGRESO` \| `COMPLETADO`. Guarda vía `PatchControlScoreUseCase` → `PATCH .../controls/{nodeId}` (toast de éxito/error).
+- **Revisión** (`reviewMode`, evaluación `EN_REVISION` + rol Revisor/EvaluadorRevisor): select Validado / Requiere ajustes → `ReviewControlUseCase` → `PATCH .../controls/{nodeId}/review` con `{ reviewStatus: VALIDATED|NEEDS_CHANGES, comment? }`. Evidencia/brecha/recomendación quedan en solo lectura. El estado actual se lee de `reviewStatus` del control.
+- **% Validado** en `ControlsPageComponent`: cuenta controles con `reviewStatus === 'VALIDATED'` sobre el total de hojas (no usa `controlStatus`).
 
-El panel es un componente de presentación puro (no invoca el repositorio directamente): emite `saved` con el request armado y delega en el componente padre (`ControlsPageComponent`) la ejecución de `PatchControlScoreUseCase` y el refresco del árbol. También expone un botón **"Gestionar evidencias en mf_evidence →"** que invoca `openShellRoute('/evidence', assessmentId)`, cruzando hacia otro microfrontend sin salir del shell.
+También expone **"Gestionar evidencias →"** vía `openShellRoute('/evidence', assessmentId)`.
 
 ## 8. Árbol de controles (rollup) recursivo
 

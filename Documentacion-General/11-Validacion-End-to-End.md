@@ -78,6 +78,11 @@ Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 - [ ] Títulos de pestaña usan la marca **AuditCyber** (p. ej. `AuditCyber — Evaluaciones`), no el nombre del microfrontend.
 - [ ] En miembros de evaluación, el selector de usuario se etiqueta **Usuario** (sin `(ms_iam)`).
 - [ ] En el panel de control, la ayuda de evidencias dice que se guardan **de forma segura** (sin nombrar el servicio) y el enlace es **Gestionar evidencias →**.
+- [ ] Toasts/errores de negocio **no** muestran camelCase ni enums crudos (`evidenceText`, `SCORED`, etc.); usan etiquetas en español.
+
+**A2. Revisión de controles**
+- [ ] En diligenciamiento, el select de estado del control solo tiene Pendiente / En progreso / Completado (sin Validado / Requiere ajustes).
+- [ ] En `EN_REVISION` con rol revisor, guardar Validado/Requiere ajustes persiste vía revisión (toast «Revisión guardada correctamente») y el % Validado sube al marcar Validado.
 
 **B. Organización (bug #1 y #2)**
 - [ ] Crear organización con **correo** → al guardar **aparece un toast de éxito** y **redirige a la lista**.
