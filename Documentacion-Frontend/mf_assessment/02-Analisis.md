@@ -133,8 +133,9 @@ sequenceDiagram
 
 1. El usuario abre un nodo hoja en el árbol (`ControlTreeComponent`, evento `nodeSelect` solo en hojas — `isRollupLeaf`).
 2. Se abre el panel lateral (`ControlDetailPanelComponent`) con score, hallazgos, textos y evidencia.
-3. Al guardar, se ejecuta `PATCH /assessments/{id}/controls/{nodeId}` con `PatchControlScoreRequest`.
-4. Si el backend detecta conflicto de versión, se captura `AssessmentConflictError` y se informa al usuario que "otro usuario modificó esta evaluación" y que los datos se recargaron.
+3. Al guardar (diligenciamiento), se ejecuta `PATCH /assessments/{id}/controls/{nodeId}` con `PatchControlScoreRequest` vía `[persistSave]`. En revisión: `PATCH .../controls/{nodeId}/review` vía `[persistReview]`.
+4. Éxito → toast («Calificación…» / «Revisión guardada correctamente») y el panel emite `close` (el padre limpia selección). Error → toast de error; el modal permanece abierto para reintentar; tras 3 fallos consecutivos en el mismo control también cierra.
+5. Si el backend detecta conflicto de versión, se captura `AssessmentConflictError` y se informa al usuario que "otro usuario modificó esta evaluación" y que los datos se recargaron.
 
 ### 6.4 Stewardship personalizado
 
