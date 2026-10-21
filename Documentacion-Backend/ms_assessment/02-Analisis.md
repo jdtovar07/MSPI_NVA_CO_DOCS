@@ -74,7 +74,7 @@ Extraídas de `domain/usecase` y de los comentarios Javadoc que referencian hist
 
 ### 4.2 Calificación de controles (HU-ADM-01)
 
-- `scoreStatus` solo admite `SCORED` o `NA`; si es `NA`, `scoreValue` debe quedar nulo (regla explícita, con mensaje de error dedicado).
+- `scoreStatus` en captura admite `SCORED` o `NA` (el estado inicial del snapshot es `PENDING` sin valor); si es `NA`, `scoreValue` debe quedar nulo (regla explícita, con mensaje de error dedicado).
 - Si `SCORED` y se envía un `scoreValue`, debe pertenecer a la escala publicada por `ms_catalog` (`listPublishedScaleLevels`), típicamente `{0,20,40,60,80,100}` más el nivel `N/A`.
 - Solo los nodos hoja marcados `isScored()=true` en el snapshot admiten calificación (`GetControlDetailUseCase`/`PatchControlScoreUseCase` rechazan nodos de agrupación).
 - Al marcar un control `COMPLETADO`, se activan validaciones condicionadas por `ControlRuleInfo` (reglas del catálogo, indexadas por nodo de catálogo origen):
