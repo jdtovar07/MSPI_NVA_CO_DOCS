@@ -94,6 +94,11 @@ Stack arriba (`http://localhost:4200`), login `admin@mspi.local` / `Admin123!`.
 - [ ] Con evaluación vencida o ≤5 días, el evaluador asignado puede solicitar ampliación (motivo obligatorio); no puede haber 2 PENDING.
 - [ ] AdminSistema/AdminInstrumento o Revisor/EvaluadorRevisor aprueba (suma días a `due_date`) o rechaza (comentario obligatorio).
 
+**A4. Eliminación lógica**
+- [ ] Evaluador asignado puede solicitar eliminación (motivo obligatorio); no hay dos PENDING.
+- [ ] Al aprobar, la evaluación sigue visible con aviso de gracia (`assessmentDeletionGraceDays`) y botón Recuperar.
+- [ ] Tras la gracia, desaparece de listados/my-assigned pero el registro permanece (`deleted_at`); admin ve `/evaluations/deleted`.
+
 **B. Organización (bug #1 y #2)**
 - [ ] Crear organización con **correo** → al guardar **aparece un toast de éxito** y **redirige a la lista**.
 - [ ] En la lista de organizaciones se ve la columna **Correo** con el email guardado.

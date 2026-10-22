@@ -35,6 +35,7 @@
 | Ciclo de vida | `POST/GET /assessments`, `GET/PATCH /assessments/{id}`, `PUT .../entity-order-type`, `POST .../publish`, `POST .../clone` | Ver RBAC por miembro |
 | Workflow | `GET /assessments/my-assigned`, `GET /assessments/workflow-rules`, `POST /assessments/{id}/status`, `POST .../reopen`, `GET .../status-history` | Rol de miembro + estado |
 | Ampliación de plazo | `POST/GET /assessments/{id}/extension-requests`, `POST .../extension-requests/{reqId}/approve\|reject`, `GET /extension-requests?status=PENDING` | Solicitar: Evaluador/EvaluadorRevisor asignado (vencida o ≤5 días). Decidir: AdminSistema/AdminInstrumento o Revisor/EvaluadorRevisor miembro |
+| Eliminación lógica | `POST/GET /assessments/{id}/deletion-requests`, `POST .../approve\|reject\|cancel`, `GET /deletion-requests?status=PENDING`, `GET /assessments/deleted` | Solicitar: Evaluador/EvaluadorRevisor. Decidir: mismos guards que ampliación. Cancelar = recuperar en gracia. Soft delete: `deleted_at`; listados filtran `deleted_at IS NULL`. Sweeper horario |
 | Miembros | `GET/POST /assessments/{id}/members`, `DELETE /assessments/{id}/members/{memberId}` | `AdminSistema` (mutación) |
 | Áreas y responsables | `GET/PUT /assessments/{id}/areas`, `PUT .../areas/{areaId}/topics` | Rol de miembro editor |
 | Controles | `GET /assessments/{id}/controls`, `GET/PATCH .../controls/{nodeId}`, `GET .../scores/rollup` | Rol de miembro editor (`controlStatus`: PENDIENTE\|EN_PROGRESO\|COMPLETADO). `GET` incluye `reviewStatus` (VALIDATED\|NEEDS_CHANGES\|null) |

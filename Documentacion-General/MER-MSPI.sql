@@ -284,8 +284,26 @@ CREATE TABLE "assessment"."assessment" (
   "created_by" uuid NOT NULL,
   "created_at" timestamptz NOT NULL DEFAULT (now()),
   "status_changed_at" timestamptz,
-  "status_changed_by" uuid
+  "status_changed_by" uuid,
+  "deleted_at" timestamptz
 );
+
+-- Solicitudes de eliminación lógica (aprobación + periodo de gracia). DDL canónico completo en MR_BACK MER-MSPI.sql.
+CREATE TABLE "assessment"."assessment_deletion_request" (
+  "id" uuid PRIMARY KEY,
+  "assessment_id" uuid NOT NULL,
+  "requested_by" uuid NOT NULL,
+  "reason" text NOT NULL,
+  "attachment_file_id" uuid,
+  "status" varchar(20) NOT NULL DEFAULT 'PENDING',
+  "scheduled_deletion_at" timestamptz,
+  "decision_by" uuid,
+  "decision_at" timestamptz,
+  "decision_comment" text,
+  "created_at" timestamptz NOT NULL DEFAULT (now())
+);
+
+CREATE INDEX ON "assessment"."assessment_deletion_request" ("assessment_id", "status");
 
 CREATE TABLE "assessment"."assessment_member" (
   "assessment_id" uuid NOT NULL,
